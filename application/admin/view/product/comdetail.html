@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>组合商品详细</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <style>
+		a.back{color:#ff6a08!important}
+		.layui-input-long{width:300px;}
+		.layui-input-sort{width:80px;height:32px;text-align:center;padding-left:0;}
+	</style>
+</head>
+<body>
+
+		<div class="layui-card">
+			<div class="layui-card-header">
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="backToList()">
+				<i class="pear-icon pear-icon-back"></i>
+				返回
+				</button>
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="selectGoods()">
+				<i class="pear-icon pear-icon-file-open"></i>
+				选择添加商品
+				</button>
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="saveCombItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				保存并返回
+				</button>
+			</div>
+		</div>
+
+		<div class="layui-card">
+					<form class="layui-form" action="" onsubmit="return false">
+						<div class="layui-container">  
+						  <div class="layui-row">
+						    <div class="layui-col-md4">
+					    		 <div class="layui-form-item">
+								    <label class="layui-form-label">商品名称</label>
+								    <div class="layui-input-inline">
+								    	<input type="hidden" value="{$model.item_no}" id="hidItemNo"></input>
+								      	<input name="txtItemName" type="text" value="{$model.item_name}" readonly="readonly" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						    <div class="layui-col-md4">
+						    	<div class="layui-form-item">
+								    <label class="layui-form-label">进货价</label>
+								    <div class="layui-input-inline">
+								      <input type="text" name="txtPrice" value="{$model.price}" readonly="readonly" placeholder="" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						    <div class="layui-col-md4">
+						    	<div class="layui-form-item">
+								    <label class="layui-form-label">规格</label>
+								    <div class="layui-input-inline">
+								      <input type="text" name="txtItemSize" value="{$model.item_size}" readonly="readonly" placeholder="" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						  </div>
+						  
+						   <div class="layui-row">
+						    <div class="layui-col-md4">
+					    		 <div class="layui-form-item">
+								    <label class="layui-form-label">商品类型</label>
+								    <div class="layui-input-inline">
+								      <input name="txtItemType" type="text" value="{$model.combine_sta}" readonly="readonly" placeholder="" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						    <div class="layui-col-md4">
+						    	<div class="layui-form-item">
+								    <label class="layui-form-label">零售价</label>
+								    <div class="layui-input-inline">
+								      <input name="txtSalePrice" type="text" value="{$model.sale_price}" readonly="readonly" placeholder="" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						    <div class="layui-col-md4">
+						    	<div class="layui-form-item">
+								    <label class="layui-form-label">单位</label>
+								    <div class="layui-input-inline">
+								      <input name="txtUnitNo" type="text" value="{$model.unit_no}" readonly="readonly" placeholder="" autocomplete="off" class="layui-input">
+								    </div>
+								  </div>
+						    </div>
+						  </div>
+						  
+						</div>
+					</form>
+		</div>
+		  
+ 		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="comblist-table" lay-filter="comblist-table"></table>
+			</div>
+		</div>
+		<script type="text/html" id="comb-bar">
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+			<i	class="layui-icon layui-icon-delete"></i>
+			</button>
+	    </script>     
+<script type="text/html" id="numTpl">
+<input name="item_qty" id="item{{d.item_no}}" value="{{d.item_qty}}" class="layui-input layui-input-sort" onchange="changeNum('{{d.item_no}}')">
+</script>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script src="__STATIC__/js/admin/common.js"></script>
+<script>
+var items_url="{:U('Controls/items')}";
+var item_no="{$model.item_no}";
+var _layerIndex=null;
+var all_item_no=[];
+var rowIndex=0;
+var rowObj=null;
+var jq=null;
+
+//计算
+function changeNum(item_no){
+	var num=jq("#item"+item_no).val();
+	//计算价格
+	window.changeNumTable(num);
+}
+
+layui.use(['form','jquery','table','common'],function(){
+    let form = layui.form;
+    let common = layui.common;
+    let table = layui.table;
+    let $ = layui.jquery;
+    	jq=$;
+    var path="/{$MODULE_NAME}/Product/";
+	var _url="/saveFunc";
+
+
+	let cols = [
+		[
+			{
+				title: '成分货号',
+				field: 'item_no',
+				align: 'center',
+				width: 180
+			},
+			{
+				title: '商品名称',
+				field: 'item_name',
+				align: 'center',
+				width: 180
+			},
+			{
+				title: '自编码',
+				field: 'item_subno',
+				align: 'center'
+			},
+			{
+				title: '单位',
+				field: 'unit_no',
+				align: 'center'
+			},
+			{
+				title: '规格',
+				field: 'item_size',
+				align: 'center'
+			},
+			{
+				title: '成分数量',
+				field: 'item_qty',
+				align: 'center',
+				templet: '#numTpl',
+				width:120
+			},
+			{
+				title: '进货价',
+				field: 'price',
+				align: 'center'
+			},
+			{
+				title: '进价金额',
+				field: 'amount',
+				align: 'center'
+			},
+			{
+				title: '零售价',
+				field: 'sale_price',
+				align: 'center'
+			},
+			{
+				title: '售价金额',
+				field: 'sale_amt',
+				align: 'center'
+			},
+			{
+				title: '操作',
+				toolbar: '#comb-bar',
+				align: 'center',
+				width: 130
+			}
+		]
+	]
+
+	table.render({
+		elem: '#comblist-table',
+		url: path+"getcomb/item_no/"+item_no,
+		page: false,
+		cols: cols,
+		skin: 'line',
+		toolbar: '',
+		defaultToolbar: [],
+		done:function(){
+			rebuildItemNo();
+			editListener();
+		}
+	});
+	
+	//删除按钮工具按钮事件
+	table.on('tool(comblist-table)', function(obj) {
+		var event=obj.event;
+		var index=obj.tr.attr("data-index");
+		var rows=table.getData("comblist-table");
+		if (event === 'remove') {
+			//删除行
+			obj.del();
+			//删除索引
+			rows.splice(index, 1);
+			//重新加载表格
+			table.reload('comblist-table',{
+				url: '',
+				data : rows
+			});
+		}
+		
+		rebuildItemNo();
+		event.stoppropagation();
+	});
+	
+	//返回
+	window.backToList=function(){
+		window.location.href="{:U('Product/comblist')}";
+	}
+	//选择商品窗口
+	window.selectGoods=function(param){
+		_layerIndex=openWin("商品选择",items_url,"1100px","600px");
+	}
+	
+	//商品选择后的回调函数
+	window.callBack=function(data){
+		
+		var new_item_no=data[0]['item_no'];
+		if(item_no==new_item_no){
+			layer.msg("不能选择当前商品作为组合商品");
+			return;
+		}
+	
+		if(all_item_no.indexOf(new_item_no)!=-1){
+			layer.msg("已存在相同的组合商品");
+			return;
+		}
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+		}
+		
+		//临时添加行项目
+		addCombItem(data[0]);
+
+	}
+	
+	//更新数字，更新价格，重构表格
+	window.changeNumTable=function(num){
+		var rows=table.getData("comblist-table");
+		if(rows==null||rows.length<=0){
+			return;
+		}
+
+		var j=rowIndex;
+		var price=rows[j]['price'];
+		var sale_price=rows[j]['sale_price'];
+		var amount=parseFloat(price*num).toFixed(2);
+		var sale_amt=parseFloat(sale_price*num).toFixed(2);
+		
+		rows[j]['item_qty']=num;
+		rows[j]['amount']=amount;
+		rows[j]['sale_amt']=sale_amt;
+		
+		table.reload('comblist-table',{
+			url: '',
+			data : rows
+		});
+	}
+	
+	//重新堆栈数组，保存当前所有的商品编号
+	function rebuildItemNo(){
+		
+		all_item_no=new Array();
+		
+		var rows=table.getData("comblist-table");
+		
+		for(var i in rows){
+			all_item_no.push(rows[i]['item_no']);
+		}
+	}
+
+	//监听单元格编辑
+	function editListener(){
+		
+		//监听行单击事件
+		table.on('row(comblist-table)', function(obj){
+			rowObj=obj;
+			//当前编辑行的序号
+			rowIndex=rowObj.tr.attr("data-index");
+		});  
+	}
+	
+	//临时添加商品组合
+	function addCombItem(data){
+		//获取当前表格的所有数据
+		var rows=table.getData("comblist-table");
+		
+		var array=new Object();
+			array['item_no']=data['item_no'];
+			array['item_name']=data['item_name'];
+			array['item_subno']=data['item_subno'];
+			array['unit_no']=data['unit_no'];
+			array['item_size']=data['item_size'];
+			array['item_qty']=1;
+			array['price']=parseFloat(data['price']).toFixed(2);
+			array['amount']=array['price'];
+			array['sale_price']=parseFloat(data['sale_price']).toFixed(2);
+			array['sale_amt']=array['sale_price'];
+		
+			rows.push(array);
+			//console.log(rows);
+			
+			rebuildItemNo(rows);
+			
+			table.reload('comblist-table',{
+				url: '',
+				data : rows
+			});
+	}
+	
+	//添加商品组合
+	window.saveCombItem=function(){
+		
+		var lindex=layer.msg("请稍后...");
+		var rows=table.getData("comblist-table");
+		
+		var drow=new Object();
+		var ditem=[];
+		for(var i in rows){
+			var dataObj=new Object();
+			dataObj['item_no']=rows[i]['item_no'];
+			dataObj['item_qty']=rows[i]['item_qty'];
+			ditem.push(dataObj);
+		}
+		drow['rows']=ditem;
+		$.ajax({
+	            url:path+"addcomb",
+	            data:{"comb_item_no":item_no,"comb":drow},
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	layer.close(lindex);
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							window.backToList();
+						});
+	                	
+	                    table.reload("comblist-table",{
+								where:{}
+						});
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	            }
+	     })
+	}
+	
+})
+</script>
+<script>
+</script>
+</body>
+</html>

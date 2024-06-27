@@ -1,0 +1,84 @@
+<style type="text/css">
+        .uploader-list {
+            margin-left: -15px;
+        }
+ 
+        .uploader-list .info {
+            position: relative;
+            margin-top: -25px;
+            background-color: black;
+            color: white;
+            filter: alpha(Opacity=80);
+            -moz-opacity: 0.5;
+            opacity: 0.5;
+            width: 100px;
+            height: 25px;
+            text-align: center;
+            display: none;
+        }
+ 
+        .uploader-list .handle {
+            position: relative;
+            background-color: black;
+            color: white;
+            filter: alpha(Opacity=80);
+            -moz-opacity: 0.5;
+            opacity: 0.5;
+            width: 100px;
+            text-align: right;
+            height: 18px;
+            margin-bottom: -18px;
+            display: none;
+            z-index:1000;
+        }
+ 
+        .uploader-list .handle i {
+            margin-right: 5px;
+        }
+ 
+        .uploader-list .handle i:hover {
+            cursor: pointer;
+        }
+ 
+        .uploader-list .file-iteme {
+            margin: 12px 0 0 15px;
+            padding: 1px;
+            float: left;
+        }
+        
+         .uploader-list .default-icon {
+            position: absolute;
+            width: 100px;
+            text-align: center;
+            height: 30px;
+            display:none;
+        }
+        .uploader-list .default-icon i{
+            font-size: 50px;
+            color: #5ff55f;
+        }
+    </style>
+<div class="layui-upload">
+    <button type="button" class="pear-btn pear-btn-primary" id="uploader">多图片上传</button>
+    <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+        预览图：
+        <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list">
+            {volist name="photos" id="vo"}
+            	<div id="" class="file-iteme" data-itemno="{$vo['item_no']}" data-photoid="{$vo['photo_id']}">
+                <div class="handle"><i class="layui-icon layui-icon-delete" data-itemno="{$vo['item_no']}" data-photoid="{$vo['photo_id']}"></i></div>
+                {php}
+                	$style="";
+                	$tag=0;
+                	if($one['img_src']==$vo['photo_url']){
+                		$tag=1;
+                		$style="display:block;";
+                	}
+                {/php}
+                <div class="default-icon" style="{$style}" data="{$tag}"><i class="layui-icon layui-icon-ok" ></i></div>
+                <img style="width: 100px;height: 100px;" src="{$vo['photo_url']}">
+                <div class="info">{$vo['photo_name']}</div>
+                </div>
+            {/volist}              
+        </div>
+    </blockquote>
+</div>

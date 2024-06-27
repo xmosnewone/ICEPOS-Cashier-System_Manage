@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>分店仓库列表</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="__PEAR__/admin/css/other/department.css"/>
+	</head>
+	<body>
+	<form class="layui-form" action="">
+	    <div class="mainBox" id="tabbox">
+        <div class="main-container">
+            <div class="main-container">
+						<div class="layui-form-item">
+							<label class="layui-form-label">开始时间</label>
+							<div class="layui-input-inline">
+								<input type="text" id="start" name="start" value="{$start_date}" placeholder="" class="layui-input"/>
+							</div>
+						</div>
+						
+						<div class="layui-form-item">
+						<label class="layui-form-label">结束时间</label>
+							<div class="layui-input-inline">
+								<input type="text" id="end" name="end" value="{$end_date}" placeholder="" class="layui-input"/>
+							</div>
+						</div>
+						
+						<div class="layui-form-item" style="text-align:center;">
+							<a class="pear-btn pear-btn-md pear-btn-primary" onclick="excuteSum()">
+								<i class="layui-icon layui-icon-set-fill"></i>
+								执行日结
+							</a>
+							
+							<a class="pear-btn pear-btn-md" onclick="cancelSum()">
+								<i class="layui-icon layui-icon-close"></i>
+								关闭窗口
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				
+				//确认返回按钮点击事件
+				window.excuteSum=function(){
+					var strat=$("#start").val();
+					var end=$("#end").val();
+					if(strat==''||end==''){
+						layer.msg("请选择日期");
+						return;
+					}
+					$.ajax({
+						url:"/{$MODULE_NAME}/report/daysum",
+						data:{"start":strat,'end':end},
+						dataType: 'json',
+						type: 'post',
+						success: function(result) {
+							if(result.code){
+								layer.msg(result.msg, {
+									icon: 1,
+									time: 2000
+								}, function() {
+									parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+									parent.window.location.href="/{$MODULE_NAME}/report/daylist";
+								});
+							}else{
+								layer.msg(result.msg,{icon:2,time:2000});
+							}
+						}
+					})
+				}
+				
+				window.cancelSum=function(){
+					parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+				}
+			})
+		</script>
+	</body>
+</html>

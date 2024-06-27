@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑广告</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.all.js"></script>
+<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
+<style>
+.longtxt{width:500px;}
+.imgbox{
+	position: relative;
+	display: inline-block;
+}
+.imgbox .layui-icon-close{
+	position: absolute;
+	top:0;
+	left:0 ;
+	color:#000000;
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+
+                  <div class="layui-form-item ">
+                  	<div class="layui-col-md6">
+					    <label class="layui-form-label">所属广告位</label>
+					    <div class="layui-input-inline">
+					      <select name="sltSpace">
+									{volist name="space" id="vo"}
+									<option {if condition="$vo['ad_space_id'] eq $one['ad_space_id']"} selected="selected"{/if} value="{$vo['ad_space_id']}">{$vo['ad_space_name']}</option>
+									{/volist}
+							</select>
+					    </div>
+				    </div>
+				    <div class="layui-col-md6">
+					    <label class="layui-form-label">广告类型</label>
+					    <div class="layui-input-inline">
+					      <select name="sltType" lay-filter="adtype">
+									{volist name="category" id="vo"}
+									<option {if condition="$key eq $one['category']"} selected="selected"{/if} value="{$key}">{$vo['value']}</option>
+									{/volist}
+							</select>
+					    </div>
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				  <div class="layui-col-md12">
+				    <label class="layui-form-label">广告名称</label>
+				    <div class="layui-input-inline">
+				      <input type="text" name="txtAdName" value="{$one['ad_name']}" required  lay-verify="required" placeholder="请输入广告名称" autocomplete="off" class="layui-input longtxt">
+				    </div>
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				  <div class="layui-col-md12">
+				    <label class="layui-form-label">门店编号</label>
+				    <div class="layui-input-inline">
+				      <input type="text" name="branch_no" value="{$one['branch_no']}" placeholder="请输入门店编号或 ALL 代表门店通用" autocomplete="off" class="layui-input longtxt">
+				    </div>
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				    <label class="layui-form-label">点击次数</label>
+				    <div class="layui-input-inline">
+				      <input type="text" name="txtClickCount" value="{$one['click_count']}" placeholder="请输入点击次数" autocomplete="off" class="layui-input longtxt">
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				  	<div class="layui-col-md6">
+					    <label class="layui-form-label">开始时间</label>
+					    <div class="layui-input-inline">
+					      <input type="text" id="startTime" name="txtStartTime" value="{$one['start_time']}" placeholder="请输入开始时间" autocomplete="off" class="layui-input">
+					    </div>
+				    </div>
+				    <div class="layui-col-md6">
+					    <label class="layui-form-label">结束时间</label>
+					    <div class="layui-input-inline">
+					      <input type="text" id="endTime" name="txtEndTime" value="{$one['end_time']}" placeholder="请输入结束时间" autocomplete="off" class="layui-input">
+					    </div>
+				    </div>
+				  </div>
+				  
+				  
+				  <div class="layui-form-item">
+				    <label class="layui-form-label">是否开启</label>
+				    <div class="layui-input-inline">
+				      <input type="checkbox" name="isEnabled" {if condition="$one['is_enabled'] eq 1"} checked="checked"{/if} value="1" title="是" >
+				    </div>
+				  </div>
+				  
+				  {include file="portal/ad/view_image" /}
+				  {include file="portal/ad/view_text" /}
+				  {include file="portal/ad/view_code" /}
+				  
+				  <input name="txtAdno" type="hidden" value="{$one['ad_id']}"/>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="type-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script>
+
+var ue = UE.getEditor('editor');
+//编辑器加载完毕后执行操作
+ue.ready(function() {
+	ue.setContent('{$one["ad_code"]|raw}',false);
+});
+
+var Juery=null;
+var layerLib=null;
+var path="/{$MODULE_NAME}/portal/ad";
+
+function delImg( pid ){
+	Juery.ajax({
+		url:path+"/delImg",
+		data: {'pid':pid},
+		dataType:'json',
+		contentType:'application/json',
+		type:'get',
+		success:function(result){
+			let _icon=1;
+			if(result.code!='1'){
+				_icon=2;
+			}
+			layer.msg(result.msg,{icon:_icon,time:1000},function(){
+			});
+			Juery("#img"+pid).remove();
+		}
+	})
+}
+
+
+layui.use(['form','jquery','laydate','upload','colorpicker'],function(){
+	
+	var laydate = layui.laydate;
+	var upload = layui.upload;
+    let form = layui.form;
+    let $ = layui.jquery;
+    let colorpicker = layui.colorpicker;
+
+	layerLib=layer;
+	Juery=layui.jquery;
+
+    
+    laydate.render({
+        elem: '#startTime'
+        ,type: 'datetime'
+    });
+    
+    laydate.render({
+        elem: '#endTime'
+        ,type: 'datetime'
+    });
+
+	//多图片上传
+	upload.render({
+		elem: '#uploadImage'
+		,url: '/{$MODULE_NAME}/portal/ad/uploadImages' //此处配置你自己的上传接口即可
+		,method: 'post'
+		,size: 5012 //限制文件大小，单位 KB
+		,multiple: true
+		,before: function(obj){
+			//预读本地文件示例，不支持ie8
+
+		}
+		,done: function(res){
+			//上传完毕
+			$('#uploadList').append('<div class="imgbox" id="img'+res.data.pid+'">' +
+					'<i onclick="delImg( '+res.data.pid+' )" class="layui-icon layui-icon-close"></i> <img height="150" src="'
+					+ res.data.path +'" alt="'+  res.data.filename +'" class="layui-upload-img"><input name="attrval[]" type="hidden" value="'+res.data.pid+'"/></div>')
+		}
+	});
+
+	  //颜色选择器
+	  colorpicker.render({
+	    elem: '#attr_text_color'
+	    ,color: '#1c97f5'
+	    ,done: function(color){
+	      $('#attr_text_color-input').val(color);
+	    }
+	  });
+	  
+	function typeChange(_val){
+		$(".adrows").hide();
+		if(_val=='image'){
+			$("#view_image").show();
+		}else if(_val=='text'){
+			$("#view_text").show();
+		}else if(_val=='code'){
+			$("#view_code").show();
+		}else{
+			$("#view_image").show();
+		}
+	}
+
+	$(document).ready(function(){
+		typeChange("{$one['category']}");
+
+	})
+  	form.on('select(adtype)', function(data){
+			var _val=data.value;
+			$(".adrows").hide();
+			typeChange(_val);
+	});
+
+	var _url="/save";
+    form.on('submit(type-save)', function(data){
+        $.ajax({
+            url:path+_url,
+            data:JSON.stringify(data.field),
+            dataType:'json',
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code){
+                    layer.msg(result.msg,{icon:1,time:1000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        parent.layui.table.reload("ad-table",{
+							where:{}
+						});
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

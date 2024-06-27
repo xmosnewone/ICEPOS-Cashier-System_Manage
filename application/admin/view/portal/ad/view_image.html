@@ -1,0 +1,81 @@
+<style>
+.layui-upload-list{width:520px;margin: 0 auto;}
+</style>
+<div class="layui-row adrows" id="view_image" style="display:none;">
+ <div class="layui-form-item">
+ 	<div class="layui-col-md6">
+   <label class="layui-form-label">图片地址</label>
+   <div class="layui-input-inline">
+       <button type="button" class="layui-btn layui-btn-danger" id="uploadImage"><i class="layui-icon"></i>上传图片</button>
+   </div>
+   </div>
+ </div>
+    <div class="layui-form-item">
+        <div class="layui-col-md6">
+            <div class="layui-upload-list">
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                    预览图：
+                    <div class="layui-upload-list" id="uploadList">
+                        {volist name="attr" id="vo"}
+                            {php} $akey=$key;{/php}
+                            {volist name="vo" id="cvo"}
+                                {if condition="$key eq 'attr_image_url'"}
+                                <div class="imgbox" id="img{$akey}">
+                                <i onclick="delImg({$akey})" class="layui-icon layui-icon-close"></i> <img height="150" src="{$cvo}"  class="layui-upload-img"><input name="attrval[]" type="hidden" value="{$k}"/></div>
+                                {/if}
+                            {/volist}
+                        {/volist}
+                    </div>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+ <!--
+  <div class="layui-form-item">
+ 	<div class="layui-col-md6">
+   <label class="layui-form-label">图片宽度</label>
+   <div class="layui-input-inline">
+     <input type="text" id="attr_image_width" name="attr_image_width" value="{$attr['attr_image_width']|default=''}" autocomplete="off" class="layui-input">
+   </div>
+   </div>
+   
+  <div class="layui-col-md6">
+   <label class="layui-form-label">图片高度</label>
+   <div class="layui-input-inline">
+     <input type="text" id="attr_image_height" name="attr_image_height" value="{$attr.attr_image_height}" autocomplete="off" class="layui-input">
+   </div>
+   </div>
+   
+ </div>
+ 
+ <div class="layui-form-item">
+ 	<div class="layui-col-md12">
+   <label class="layui-form-label">链接地址</label>
+   <div class="layui-input-inline">
+     <input type="text" id="attr_image_link" name="attr_image_link" value="{$attr['attr_image_link']|default=''}" autocomplete="off" class="layui-input longtxt">
+   </div>
+   </div>
+ </div>
+ 
+ <div class="layui-form-item">
+ 	<div class="layui-col-md12">
+   <label class="layui-form-label">链接提示</label>
+   <div class="layui-input-inline">
+     <input type="text" id="attr_image_title" name="attr_image_title" value="{$attr['attr_image_title']|default=''}" autocomplete="off" class="layui-input longtxt">
+   </div>
+   </div>
+ </div>
+ 
+  <div class="layui-form-item">
+ 	<div class="layui-col-md12">
+   <label class="layui-form-label">链接目标</label>
+   <div class="layui-input-inline">
+     <input title="新窗口" type="radio" name="attr_image_target" value="_blank" {if condition="$attr['attr_image_target'] eq '_blank'"}checked="checked"{/if} autocomplete="off" class="layui-input">
+     <input title="原窗口" type="radio" name="attr_image_target" value="_self" {if condition="$attr['attr_image_target'] eq '_self'"}checked="checked"{/if} autocomplete="off" class="layui-input"> 
+   </div>
+   </div>
+ </div>
+    -->
+
+ </div>
+ 

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增库存存量指标</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <style>
+		a.back{color:#ff6a08!important}
+		.layui-input-long{width:300px;}
+		.layui-input-sort{width:80px;height:32px;text-align:center;padding-left:0;}
+	</style>
+</head>
+<body>
+
+		<div class="layui-card">
+			<div class="layui-card-header">
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="backToList()">
+				<i class="pear-icon .pear-icon-back"></i>
+				返回
+				</button>
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="saveCombItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				保存并返回
+				</button>
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="selectGoods()">
+				<i class="pear-icon pear-icon-file-open"></i>
+				选择添加商品
+				</button>
+				<button class="pear-btn pear-btn-danger pear-btn-md" onclick="deleteItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				清空当前行
+				</button>
+			</div>
+		</div>
+
+		<div class="layui-card">
+					<form class="layui-form" action="" onsubmit="return false">
+						<div class="layui-container">  
+						  <div class="layui-row">
+						    <div class="layui-col-md12">
+					    		 <div class="layui-form-item">
+								    <label class="layui-form-label">分店仓库</label>
+								    <div class="layui-input-inline">
+								    	<select name="txtBranchno" lay-verify="" lay-search lay-filter="txtBranchNo">
+											<option value="">请选择...</option>
+											{volist name="branchs" id="vo"}
+											<option value="{$vo['branch_no']}">{$vo['branch_name']}</option>
+											{/volist}
+										</select>
+										
+										
+								    </div>
+								    <div class="layui-input-inline">
+								    <button class="pear-btn pear-btn-primary pear-btn-md" onclick="callFormula()">
+										<i class="layui-icon-fonts-code layui-icon"></i>
+										公式计算库存
+										</button>
+								    </div>
+								    <span style="color:#ff6a08;text-align:left;padding-top:10px;display: inline-block;"> 
+								    * 下面数据表格有背景颜色的方格，点击可编辑
+								    </span>
+								  </div>
+								  
+						    </div>
+						    
+						  </div>
+						  
+						</div>
+					</form>
+		</div>
+		  
+ 		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="stockage-table" lay-filter="stockage-table"></table>
+			</div>
+		</div>
+		
+		<div id="formula_div" style="display:none;">
+		{include file="product/base/formula" /}
+		</div>
+		
+		<script type="text/html" id="comb-bar">
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+			<i	class="layui-icon layui-icon-delete"></i>
+			</button>
+	    </script>     
+<script type="text/html" id="numTpl">
+<input name="item_qty" id="item{{d.item_no}}" value="{{d.item_qty}}" class="layui-input layui-input-sort" onchange="changeNum('{{d.item_no}}')">
+</script>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script src="__STATIC__/js/admin/common.js"></script>
+<script>
+var multiple_items_url="{:U('Controls/multipleItems')}";
+var items_url="{:U('Controls/items')}";
+var item_no="{$model.item_no}";
+var _layerIndex=null;
+var all_item_no=[];
+var rowIndex=0;
+var rowObj=null;
+var jq=null;
+var branchNo='';
+var isSingle=false;
+var formulaChecked=2;
+var stockflag=0;
+var loadGood=false;
+
+var emptyGrid={"rowIndex":1,"item_no":'',"item_name":'',"item_subno":'',"max_qty":'',"min_qty":'',"unit_no":'',"item_size":''};
+//计算
+function changeNum(item_no){
+	var num=jq("#item"+item_no).val();
+	//计算价格
+	window.changeNumTable(num);
+}
+
+//判断是否未选择分店
+function emptyBranch(){
+	if(branchNo==''){
+			layer.alert("请选择分店仓库");
+			return false;
+	}
+	return true;
+}
+
+layui.use(['form','jquery','table','common'],function(){
+    let form = layui.form;
+    let common = layui.common;
+    let table = layui.table;
+    let $ = layui.jquery;
+    	jq=$;
+    var path="/{$MODULE_NAME}/Products/Probase/";
+
+
+	let cols = [
+		[
+			{
+				title: '行号',
+				field: 'rowIndex',
+				align: 'center',
+				width: 180
+			},
+			{
+				title: '货号',
+				field: 'item_no',
+				align: 'center',
+				width: 180,
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '商品名称',
+				field: 'item_name',
+				align: 'center'
+			},
+			{
+				title: '自编码',
+				field: 'item_subno',
+				align: 'center'
+			},
+			{
+				title: '库存上限',
+				field: 'max_qty',
+				align: 'center',
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '库存下限',
+				field: 'min_qty',
+				align: 'center',
+				style:'background-color: #fff6f0;',
+				edit:'text',
+				width:120
+			},
+			{
+				title: '单位',
+				field: 'unit_no',
+				align: 'center'
+			},
+			{
+				title: '规格',
+				field: 'item_size',
+				align: 'center'
+			}
+		]
+	]
+
+	var emptyData=[];
+	//显示10行空数据
+	for(var i=1;i<=10;i++){
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=i;
+		emptyData.push(grid);
+	}
+
+	table.render({
+		elem: '#stockage-table',
+		url: "",
+		page: false,
+		cols: cols,
+		limit:1000,
+		data:emptyData,
+		skin: 'line',
+		toolbar: '',
+		defaultToolbar: [],
+		done:function(){
+			rebuildItemNo();
+			editListener();
+		}
+	});
+	
+	//在表格的最后面增加一行空数据
+	window.addEmptyRow=function(){
+		var rows=table.getData("stockage-table");
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=rows.length+1;
+		rows.push(grid);
+		
+		reloadTable(rows);
+	}
+	
+	//重载表格
+	window.reloadTable=function(rows){
+		table.reload('stockage-table',{
+			url: '',
+			data : rows
+		});
+		rebuildItemNo();
+	}
+	
+	//删除按钮工具按钮事件
+	table.on('tool(stockage-table)', function(obj) {
+		var event=obj.event;
+		var index=obj.tr.attr("data-index");
+		var rows=table.getData("stockage-table");
+		if (event === 'remove') {
+			//删除行
+			obj.del();
+			//删除索引
+			rows.splice(index, 1);
+			//重新加载表格
+			reloadTable(rows);
+		}
+		
+		event.stoppropagation();
+	});
+	
+	//监听下拉选择门店分店
+	form.on('select(txtBranchNo)', function(data){
+			branchNo=data.value;
+    })
+    
+    //监听单元格编辑
+  	table.on('edit(stockage-table)', function(obj){
+  		
+    	if(!emptyBranch()){
+    		$(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val("");
+    		return;
+    	}
+    	
+  		//验证数字规则
+  		var regNum =  /^[0-9.]*$/g;
+  		//验证商品编码
+  		var regNo =  /^[0-9a-zA-Z]*$/g;
+  		
+  		var value = obj.value //得到修改后的值
+		    ,data = obj.data //得到所在行所有键值
+		    ,field = obj.field; //得到字段
+	    var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';   
+		var oldtext = $(selector).text();
+
+		 if(field=='item_no'&&!regNo.test(value)){
+	    		layer.alert("请输入字母或数字");
+	    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+	    		return;
+		 }
+		 
+		 if(field=='max_qty'||field=='min_qty'){
+			 if(!regNum.test(value)){
+		    		layer.alert("请输入数字");
+		    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+		    		return;
+	    	}
+		 }    
+		 
+		 rowIndex=obj.tr.attr("data-index");
+		 rowIndex=parseInt(rowIndex);
+  		if(field=='item_no'&&$.trim(value)!=''){
+  			loadGood=true;
+  			//判断商品编码，并且弹出商品选择窗口
+	    	$.ajax({
+				url:"/{$MODULE_NAME}/common/index/getiteminstance",
+				data:{"itemno":value},
+				dataType: 'json',
+				type: 'POST',
+				success: function(result) {
+					//如果不为空，则填充数据
+					if(result.code==1){
+						
+							var tempData=result.data;
+								tempData['rowIndex']=rowIndex+1;
+								tempData['max_qty']=0;
+								tempData['min_qty']=0;
+			
+								window.editRow(rowIndex,tempData);
+					}else{
+							//弹出商品选择窗口
+							selectSingleGoods("");
+					}
+					
+					loadGood=false;
+				}
+			})
+			
+  		}else if(field=='max_qty'){
+  				var min=obj.data.min_qty;
+  				if(parseFloat(min)>=parseFloat(value)){
+  					layer.alert("库存上限必须大于下限数值");
+  					$(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+  					return;
+  				}
+  		}else if(field=='min_qty'){
+  				var max=obj.data.max_qty;
+				if(parseFloat(max)<=parseFloat(value)){
+					layer.alert("库存下限必须小上限数值");
+					$(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+					return;
+				}
+  		}	
+  	});
+	//返回
+	window.backToList=function(){
+		window.location.href="/{$MODULE_NAME}/Products/ProBase/StockageObjective";
+	}
+
+	//调用公式计算弹窗
+	window.callFormula=function(){
+		//还原选项
+		formulaChecked=2;
+		stockflag=0;
+		openWinHtml("调用公式",$("#formula_div").html(),"650px","450px",_success,_yes);
+	}
+	//公式计算弹出窗后执行函数
+	window._success=function(){
+		form.on('radio(formulaRadio)', function(data){
+			  //console.log(data.elem); //得到radio原始DOM对象
+			  //console.log(data.value); //被点击的radio的value值
+			  var val=data.value;
+			  	  formulaChecked=val;
+			  if(val==2){
+				  $(".layui-layer-content #divcal1").hide();
+				  $(".layui-layer-content #divcal2").show();
+			  }else{
+				  $(".layui-layer-content #divcal1").show();
+				  $(".layui-layer-content #divcal2").hide();
+			  }
+			  
+		});
+
+		form.on('select(formulaFlag)', function(data){
+			stockflag=data.value;
+    	});
+		
+		form.render();
+	}
+	//公式计算弹出窗后"确认"按钮执行函数
+	window._yes=function(){
+		
+		var flag;
+
+        //销售天数
+        var saleDay = $(".layui-layer-content #saleDay").val();
+        //平均销售数量
+        var probDay = $(".layui-layer-content #probDay").val();
+        //默认库存数
+        var txtNum = $(".layui-layer-content #txtNum").val();
+        //上限下限标示 stockflag
+        
+        var bcNo = branchNo;
+        var fc=formulaChecked;
+        
+        if (formulaChecked !=2) {
+            if (parseInt(saleDay) <= 0) {
+            	layer.msg("计算天数不可为0！");
+                return;
+            }
+            if (parseInt(probDay) <= 0) {
+            	layer.msg("计算天数不可为0！");
+                return;
+            }
+        }
+      
+        if(formulaChecked==2){
+            flag = "3";
+        }else{
+            if(formulaChecked==0){ 
+                flag = "1"; 
+            }else {
+                flag = "2";
+            }
+        }
+        
+        layer.load(1);
+        window.backItemQty( bcNo, saleDay, probDay, txtNum, stockflag, flag);
+		
+	}
+	
+	//ajax 计算商品库存上下限
+	window.backItemQty=function(branchno, saleDay, probDay, txtNum, stockflag, flag){
+		var rows=table.getData("stockage-table");
+		$.ajax({
+            url: "/{$MODULE_NAME}/Products/ProBase/getItemQty",
+            type: "POST",
+            data: {
+                "rows": rows,
+                "branchno":branchno,
+                "saleDay": saleDay,
+                "probDay":probDay,
+                "txtNum": txtNum,
+                "stockflag": stockflag,
+                "flag": flag
+            },
+            success: function(res)
+            {
+            	layer.closeAll();
+                window.initTable(res.data);
+            }
+        });
+		
+	}
+	
+	//计算成功，显示数据到表格
+	window.initTable=function(rows){
+		  var msg = "";
+          for(var i = 0, len = rows.length; i< len; i++){
+              if(rows[i].max_qty < rows[i].min_qty ){
+                  msg += " [ " + rows[i].item_no + " ] ";
+              }
+          }
+         
+          if(msg !== ""){
+              if (stockflag ==0)                                     
+              {
+            	  layer.msg("商品"+ msg + "库存上限数不能小于库存下限数!");
+                  return;
+               }
+               else
+               {
+            	  layer.msg("商品"+ msg + "库存下限数不能大于库存上限数!");
+                  return;                                         
+               } 
+          }
+          else
+          {
+        	  layer.msg("公式换算成功!");
+              reloadTable(rows);
+          }
+	}
+	
+	//选择多个商品窗口
+	window.selectGoods=function(param){
+		if(!emptyBranch()){
+    		return;
+    	}
+		isSingle=false;
+		_layerIndex=openWin("商品选择",multiple_items_url,"1100px","600px");
+	}
+	//编辑数据表格选择单个商品窗口
+	window.selectSingleGoods=function(param){
+		isSingle=true;
+		_layerIndex=openWin("商品选择",items_url,"1100px","600px");
+	}
+	//商品选择后的回调函数
+	window.callBack=function(data){
+	
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+		}
+		
+		if(isSingle){
+			data[0]['rowIndex']=rowIndex+1;
+			data[0]['max_qty']=0;
+			data[0]['min_qty']=0;
+			window.editRow(rowIndex,data[0]);
+			return;	
+		}
+		
+		var repeat=false;
+		for(var i in data){
+			var new_item_no=data[i]['item_no'];
+			if(all_item_no.indexOf(new_item_no)!=-1){
+				repeat=true;
+				data.splice(i,1);
+			}
+		}
+				
+		if(repeat){
+			layer.msg("已存在相同商品");
+		}
+		
+		if(data.length>0){
+			//临时添加行项目
+			addCombItem(data);
+			
+			window.addEmptyRow();
+			
+		}
+	}
+	//成功输入商品编码或单选商品返回成功，编辑当前表格数据
+	//_rowIndex是当前编辑的行号
+	//data是新数据
+	window.editRow=function(_rowIndex,data){
+		
+		var new_item_no=data['item_no'];
+		if(all_item_no.indexOf(new_item_no)!=-1){
+			layer.msg("已存在相同商品");
+			data['item_no']='';
+			data['item_name']='';
+			data['item_subno']='';
+			data['unit_no']='';
+			data['item_size']='';
+			data['max_qty']=0;
+			data['min_qty']=0;
+		}
+		
+		var rows=table.getData("stockage-table");
+			rows[_rowIndex]=data;
+			reloadTable(rows);
+			return true;
+	}
+	
+	//重新堆栈数组，保存当前所有的商品编号
+	function rebuildItemNo(){
+		
+		all_item_no=new Array();
+		
+		var rows=table.getData("stockage-table");
+		
+		for(var i in rows){
+			if(rows[i]['item_no']!=''){
+				all_item_no.push(rows[i]['item_no']);
+			}
+		}
+	}
+
+	//监听单元格编辑
+	function editListener(){
+	    //数据表格点击事件
+	    table.on('row(stockage-table)', function(obj){
+	    	
+	    	if(loadGood){
+	    		return;
+	    	}
+	    	
+	    	var bg=$(this).attr("style");
+	    	if(bg==undefined||bg=='background-color:#ffffff;'){
+	    		$(this).attr({ "style": "background-color:#fafafa;" });
+	    	}else{
+	    		$(this).attr({ "style": "background-color:#ffffff;" });
+	    	}
+	    	
+	    	if(!emptyBranch()){
+	    		return;
+	    	}
+	    	
+	    	rowObj=obj;
+			//当前编辑行的序号
+			rowIndex=rowObj.tr.attr("data-index");
+	    	
+		});
+	}
+	
+	//临时添加商品组合
+	function addCombItem(data){
+		//获取当前表格的所有数据
+		var rows=table.getData("stockage-table");
+		var update_rows=[];
+		//删除空数据
+		for(var i in rows){
+			if(rows[i]['item_no']!=''){
+				update_rows.push(rows[i]);
+			}
+		}
+		
+		var next=update_rows.length+1;
+		for(var i in data){
+			var obj=data[i];
+			
+			var array=new Object();
+			array['rowIndex']=next;
+			array['item_no']=obj['item_no'];
+			array['item_name']=obj['item_name'];
+			array['item_subno']=obj['item_subno'];
+			array['unit_no']=obj['unit_no'];
+			array['item_size']=obj['item_size'];
+			array['max_qty']=0;
+			array['min_qty']=0;
+
+			update_rows.push(array);
+			next++;
+		}
+			reloadTable(update_rows);
+	}
+	
+	//清空当前行
+	window.deleteItem=function(){
+		
+		if(rowObj==null){
+			layer.msg("请选择要清空的数据行");
+			return;
+		}
+		
+		var rows=table.getData("stockage-table");
+		rows.splice(rowIndex,1);
+		
+		var _index=1;
+		for(var i in rows){
+			rows[i]['rowIndex']=_index;
+			_index++;
+		}
+		reloadTable(rows);
+	}
+	
+	//添加商品组合
+	window.saveCombItem=function(){
+		
+    	if(!emptyBranch()){
+    		return;
+    	}
+		
+		var lindex=layer.msg("请稍后...");
+		var rows=table.getData("stockage-table");
+		
+		var drow=new Object();
+		var ditem=[];
+		for(var i in rows){
+			if(rows[i]['item_no']!=''){
+				var dataObj=new Object();
+				dataObj['item_no']=rows[i]['item_no'];
+				dataObj['max_qty']=rows[i]['max_qty'];
+				dataObj['min_qty']=rows[i]['min_qty'];
+				ditem.push(dataObj);
+			}
+		}
+		$.ajax({
+	            url:path+"stockageSave",
+	            data:{"txtBranchno":branchNo,"items":ditem},
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	layer.close(lindex);
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							window.backToList();
+						});
+
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	            }
+	     })
+	}
+	
+})
+</script>
+</body>
+</html>

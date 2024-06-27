@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>采购订单</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:150px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 150px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.layui-table-cell .layui-table-link {color: #ff6a08!important;}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+					
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">单据编号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="no" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">制单人</label>
+							<div class="layui-input-inline inputdiv">
+								<input type="text" name="operator" id="operator" placeholder="" class="layui-input" onfocus="showOperators()">
+								<input type="hidden" name="oper_id" id="txtOperNo">
+								<i class="layui-icon layui-icon-username"></i>
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">供应商</label>
+							<div class="layui-input-inline inputdiv">
+								<input type="text" name="supplier" id="supplier" placeholder="" class="layui-input" onfocus="showSupplier()">
+								<input type="hidden" name="supcust_no" id="sp_no">
+								<i class="layui-icon layui-icon-username"></i>
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">审核状态</label>
+							<div class="layui-input-inline">
+								<select name="approve_flag" lay-verify="">
+									<option value="0">全部</option>
+									<option value="-1">未审核</option>
+									<option value="1">已审核</option>
+								</select>
+							</div>
+						</div>
+						</div>
+						
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline" id="date-range">
+							<label class="layui-form-label">日期范围</label>
+							<div class="layui-input-inline">
+					          <input type="text" name="start" value="" autocomplete="off" id="start-date" class="layui-input" placeholder="开始日期">
+					        </div>
+					        <div class="layui-form-mid">-</div>
+					        <div class="layui-input-inline">
+					          <input type="text" name="end" value="" autocomplete="off" id="end-date" class="layui-input" placeholder="结束日期">
+					        </div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">快速设置</label>
+							<div class="layui-input-inline">
+								<select lay-filter="getdate">
+									<option value="0">全部</option>
+									<option value="1">今天</option>
+									<option value="2">昨天</option>
+									<option value="3">本周</option>
+									<option value="4">上周</option>
+									<option value="5">本月</option>
+									<option value="6">上月</option>
+									<option value="7">本季</option>
+									<option value="8">上季</option>
+									<option value="9">今年</option>
+								</select>
+							</div>
+						</div>
+						
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">订单状态</label>
+							<div class="layui-input-inline">
+								<select name="order_status">
+									<option value="0">全部</option>
+									<option value="-1">未处理</option>
+									<option value="1">部分处理</option>
+									<option value="2">全部处理</option>
+									<option value="4">终止订单</option>
+								</select>
+							</div>
+						</div>
+						
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="polist-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md" onclick="resetForm()">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+						</div>
+						
+					</div>
+					
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="polist-table" lay-filter="polist-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="polist-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+		        <i class="layui-icon layui-icon-delete"></i>
+		        删除
+		    </button>
+			<button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchStop">
+		        <i class="icon pear-icon pear-icon-operation"></i>
+		        终止
+		    </button>
+		</script>
+		<script type="text/html" id="psheetTpl">
+  			<a href="/{$MODULE_NAME}/pmsheet/po/detail/no/{{d.sheet_no}}" class="layui-table-link" target="_self">{{ d.sheet_no }}</a>
+		</script>
+		<script type="text/html" id="statusTpl">
+  			{{#  if(d.approve_flag ==1){ }}
+    				<a class="layui-table-link">已审核</a>
+  				{{#  } else { }}
+    				未审核
+  			{{#  } }}
+		</script>
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			var branch_no="";
+			var _layerIndex=null;
+			var operator_url="{:U('Controls/operators')}";
+			var supplier_url="{:U('Controls/suppliers')}";
+			layui.use(['table', 'form', 'jquery','common','laydate'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+				let laydate = layui.laydate;
+				
+			  	laydate.render({
+					    elem: '#date-range'
+					    ,range: ['#start-date', '#end-date']
+			    });
+
+				let DATA_PATH = "/{$MODULE_NAME}/pmsheet/Po/";
+
+				let cols = [
+					[{
+							type: 'checkbox'
+						},
+						{
+							title: '序号',
+							field: 'rowIndex',
+							align: 'left',
+							width: 80,
+						},
+						{
+							title: '单号',
+							field: 'sheet_no',
+							align: 'left',
+							templet: '#psheetTpl',
+							width: 180
+						},
+						{
+							title: '审核状态',
+							field: 'approve_flag',
+							align: 'left',
+							templet: '#statusTpl',
+							width: 100
+						},
+						{
+							title: '仓库',
+							field: 'branch_name',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '供应商',
+							field: 'sp_name',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '操作员',
+							field: 'oper_name',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '单据金额',
+							field: 'sheet_amt',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '操作日期',
+							field: 'oper_date',
+							align: 'center',
+							width: 180
+						},
+						{
+							title: '审核人',
+							field: 'confirm_name',
+							align: 'center',
+							width: 180
+						},
+						{
+							title: '单据状态',
+							field: 'order_status',
+							align: 'center',
+							width: 120
+						}
+					]
+				]
+
+				table.render({
+					elem: '#polist-table',
+					url: DATA_PATH+"getlist",
+					page: true,
+					cols: cols,
+					height:600,
+					skin: 'line',
+					toolbar: '#polist-toolbar',
+					defaultToolbar: []
+				});
+
+				table.on('toolbar(polist-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
+					}else if (obj.event === 'batchStop') {
+						window.batchStop(obj);
+					}
+				});
+
+				form.on('select(getdate)', function(data) {
+					date = new Array(2);
+					var selc=parseInt(data.value);
+		            switch (selc)
+		            {
+		            	case 1://当前天
+	                    	date[0] = '{php}echo date('Y-m-d');{/php}';
+	                    	date[1] = '{php}echo date('Y-m-d');{/php}';
+	                    break;
+		                case 2://昨天
+		                    date[0] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    break;
+		                case 3://本周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7,date("Y")));{/php}';
+		                    break;
+		                case 4://上周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1-7,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7-7,date("Y")));{/php}';
+		                    break;
+		                case 5://本月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("t"),date("Y")));{/php}';
+		                    break;
+		                case 6://上月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m")-1,1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d',mktime(23,59,59,date("m") ,0,date("Y")));{/php}';
+		                    break;
+		                case 7://本季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,ceil((date('n'))/3)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,ceil((date('n'))/3)*3,date('t',mktime(0, 0 ,0,ceil((date('n'))/3)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 8://上季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,(ceil((date('n'))/3)-1)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,(ceil((date('n'))/3)-1)*3,date('t',mktime(0, 0 ,0,(ceil((date('n'))/3)-1)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 9://本年
+		                    date[0] = '{php}echo date('Y-01-01');{/php}';
+		                    date[1] = '{php}echo date('Y-12-31');{/php}';
+		                    break;
+		            }
+		            $('#start-date').val( date[0]);
+	                $('#end-date').val(date[1]);
+				});
+				
+				form.on('submit(polist-query)', function(data) {
+					table.reload('polist-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+				
+				//显示操作员选择框
+				window.showOperators=function(){
+					_layerIndex=openWin("操作员选择",operator_url,"800px","600px");
+				}
+				
+				//操作员选择后的回调函数
+				window.callBackOprator=function(data){
+					
+					$("#operator").val(data[0]['oper_id']+"("+data[0]['oper_name']+")");
+					$("#txtOperNo").val(data[0]['oper_id']);
+					
+					if(_layerIndex!=null){
+						layer.close(_layerIndex);
+						_layerIndex=null;
+					}
+				}
+				
+				//显示供应商选择框
+				window.showSupplier=function(){
+					_layerIndex=openWin("供应商选择",supplier_url,"800px","600px");
+				}
+				
+				//供应商选择后的回调函数
+				window.callBackSupplier=function(data){
+					
+					$("#supplier").val(data[0]['sp_no']+"("+data[0]['sp_name']+")");
+					$("#sp_no").val(data[0]['sp_no']);
+					
+					if(_layerIndex!=null){
+						layer.close(_layerIndex);
+						_layerIndex=null;
+					}
+				}
+
+				
+				window.add = function() {
+					window.location.href=DATA_PATH+"detail";
+				}
+
+				window.batchRemove = function(obj) {
+					
+					var checkIds = common.checkField(obj,'sheet_no');
+
+					if (checkIds === "") {
+						layer.msg("请选择采购单", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要删除采购单?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: DATA_PATH + "batchDelete",
+							data:{"sheet_no":checkIds},
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										table.reload('polist-table');
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 3000
+									}, function() {
+										table.reload('polist-table');
+									});
+								}
+							}
+						})
+					});
+				}
+
+				//终止采购单
+				window.batchStop = function(obj) {
+					
+					var checkIds = common.checkField(obj,'sheet_no');
+
+					if (checkIds === "") {
+						layer.msg("请选择采购单", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要终止采购单?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: DATA_PATH + "batchStop",
+							data:{"sheet_no":checkIds},
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 2000
+									}, function() {
+										table.reload('polist-table');
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 3000
+									}, function() {
+										table.reload('polist-table');
+									});
+								}
+							}
+						})
+					});
+				}
+				
+				window.refresh = function(param) {
+					table.reload('polist-table');
+				}
+			})
+		</script>
+	</body>
+</html>

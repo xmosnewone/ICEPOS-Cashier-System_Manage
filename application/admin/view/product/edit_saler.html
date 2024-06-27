@@ -1,0 +1,28 @@
+<table style="width: 100%; height: 28px;" border="0" cellpadding="0" cellspacing="0">
+  <tbody><tr>
+      <td style="width: 100px" align="right">
+        <b>供应商编号：</b>
+      </td>
+      <td style="width: 120px">
+        <input name="txtAddSupcustNO" type="text" id="txtAddSupcustNO" class="layui-input" onkeyup="try{value=value.replace(/[^A-Za-z0-9]/g,'');}catch(e){};" style="width:91px;">
+      </td>
+      <td style="width: 100px" align="right">
+        <b>约定价格：</b>
+      </td>
+      <td style="width:120px;">
+        <input name="txtAppointted_price" type="text" id="txtAppointted_price" value="0.00" class="layui-input" style="width:91px;">
+      </td>
+      <td align="right">
+        <input type="button" class="pear-btn pear-btn-primary" id="btnAddSupcust" value="添加记录"/>
+      	<input name="hidNOCode" type="hidden" id="hidNOCode">
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="layui-card">
+	<div class="layui-card-body">
+		<table id="saler-table" lay-filter="saler-table"></table>
+	</div>
+</div>
+
