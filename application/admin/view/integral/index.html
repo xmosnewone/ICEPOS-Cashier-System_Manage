@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>积分方案</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:150px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 150px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.layui-table-cell .layui-table-link {color: #ff6a08!important;}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+					
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">方案标题</label>
+							<div class="layui-input-inline">
+								<input type="text" name="title" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">门店编号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="branch_no" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">方案状态</label>
+							<div class="layui-input-inline">
+								<select name="status" lay-verify="">
+									<option value="">全部</option>
+									<option value="2">开启</option>
+									<option value="1">暂停</option>
+								</select>
+							</div>
+						</div>
+						</div>
+						
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline" id="date-range">
+							<label class="layui-form-label">日期范围</label>
+							<div class="layui-input-inline">
+					          <input type="text" name="start" value="" autocomplete="off" id="start-date" class="layui-input" placeholder="开始日期">
+					        </div>
+					        <div class="layui-form-mid">-</div>
+					        <div class="layui-input-inline">
+					          <input type="text" name="end" value="" autocomplete="off" id="end-date" class="layui-input" placeholder="结束日期">
+					        </div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">快速设置</label>
+							<div class="layui-input-inline">
+								<select lay-filter="getdate">
+									<option value="0">全部</option>
+									<option value="1">今天</option>
+									<option value="2">昨天</option>
+									<option value="3">本周</option>
+									<option value="4">上周</option>
+									<option value="5">本月</option>
+									<option value="6">上月</option>
+									<option value="7">本季</option>
+									<option value="8">上季</option>
+									<option value="9">今年</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="gift-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+						</div>
+						
+					</div>
+					
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body" id="gift-body">
+				<table id="integral-table" lay-filter="integral-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="integral-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+
+		    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+		        <i class="layui-icon layui-icon-delete"></i>
+		        删除
+		    </button>
+		</script>
+		
+		<script type="text/html" id="gift-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i></button>
+		</script>
+	
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			var branch_no="";
+			var _layerIndex=null;
+			var operator_url="{:U('Controls/operators')}";
+			var branchs_url="{:U('Controls/branchs')}";
+			layui.use(['table', 'form', 'jquery','common','laydate'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+				let laydate = layui.laydate;
+				
+			  	laydate.render({
+					    elem: '#date-range'
+					    ,range: ['#start-date', '#end-date']
+			    });
+
+				let DATA_PATH = "/{$MODULE_NAME}/integral/";
+
+				let cols = [
+					[{
+							type: 'checkbox'
+						},
+						{
+							title: '方案名称',
+							field: 'title',
+							align: 'left',
+							width: 130,
+						},
+						{
+							title: '门店编号',
+							field: 'branch_no',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '倍率',
+							field: 'rate',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '状态',
+							field: 'status',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '开始日期',
+							field: 'start_date',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '结束日期',
+							field: 'end_date',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '修改日期',
+							field: 'add_date',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '操作',
+							toolbar: '#gift-bar',
+							align: 'center',
+							width: 100
+						}
+					]
+				]
+
+				table.render({
+					elem: '#integral-table',
+					url: DATA_PATH+"search",
+					page: true,
+					cols: cols,
+					height:600,
+					skin: 'line',
+					toolbar: '#integral-toolbar',
+					defaultToolbar: [],
+					done:function(res, curr, count){
+						var _width=$("#gift-body").width();
+						$("#integral-table").css("width", _width);
+					}
+				});
+				
+				table.on('tool(integral-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					}
+				});
+
+				table.on('toolbar(integral-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
+					}else if (obj.event === 'batchAdd') {
+						window.batchAdd(obj);
+					}
+				});
+
+				form.on('select(getdate)', function(data) {
+					date = new Array(2);
+					var selc=parseInt(data.value);
+		            switch (selc)
+		            {
+		            	case 1://当前天
+	                    	date[0] = '{php}echo date('Y-m-d');{/php}';
+	                    	date[1] = '{php}echo date('Y-m-d');{/php}';
+	                    break;
+		                case 2://昨天
+		                    date[0] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    break;
+		                case 3://本周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7,date("Y")));{/php}';
+		                    break;
+		                case 4://上周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1-7,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7-7,date("Y")));{/php}';
+		                    break;
+		                case 5://本月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("t"),date("Y")));{/php}';
+		                    break;
+		                case 6://上月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m")-1,1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d',mktime(23,59,59,date("m") ,0,date("Y")));{/php}';
+		                    break;
+		                case 7://本季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,ceil((date('n'))/3)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,ceil((date('n'))/3)*3,date('t',mktime(0, 0 ,0,ceil((date('n'))/3)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 8://上季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,(ceil((date('n'))/3)-1)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,(ceil((date('n'))/3)-1)*3,date('t',mktime(0, 0 ,0,(ceil((date('n'))/3)-1)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 9://本年
+		                    date[0] = '{php}echo date('Y-01-01');{/php}';
+		                    date[1] = '{php}echo date('Y-12-31');{/php}';
+		                    break;
+		            }
+		            $('#start-date').val( date[0]);
+	                $('#end-date').val(date[1]);
+				});
+				
+				form.on('submit(gift-query)', function(data) {
+					table.reload('integral-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+				
+				//显示操作员选择框
+				window.showOperators=function(){
+					_layerIndex=openWin("操作员选择",operator_url,"800px","600px");
+				}
+				
+				//操作员选择后的回调函数
+				window.callBackOprator=function(data){
+					
+					$("#operator").val(data[0]['oper_id']+"("+data[0]['oper_name']+")");
+					$("#txtOperNo").val(data[0]['oper_id']);
+					
+					if(_layerIndex!=null){
+						layer.close(_layerIndex);
+						_layerIndex=null;
+					}
+				}
+				
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增积分方案',
+						shade: 0.1,
+						area: ['800px', '500px'],
+						content: DATA_PATH + 'addIntegral'
+					});
+				}
+				
+				window.edit = function(obj) {
+					var _id=obj.data.id;
+					layer.open({
+						type: 2,
+						title: '编辑积分方案',
+						shade: 0.1,
+						area: ['800px', '600px'],
+						content: DATA_PATH + 'addIntegral/id/'+_id+'.html'
+					});
+				}
+				
+				window.batchAdd = function() {
+					layer.open({
+						type: 2,
+						title: '批量添加积分方案',
+						shade: 0.1,
+						area: ['800px', '500px'],
+						content: DATA_PATH + 'batchGift'
+					});
+				}
+				
+				
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该方案?', {
+						icon: 3,
+						title: '删除提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: DATA_PATH + "batchDelete/ids/" + obj.data['id'],
+							dataType: 'json',
+							type: 'delete',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+				
+				window.batchRemove = function(obj) {
+					
+					var checkIds = common.checkField(obj,'id');
+
+					if (checkIds === "") {
+						layer.msg("请选择方案", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要删除方案?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: DATA_PATH + "batchDelete",
+							data:{"ids":checkIds},
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										table.reload('integral-table');
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 3000
+									}, function() {
+										table.reload('integral-table');
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('integral-table');
+				}
+			})
+		</script>
+	</body>
+</html>

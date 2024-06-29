@@ -1,0 +1,4 @@
+微信支付刷卡支付 && SDK
+https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
+
+微信： 用户付款码条形码规则：18位纯数字，以10、11、12、13、14、15开头

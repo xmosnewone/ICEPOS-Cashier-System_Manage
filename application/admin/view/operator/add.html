@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑角色</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <style>
+    {if condition="$one eq '' or $one['perm'] eq '0'"}
+    	.rolediv{display:none;}
+    {/if}
+    </style>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+            
+                  <div class="layui-form-item">
+				    <label class="layui-form-label">角色名称</label>
+				    <div class="layui-input-inline">
+				      <input type="text" name="name" value="{$one['name']}" required  lay-verify="required" placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				    <label class="layui-form-label">角色权限</label>
+				    <div class="layui-input-inline">
+				       <select name="roletype" lay-filter="roletype">
+									<option value="0">全部权限</option>
+									<option value="1">选择权限</option>
+						</select>
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item rolediv">
+				    <label class="layui-form-label">权限列表</label>
+				  </div>
+				
+					<div class="layui-form-item rolediv">
+						
+						  {foreach name="funcList" item="v1"}
+						  	
+						  	<table class="layui-table" style="table-layout:fixed;word-break:break-all;width:750px;">
+							  <tbody>
+								    <tr>
+								      <td width="100">
+									    <input type="checkbox" name="perms[]" value="{$v1['id']}"  title="{$v1['name']}" {php} if(in_array($v1['id'],$perms)){ echo 'checked="checked"';}{/php}/>
+									  </td>
+									   
+									 <td width="600">
+									 	{foreach name="v1['sub_menu']" item="v2"} 	
+									 	<input type="checkbox" name="perms[]" value="{$v2['id']}"  title="{$v2['name']}" {php} if(in_array($v2['id'],$perms)){ echo 'checked="checked"';}{/php}/>
+										{foreach name="v2['sub_menu']" item="v3"}
+									      <input type="checkbox" name="perms[]" value="{$v3['id']}"  title="{$v3['name']}" {php} if(in_array($v3['id'],$perms)){ echo 'checked="checked"';}{/php}/>
+									    {/foreach}
+									    {/foreach}
+								      </td>
+								       
+								    </tr>
+						    </tbody>
+							</table>
+						   
+						    {/foreach}
+						  
+					</div>
+        		<input name="id" type="hidden" value="{$one['id']}"/>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="operator-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script>
+layui.use(['form','jquery'],function(){
+    let form = layui.form;
+    let $ = layui.jquery;
+    var path="/{$MODULE_NAME}/Operator";
+	var _url="/save";
+
+  	form.on('select(roletype)', function(data){
+		var _val=data.value;
+		if(_val!=1){
+			$(".rolediv").hide();
+		}else{
+			$(".rolediv").show();
+		}
+	});
+  	
+    form.on('submit(operator-save)', function(data){
+    	
+    	var _field=data.field;
+    	var _data={};
+    	var perms=[];
+    	for(var i in _field){
+    		var _key=i;
+    		var _value=_field[i];
+    		_data[_key]=_value;
+    		
+    		if(_key.indexOf("perms")!=-1){
+    			perms.push(_value);
+    		}
+    	}
+    	_data['perms']=perms;
+    	
+        $.ajax({
+            url:path+_url,
+            data:JSON.stringify(_data),
+            dataType:'json',
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code){
+                    layer.msg(result.msg,{icon:1,time:1000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        parent.layui.table.reload("operator-table");
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

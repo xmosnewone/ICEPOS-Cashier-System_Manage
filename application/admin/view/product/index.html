@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>商品档案</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="__PEAR__/admin/css/other/department.css"/>
+	</head>
+	<body class="pear-container">
+
+		<div class="layui-row layui-col-space15">
+			<div class="layui-col-md3">
+				<div class="layui-card">
+					<div class="layui-card-body">
+						<div id="clsTreeContent" style="overflow: auto">
+							<ul id="clsTree" class="dtree organizationTree"></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-md9">
+				<div class="layui-card">
+					<div class="layui-card-body">
+						<table id="items-table" lay-filter="items-table"></table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/html" id="items-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+			<i class="layui-icon layui-icon-add-1"></i>
+			新增
+		</button>
+		<button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+			<i class="layui-icon layui-icon-delete"></i>
+			删除
+		</button>
+		<input type="text" id="keyword" name="keyword" placeholder="关键字可以是商品编号、分类编号或者商品名称" class="layui-input" style="width:320px;display:inline;"/>
+	<button class="pear-btn pear-btn-md pear-btn-primary" lay-event="keywordQuery">
+			<i class="layui-icon layui-icon-search"></i>
+			查询
+		</button>
+	</script>
+
+		<script type="text/html" id="items-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit">
+			<i class="layui-icon layui-icon-edit"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+			<i class="layui-icon layui-icon-delete"></i></button>
+	    </script>
+   		<script type="text/html" id="itemnoTpl">
+  			<a onclick="openEdit('{{ d.item_no }}')">{{ d.item_no }}</a>
+		</script>
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			var _parent="";
+			
+			layui.use(['table', 'form', 'jquery', 'dtree','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let dtree = layui.dtree;
+				let common = layui.common;
+				
+				_parent='';
+				
+				let MODULE_PATH = "/{$MODULE_NAME}/";
+				let DATA_PATH = MODULE_PATH+"/common/index/";
+				let TREE_PATH="/{$MODULE_NAME}/imsheet/"+"Jsondata/ItemClass";
+
+				let cols = [
+					[{
+							type: 'checkbox',
+							fixed:'left',
+						},
+						{
+							title: '货号',
+							field: 'item_no',
+							width:160,
+							fixed:'left',
+							align: 'center',
+							templet: '#itemnoTpl',
+						},
+						{
+							title: '自编码',
+							field: 'item_subno',
+							width:160,
+							align: 'center'
+						},
+						{
+							title: '品名',
+							field: 'item_name',
+							width:150,
+							align: 'center'
+						},
+						{
+							title: '商品分类',
+							field: 'cls_name',
+							width:100,
+							align: 'center'
+						},
+						{
+							title: '进价',
+							field: 'price',
+							width:100,
+							align: 'center'
+						},
+						{
+							title: '售价',
+							field: 'sale_price',
+							width:100,
+							align: 'center'
+						},
+						{
+							title: '单位',
+							field: 'unit_no',
+							align: 'center'
+						},
+						{
+							title: '产地',
+							field: 'product_area',
+							align: 'center'
+						},
+						{
+							title: '规格',
+							field: 'item_size',
+							align: 'center'
+						},
+						{
+							title: '保质期天数',
+							field: 'num2',
+							width:100,
+							align: 'center'
+						},
+						{
+							title: '毛利率',
+							field: 'mlv',
+							width:100,
+							align: 'center'
+						},
+						{
+							title: '操作',
+							toolbar: '#items-bar',
+							align: 'center',
+							fixed:'right',
+							width: 130
+						}
+					]
+				]
+				;
+				
+				var treeHeight=parent.globalHeight-25;
+				var DTree = dtree.render({
+					elem: "#clsTree",
+					height:treeHeight,
+					initLevel: "2", //默认展开层级为1
+					line: true, // 有线树
+					ficon: ["1", "-1"], // 设定一级图标样式。0表示方形加减图标，8表示小圆点图标
+					icon: ["0", "0"], // 设定二级图标样式。0表示文件夹图标，5表示叶子图标
+					method: 'get',
+					url: TREE_PATH
+				});
+
+				table.render({
+					elem: '#items-table',
+					url: DATA_PATH+'getItemInfo',
+					height: 'full-50',
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#items-toolbar',
+					defaultToolbar: []
+				});
+
+				// 绑定节点点击事件
+				dtree.on("node(clsTree)", function(obj) {
+					_parent=obj.param.nodeId;
+					table.reload("items-table",{
+							where:{'item_clsno':_parent},
+							page:{curr:1}
+					});
+					
+				});
+
+				table.on('tool(items-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					}
+				});
+
+				table.on('toolbar(items-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
+					}else if (obj.event === 'keywordQuery') {
+						window.keywordQuery(obj);
+					}
+				});
+
+				form.on('submit(items-query)', function(data) {
+					table.reload('items-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+
+				window.add = function() {
+					
+					layer.open({
+						type: 2,
+						title: '新增商品',
+						shade: 0.1,
+						area: ['850px', '600px'],
+						content: MODULE_PATH + 'product/add/clsno/'+_parent+'.html'
+					});
+				}
+				
+				window.edit = function(obj) {
+					var item_no=obj.data.item_no;
+					layer.open({
+						type: 2,
+						title: '编辑商品',
+						shade: 0.1,
+						area: ['850px', '600px'],
+						content: MODULE_PATH + 'product/edit/item_no/'+item_no+'.html'
+					});
+				}
+				
+				//行商品编码点击触发弹窗编辑
+				window.openEdit=function(item_no){
+					var item={"item_no":item_no};
+					var obj={"data":item};
+						window.edit (obj);
+				}
+				
+				//关键词搜索
+				window.keywordQuery=function(){
+					var keyword=$("#keyword").val();
+						if(keyword==''){
+							layer.msg("请输入关键词");
+							return;
+						}
+						table.reload("items-table",{
+							url: DATA_PATH+'getItemInfo',
+							where:{'keyword':keyword},
+							page:{curr:1}
+						});
+						
+						$("#keyword").val(keyword);
+				}
+				
+				window.batchRemove = function(obj) {
+					
+					var item_no = common.checkField(obj,'item_no');
+					
+					if (item_no === "") {
+						layer.msg("请选择要删除的商品", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要删除商品?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "product/delItems/item_no/" + item_no,
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										var keyword=$("#keyword").val();
+										table.reload("items-table",{
+											where:{'item_clsno':_parent,'keyword':keyword},
+											page:{curr:1}
+										});
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+					
+				}
+
+				window.remove = function(obj) {
+					
+					layer.confirm('确定要删除商品?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "product/delItems/item_no/" + obj.data['item_no'],
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				
+				window.refresh = function(param) {
+					table.reload('items-table');
+				}
+				
+			})
+		</script>
+	</body>
+</html>

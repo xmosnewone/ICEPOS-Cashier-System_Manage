@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>营业员管理</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:130px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 130px;}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">营业员编号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="oper_id" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">门店编号</label>
+							<div class="layui-input-inline">
+								<input type="text" name="branchno" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="oper-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="oper-table" lay-filter="oper-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="oper-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		</script>
+
+		<script type="text/html" id="oper-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i></button>
+		</script>
+		<script type="text/html" id="statusTpl">
+  			{{#  if(d.oper_status ==1){ }}
+    				正常
+  				{{#  } else { }}
+    				停用
+  			{{#  } }}
+		</script>
+		<script type="text/html" id="typeTpl">
+  			{{#  if(d.oper_type ==1){ }}
+    				用户
+  				{{#  } else { }}
+    				其他
+  			{{#  } }}
+		</script>
+
+		<script type="text/html" id="oper-createTime">
+			{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}
+		</script>
+
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+
+				let MODULE_PATH = "/{$MODULE_NAME}/pos/operator/";
+
+				let cols = [
+					[
+						{
+							title: '行号',
+							field: 'rowIndex',
+							align: 'center',
+							width: 80
+						},
+						{
+							title: '营业员编号',
+							field: 'oper_id',
+							align: 'center',
+							width: 100
+						},
+						{
+							title: '营业员名称',
+							field: 'oper_name',
+							align: 'center'
+						},
+						{
+							title: '所属门店',
+							field: 'branch_no',
+							align: 'center'
+						},
+						{
+							title: '状态',
+							field: 'oper_status',
+							align: 'center',
+							templet: '#statusTpl',
+						},
+						{
+							title: '类型',
+							field: 'oper_type',
+							align: 'center',
+							templet: '#typeTpl',
+						},
+						{
+							title: '最后操作时间',
+							field: 'last_time',
+							align: 'center'
+						},
+						{
+							title: '操作',
+							toolbar: '#oper-bar',
+							align: 'center',
+							width: 130
+						}
+					]
+				]
+
+				table.render({
+					elem: '#oper-table',
+					url: MODULE_PATH+"dataList",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#oper-toolbar',
+					defaultToolbar: []
+				});
+
+				table.on('tool(oper-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					}
+				});
+
+				table.on('toolbar(oper-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					}
+				});
+
+				form.on('submit(oper-query)', function(data) {
+					table.reload('oper-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+
+				form.on('switch(oper-enable)', function(obj) {
+					
+					var arr=this.value.split("|");
+				   	var posid=arr[0];
+				    var branch_no=arr[1];
+				    
+				    $.ajax({
+							url:MODULE_PATH+"stop",
+							data:{"posid":posid,'branch_no':branch_no},
+							dataType: 'json',
+							type: 'post',
+							success: function(result) {
+								//如果不为空，则填充数据
+								layer.msg(result.msg);
+							}
+						})
+				});
+
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增营业员',
+						shade: 0.1,
+						area: [common.isModile()?'100%':'450px', common.isModile()?'100%':'400px'],
+						content: MODULE_PATH + 'add.html'
+					});
+				}
+
+				window.edit = function(obj) {
+					var _id=obj.data.oper_id;
+					layer.open({
+						type: 2,
+						title: '修改营业员',
+						shade: 0.1,
+						area: ['450px', '400px'],
+						content: MODULE_PATH + 'edit/oper_id/'+_id+'.html'
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该营业员?', {
+						icon: 3,
+						title: '删除提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "deleteOperator/oper_id/" + obj.data['oper_id']+"/branch_no/"+obj.data['branch_no'],
+							dataType: 'json',
+							type: 'delete',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('oper-table');
+				}
+			})
+		</script>
+	</body>
+</html>

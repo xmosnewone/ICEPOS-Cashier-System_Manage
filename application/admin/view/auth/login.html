@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>{php} echo $web_config['web_name'];{/php}信息管理系统</title> 
+    <link href="__STATIC__/css/admin/base.css" rel="stylesheet">
+    <link href="__STATIC__/css/admin/login.css" rel="stylesheet">
+	<script type="text/javascript" src="__STATIC__/lib/jquery.min.js"></script>
+</head> 
+<script>
+function checkForm(){
+	if($("#loginname").val()==''){
+		$("#error_msg").html("请输入用户名");
+		$("#alert-error").show();
+		return false;
+	}
+	
+	if($("#password").val()==''){
+		$("#error_msg").html("请输入密码");
+		$("#alert-error").show();
+		return false;
+	}
+	
+	return true;
+}
+</script>
+<body>
+	<div class="login-hd">
+		<div class="left-bg"></div>
+		<div class="right-bg"></div>
+		<div class="hd-inner">
+			<span class="logo"></span>
+			<span class="sys-name"> 方程软件开发工作室{php} echo $web_config['site_name'];{/php}</span>
+		</div>
+	</div>
+	<div class="login-bd">
+		<div class="bd-inner">
+			<div class="inner-wrap">
+				<div class="lg-zone">
+					<div class="lg-box">
+						<div class="lg-label"><h4>用户登录</h4></div>
+						
+						<div class="alert alert-error" id="alert-error"  {if !$msgError}style="display:none;" {/if}>
+			              <i class="iconfont">&#xe62e;</i>
+			              <span id="error_msg"><{$msgError}></span>
+			            </div>
+			            
+						<form action="{:U('auth/index')}" id='loginform' method='post' onSubmit="return checkForm();">
+							<div class="lg-username input-item clearfix">
+								<i class="iconfont">&#xe60d;</i>
+								<input type="text" name="loginname" id="loginname" placeholder="账号">
+							</div>
+							<div class="lg-password input-item clearfix">
+								<i class="iconfont">&#xe634;</i>
+								<input type="password"  id="password" placeholder="请输入密码" name='password'>
+							</div>
+							<div class="lg-check clearfix">
+								<div class="input-item">
+									<i class="iconfont">&#xe633;</i>
+									<input type="text" placeholder="验证码" name="safecode">
+								</div>
+								<span class="check-code">
+								<img src='{:U('auth/captcha')}' onclick="this.src='{:U('auth/captcha')}?'+Math.random();" width="115" height="42">
+								</span>
+							</div>
+							<!--
+							<div class="tips clearfix">
+								<label><input type="checkbox" checked="checked">记住用户名</label>
+								<a href="javascript:;" class="register">立即注册</a>
+								<a href="javascript:;" class="forget-pwd">忘记密码？</a>
+							</div>
+							-->
+							<div class="enter">
+							<!--
+								<a href="javascript:;" class="purchaser" onClick="javascript:window.location='/door/auth/index'">门店登录</a>
+								-->
+								<input type="submit" value="" style="display:none;">
+								<a href="javascript:;" style="width:300px;" class="purchaser" onClick="javascript:$('#loginform').submit();">总管理登录</a>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="lg-poster"></div>
+			</div>
+		</div>
+	</div>
+	<div class="login-ft">
+		<div class="ft-inner">
+			<div class="other-info">版权所有  © 2024 佛山市顺德区方程软件开发工作室</div>
+		</div>
+	</div>
+</body> 
+</html>

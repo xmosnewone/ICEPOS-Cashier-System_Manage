@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>压缩图片</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-row layui-col-space10">
+
+			<div class="layui-col-md12">
+				<div class="layui-card">
+					<div class="layui-card-header">
+						压缩图片
+					</div>
+					<div class="layui-card-body">
+						将对整个系统的Uploads目录下的图片执行压缩操作
+					</div>
+					<div class="layui-card-body">
+						<button plain class="pear-btn pear-btn-primary" onclick="cleanCache();">确认执行压缩</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<script src="__STATIC__/lib/jquery.min.js"></script>
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script>
+			var layer=null;
+			var loading=null;
+			layui.use(['element', 'code',"layer"], function() {
+				layer= layui.layer;
+			})
+			function cleanCache(){
+				layer.confirm('确定要压缩图片?', {
+					icon: 3,
+					title: '执行提示'
+				}, function(index) {
+					loading=layer.load();
+					$.ajax({
+						url: "/{$MODULE_NAME}/manager/doCompresImg",
+						dataType: 'json',
+						type: 'get',
+						success: function(result) {
+							layer.close(loading);
+							if (result.code) {
+								layer.msg(result.msg, {
+									icon: 1,
+									time: 2000
+								}, function() {
+									
+								});
+
+							} else {
+								layer.msg(result.msg, {
+									icon: 2,
+									time: 2000
+								});
+							}
+						}
+					})
+				});
+				
+			}
+			
+		</script>
+	</body>
+</html>

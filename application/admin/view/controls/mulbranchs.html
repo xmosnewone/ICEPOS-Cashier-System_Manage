@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>多选分店仓库列表</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="__PEAR__/admin/css/other/department.css"/>
+	</head>
+	<body class="pear-container">
+	<!-- 使用改包含页面之前，必须首先引入layui和pear -->
+	<div class="layui-row layui-col-space15">
+			<div class="layui-col-md12">
+				<div class="layui-card">
+					
+					<div class="layui-card-body" style="width:100%;overflow-x:scroll">
+						<form class="layui-form" action="">
+							<div class="layui-form-item" style="margin-bottom:0;">
+								<div class="layui-form-item layui-inline">
+									<label class="layui-form-label">搜索</label>
+									<div class="layui-input-inline"  style="width:350px">
+										<input type="text" id="keyword" name="keyword" placeholder="关键词" class="layui-input"/>
+									</div>
+								</div>
+								
+								<div class="layui-form-item layui-inline">
+									<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="branchs-query">
+										<i class="layui-icon layui-icon-search"></i>
+										查询
+									</button>
+									<button type="button" class="pear-btn pear-btn-md pear-btn-warming" id="callback">
+										<i class="pear-icon pear-icon-back"></i>
+										确定返回
+									</button>
+								</div>
+							</div>
+					</form>
+						<table id="branchs-table" lay-filter="branchs-table"></table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				
+				let MODULE_PATH = "/{$MODULE_NAME}/common/";
+				let DATA_PATH = MODULE_PATH+"index/";
+
+				let cols = [
+					[
+						{
+							type: 'checkbox',
+						},
+						{
+							title: '行号',
+							field: 'rowIndex',
+							align: 'left',
+							width:80,
+						},
+						{
+							title: '仓库编号',
+							field: 'branch_no',
+							align: 'left',
+							width:120,
+						},
+						{
+							title: '仓库名称',
+							field: 'branch_name',
+							align: 'left'
+						},
+						{
+							title: '联系人',
+							field: 'branch_man',
+							align: 'left'
+						},
+						{
+							title: '联系电话',
+							field: 'branch_tel',
+							align: 'left'
+						}
+						
+					]
+				]
+
+				table.render({
+					elem: '#branchs-table',
+					url: DATA_PATH+'getBranchInfo',
+					width:750,
+					height: 430,
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: false,
+					defaultToolbar: []
+				});
+
+				form.on('submit(branchs-query)', function(data) {
+					//console.log(data.field.keyword);
+					var _keyword=data.field.keyword;
+					table.reload('branchs-table', {
+						where: {'keyword':_keyword},
+						page:{curr:1}
+					})
+					return false;
+				});
+				
+				var  active = {
+						getCheckData: function(){ //获取选中数据
+						      var checkStatus = table.checkStatus('branchs-table')
+						      					,data = checkStatus.data;
+								if(data.length ==0){
+									layer.msg("请选择分店仓库");
+									return;
+								}
+								
+								parent.callBackMulBranch(data);
+					    }
+				}
+				//确认返回按钮点击事件
+				$('#callback').on('click', function(){
+					     active['getCheckData'].call(this);
+					     return;
+				});
+			})
+		</script>
+	</body>
+</html>

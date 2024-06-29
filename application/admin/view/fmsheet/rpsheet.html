@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>客户结算单</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <style>
+		a.back{color:#ff6a08!important}
+		.layui-input{width:140px;}
+		.layui-input-long{width:413px;}
+		.layui-form-item .layui-input-inline{width: 140px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.sheetno{margin-left:20px;}
+		.approve{position: absolute;filter: alpha(opacity=100,Style=0);width: 150px;border-style: solid;border-width: 2px;border-color: red;
+		    word-break: break-all;table-layout: fixed;font-family: 隶书;color: Red;font-size: 30px;padding-left: 5px;
+		    padding-top: 5px;padding-bottom: 5px;padding-right: 5px;text-align: center;left: 400px;top:80px;z-index:1000;}
+	</style>
+</head>
+<body>
+
+		<div class="layui-card">
+			<div class="layui-card-header">
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="backToList()">
+				<i class="pear-icon pear-icon-back"></i>
+				返回
+				</button>
+				{if condition="$one['approve'] neq '1'"}
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="saveCombItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				保存并返回
+				</button>
+				{present name="one"}
+				{if condition="$one['approve'] neq '1' and $one['sheet_no'] neq ''"}
+				<button class="pear-btn pear-btn-warming pear-btn-md" onclick="approve()">
+				<i class="layui-icon layui-icon-vercode"></i>
+				审核
+				</button>
+				{/if}
+				{/present}
+				{/if}
+				
+				{if condition="$one['sheet_no'] neq ''"}
+				<label class="sheetno">单号:【{$one.sheet_no}】</label>
+				{/if}
+				{if condition="$one['approve'] eq '1'"}
+				<label class="approve">【已审核】</label>
+				{/if}
+				
+			</div>
+		</div>
+
+		<div class="layui-card">
+					<form class="layui-form" action="" onsubmit="return false">
+						<input type="hidden" id="hidShowSheetNo" name="hidShowSheetNo" value="{$one['sheetNo']}" />
+						<div class="layui-container">  
+						  <div class="layui-row">
+						    
+					    		 <div class="layui-form-item">
+					    		 	<div class="layui-form-item layui-inline">
+									    <label class="layui-form-label">批发客户</label>
+									    <div class="layui-input-inline inputdiv">
+									    	<input type="text" name="wholesale" id="wholesale" autocomplete="off" value="{$one['consumerName']}" placeholder="" class="layui-input" onfocus="showWholesale()">
+											<input type="hidden" name="clients_no" id="clients_no" value="{$one['consumerNo']}">
+											<i class="layui-icon layui-icon-user"></i>
+										</div>
+								    </div>
+									  <div class="layui-form-item layui-inline">
+											<label class="layui-form-label">付款方式</label>
+											<div class="layui-input-inline inputdiv">
+												<input type="text" name="payName" id="payName" value="{$one.payName}" autocomplete="off" placeholder="" class="layui-input" onfocus="showPayment()">
+												<input type="hidden" name="payWay" id="payWay" value="{$one['payWay']}">
+												<i class="layui-icon layui-icon-dollar"></i>
+											</div>
+										</div>
+										<div class="layui-form-item layui-inline">
+											<label class="layui-form-label">备注原因</label>
+											<div class="layui-input-inline">
+												<input type="text" name="memo" id="memo" value="{$one.memo}" autocomplete="off" placeholder="" class="layui-input">
+											</div>
+										</div>
+								    
+								  </div>
+								  
+								  <div class="layui-form-item">
+									<div class="layui-form-item layui-inline">
+										<label class="layui-form-label">制单人员</label>
+										<div class="layui-input-inline">
+											<input type="text" name="order_man" id="order_man" value="{$one['orderMan']}" autocomplete="off" placeholder="" class="layui-input">
+										</div>
+									</div>
+									
+									<div class="layui-form-item layui-inline">
+										<label class="layui-form-label">制单日期</label>
+										<div class="layui-input-inline">
+											<input type="text" name="oper_date" id="oper_date" value="{$one['operDate']?$one['operDate']:date('Y-m-d',time())}" autocomplete="off" placeholder="" class="layui-input">
+										</div>
+									</div>
+									
+									 <div class="layui-form-item layui-inline">
+										<label class="layui-form-label">审核人员</label>
+										<div class="layui-input-inline">
+											<input type="text" name="confirm_name" id="confirm_name" value="{$one.confirmMan}" autocomplete="off" placeholder="" class="layui-input" readonly="readonly">
+										</div>
+									</div>
+									
+									<div class="layui-form-item layui-inline">
+										<label class="layui-form-label">审核日期</label>
+										<div class="layui-input-inline">
+											<input type="text" name="work_date" id="work_date" value="{$one.workDate}" autocomplete="off" placeholder="" class="layui-input" readonly="readonly">
+										</div>
+									</div>
+									
+					    		 </div>
+						  </div>
+						  
+						</div>
+					</form>
+		</div>
+		  
+ 		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="rpsheet-table" lay-filter="rpsheet-table"></table>
+			</div>
+		</div>
+		
+		<script type="text/html" id="comb-bar">
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+			<i	class="layui-icon layui-icon-delete"></i>
+			</button>
+	    </script>     
+
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script src="__STATIC__/js/admin/common.js"></script>
+<script>
+var $;
+var multiple_items_url="{:U('Controls/multipleItems')}";
+var items_url="{:U('Controls/items')}";
+var item_no="";
+var _layerIndex=null;
+var all_item_no=[];
+var rowIndex=0;
+var rowObj=null;
+var jq=null;
+var branchNo='';
+var suplier='';
+var isSingle=false;
+var formulaChecked=2;
+var stockflag=0;
+var branchs_url="{:U('Controls/branchs')}";
+var operator_url="{:U('Controls/operators')}";
+var wholesales_url="{:U('Controls/wholesales')}";
+var payment_url="{:U('Controls/payments')}";
+var woorder_url="{:U('Controls/woorders')}";
+var ajaxing=false;
+var loadGood=false;
+
+var emptyGrid={rowIndex: '', sheet_no: '', amountReceivable: '',amountReceived: '', 
+				amountOutstanding: '',amountActual:'', amountCoupon: '', memo:''
+			};
+				
+//判断是否未选择必选项目
+function emptyOptions(){
+	clients_no=$("#clients_no").val();
+	if(clients_no==''){
+			layer.alert("请选择批发客户");
+			return false;
+	}
+	
+	var payName=$("#payName").val();
+	if(payName==''){
+			layer.alert("请选择付款方式");
+			return false;
+	}
+	return true;
+}
+
+layui.use(['form','jquery','table','common','laydate'],function(){
+    let form = layui.form;
+    let common = layui.common;
+    let table = layui.table;
+    let laydate=layui.laydate;
+    $ = layui.jquery;
+    jq=$;
+   
+    var path="/{$MODULE_NAME}/fmsheet/rpsheet/";
+    {if condition="$one['sheet_no'] neq ''"}
+    let	table_url="/{$MODULE_NAME}/fmsheet/Jsondata/GetRPSheetForSOSheet/sheetno/{$one['sheet_no']}";
+	{else/}
+	let	table_url="";
+	{/if}
+
+	let cols = [
+		[
+			{
+				title: '行号',
+				field: 'rowIndex',
+				align: 'center',
+				width: 80,
+				totalRowText: '合计'
+			},
+			{
+				title: '单号',
+				field: 'sheet_no',
+				align: 'center',
+				width: 180
+			},
+			{
+				title: '应收金额',
+				field: 'amountReceivable',
+				align: 'center',
+				width: 120
+			},
+			{
+				title: '已收金额',
+				field: 'amountReceived',
+				align: 'center',
+				width: 120,
+			},
+			{
+				title: '未收金额',
+				field: 'amountOutstanding',
+				align: 'center',
+				width: 120
+			},
+			{
+				title: '实收金额',
+				field: 'amountActual',
+				align: 'center',
+				width: 150,
+				style:'background-color: #fff6f0;',
+				edit:'text',
+				totalRow: true
+			},
+			{
+				title: '优惠金额',
+				field: 'amountCoupon',
+				align: 'center',
+				width: 150,
+				style:'background-color: #fff6f0;',
+				edit:'text',
+				totalRow: true
+			},
+			{
+				title: '备注',
+				field: 'memo',
+				align: 'center',
+				width: 150
+			}
+			
+		]
+	]
+
+	var emptyData=[];
+	//显示10行空数据
+	for(var i=1;i<=10;i++){
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=i;
+		emptyData.push(grid);
+	}
+
+	table.render({
+		elem: '#rpsheet-table',
+		url: table_url,
+		page: false,
+		cols: cols,
+		limit:1000,
+		data:emptyData,
+		skin: 'line',
+		toolbar: '',
+		totalRow: true,
+		defaultToolbar: [],
+		done:function(){
+			
+			{if condition="$one['approve'] neq '1'"}
+			rebuildItemNo();
+			editListener();
+			{else /}
+			limitEdit();
+			{/if}
+		}
+	});
+	
+	//在表格的最后面增加一行空数据
+	window.addEmptyRow=function(){
+		var rows=table.getData("rpsheet-table");
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=rows.length+1;
+		rows.push(grid);
+		
+		reloadTable(rows);
+	}
+	
+	//重载表格
+	window.reloadTable=function(rows){
+		table.reload('rpsheet-table',{
+			url: '',
+			data : rows
+		});
+		rebuildItemNo();
+	}
+	
+	//限制编辑
+	window.limitEdit=function(){
+		$(".layui-table").find('td').data('edit',false);
+	}
+	
+	//改变箱数或者数量，重新计算对方数量
+	//isPack表示改变箱数，否则数量
+	//spec进货规格
+	window.changeNum=function(data,isPack){
+		if(isPack==true){
+			//计算数量
+			data['order_qty']=data['large_qty']*data['purchase_spec'];//数量=箱数*规格
+		}else{
+			//计算箱数
+			var spec=parseFloat(data['purchase_spec']);
+			if(spec>0){
+				data['large_qty']=data['order_qty']/data['purchase_spec'];//箱数=数量/规格
+			}
+		}
+		return data;
+	}
+	
+	//计算特定字段值
+	window.copyField=function(data){
+		return data;
+	}
+	
+	//计算售价金额
+	window.sumTotal=function(data){
+		data['sale_amt']=data['order_qty']*data['sale_price'];//数量*售价
+		data['sale_amt']=parseFloat(data['sale_amt']);
+		data['sub_amt']=data['order_qty']*data['item_price'];//数量*进价
+		data['sub_amt']=parseFloat(data['sub_amt']);
+		return data;
+	}
+	
+	//删除按钮工具按钮事件
+	table.on('tool(rpsheet-table)', function(obj) {
+		var event=obj.event;
+		var index=obj.tr.attr("data-index");
+		var rows=table.getData("rpsheet-table");
+		if (event === 'remove') {
+			//删除行
+			obj.del();
+			//删除索引
+			rows.splice(index, 1);
+			//重新加载表格
+			reloadTable(rows);
+		}
+		
+		event.stoppropagation();
+	});
+    
+    //监听单元格编辑
+  	table.on('edit(rpsheet-table)', function(obj){
+  		
+    	if(!emptyOptions()){
+    		$(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val("");
+    		return;
+    	}
+    	
+  		//验证数字规则
+  		var regNum =  /^[0-9.]*$/g;
+  		//验证商品编码
+  		var regNo =  /^[0-9a-zA-Z]*$/g;
+  		
+  		var value = obj.value //得到修改后的值
+		    ,data = obj.data //得到所在行所有键值
+		    ,field = obj.field; //得到字段
+	    var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';   
+		var oldtext = $(selector).text();
+
+		 if(field=='item_no'&&!regNo.test(value)){
+	    		layer.alert("请输入字母或数字");
+	    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+	    		return;
+		 }
+		 
+		 if(field=='large_qty'||field=='order_qty'||field=='send_qty'||field=='item_price'){
+			 if(!regNum.test(value)){
+		    		layer.alert("请输入数字");
+		    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+		    		return;
+	    	}
+		 }   
+		 
+		 //修改当前行得的值，刷新表格
+		 if(field=='large_qty'||field=='order_qty'||field=='item_price'){
+			 	var index=obj.tr.attr("data-index");
+				var rows=table.getData("rpsheet-table");
+				var isPack=false;
+					//改变箱数
+					if(field=='large_qty'){
+						isPack=true;
+					}
+					//计算箱数和数量
+					data=window.changeNum(data,isPack);
+				
+					//修改多个字段值
+					data=window.sumTotal(data);
+					rows[index]=data;
+					//重新加载表格
+					reloadTable(rows);
+					return;
+		 }
+		 
+		 rowIndex=obj.tr.attr("data-index");
+		 rowIndex=parseInt(rowIndex);
+  		
+  	});
+    
+	//返回
+	window.backToList=function(){
+		window.location.href="/{$MODULE_NAME}/fmsheet/rpsheet/index";
+	}
+	
+	//显示批发商选择框
+	window.showWholesale=function(){
+		{if condition="$one['approve'] eq '1'"}
+			return;
+		{/if}
+		_layerIndex=openWin("批发商选择",wholesales_url,"800px","600px");
+	}
+	
+	//批发商选择后的回调函数
+	window.callBackWholesale=function(data){
+		
+		$("#wholesale").val(data[0]['linkname']);
+		$("#clients_no").val(data[0]['clients_no']);
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+			_layerIndex=null;
+		}
+		var supcustno=data[0]['clients_no'];
+		//返回批发客户的销售订单
+		$.ajax({
+            url:"/{$MODULE_NAME}/fmsheet/Jsondata/GetApproveSOSheet",
+            data:{"supcustno":supcustno},
+            dataType:'json',
+            type:'post',
+            success:function(result){
+                if(result.code){
+                	addCombItem(result.data);
+                }else{
+                    layer.msg(result.msg,{icon:2,time:2000});
+                }
+                
+                ajaxing=false;
+            }
+     	})
+	}
+	
+	//显示支付方式
+	window.showPayment=function(){
+		{if condition="$one['approve'] eq '1'"}
+			return;
+		{/if}
+		_layerIndex=openWin("支付方式选择",payment_url,"800px","600px");
+	}
+	
+	//支付方式的回调函数
+	window.callBackPayment=function(data){
+		
+		$("#payName").val(data[0]['pay_name']);
+		$("#payWay").val(data[0]['pay_way']);
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+			_layerIndex=null;
+		}
+	}
+	
+	//重新堆栈数组，保存当前所有的商品编号
+	function rebuildItemNo(){
+		
+		all_item_no=new Array();
+		
+		var rows=table.getData("rpsheet-table");
+		
+		for(var i in rows){
+			if(rows[i]['sheet_no']!=''){
+				all_item_no.push(rows[i]['sheet_no']);
+			}
+		}
+	}
+
+	//监听单元格编辑
+	function editListener(){
+	    //数据表格点击事件
+	    table.on('row(rpsheet-table)', function(obj){
+			
+	    	if(loadGood){
+	    		return;
+	    	}
+	    	
+	    	var bg=$(this).attr("style");
+	    	if(bg==undefined||bg=='background-color:#ffffff;'){
+	    		$(this).attr({ "style": "background-color:#fafafa;" });
+	    	}else{
+	    		$(this).attr({ "style": "background-color:#ffffff;" });
+	    	}
+	    	
+	    	if(!emptyOptions()){
+	    		return;
+	    	}
+	    	
+	    	rowObj=obj;
+			//当前编辑行的序号
+			rowIndex=rowObj.tr.attr("data-index");
+
+		});
+	}
+	
+	//添加商品
+	function addCombItem(data){
+		//获取当前表格的所有数据
+		var rows=table.getData("rpsheet-table");
+		var update_rows=[];
+		
+		var next=update_rows.length+1;
+		for(var i in data){
+			var obj=data[i];
+			
+			var array=new Object();
+				array=obj;
+				array['rowIndex']=next;
+				array['sheet_no']=obj['sheet_no'];
+				array['amountReceivable']=obj['amountReceivable'];
+				array['amountReceived']=obj['amountReceived'];
+				array['amountOutstanding']=obj['amountOutstanding'];
+				array['amountActual']=obj['amountActual'];
+				array['amountCoupon']=obj['amountCoupon'];
+				
+			update_rows.push(array);
+			next++;
+		}
+			reloadTable(update_rows);
+	}
+	
+	//清空当前行
+	window.deleteItem=function(){
+		
+		if(rowObj==null){
+			layer.msg("请选择要清空的数据行");
+			return;
+		}
+		
+		var rows=table.getData("rpsheet-table");
+		rows.splice(rowIndex,1);
+		
+		var _index=1;
+		for(var i in rows){
+			rows[i]['rowIndex']=_index;
+			_index++;
+		}
+		reloadTable(rows);
+	}
+	
+	//审核批发订单
+	window.approve=function(){
+		
+		//防止多次触发
+		if(ajaxing){
+			return;
+		}
+	
+		var sheetno=$("#hidShowSheetNo").val();
+		if($.trim(sheetno)==''){
+			layer.msg("缺少客户结算单号");
+			return;
+		}
+		
+		layer.confirm('确认审核客户结算单?', {
+			icon: 3,
+			title: '提示'
+		}, function(index) {
+			$.ajax({
+	            url:path+"approve",
+	            data:{"sheetno":sheetno},
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							location.reload();
+						});
+
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	                
+	                ajaxing=false;
+	            }
+	     	})
+		});
+
+	}
+	
+	//保存结算单
+	window.saveCombItem=function(){
+		
+		//防止多次触发
+		if(ajaxing){
+			return;
+		}
+		
+    	if(!emptyOptions()){
+    		return;
+    	}
+		
+		var lindex=layer.msg("请稍后...");
+		var rows=table.getData("rpsheet-table");
+		
+		if(rows.length<=0){
+			layer.msg("请输入明细");
+			return;
+		}
+		
+		var hasGood=false;
+		for(var i in rows){
+			if(rows[i]['sheet_no']!=''&&rows[i]['sheet_no']!=undefined){
+				hasGood=true;
+				break;
+			}
+		}
+		
+		if(!hasGood){
+			layer.msg("请输入明细");
+			return;
+		}
+		
+		var sheet={
+			        "sheetno": $("#hidShowSheetNo").val(), 
+			        "supcust_no": $("#clients_no").val(),
+			        "order_man": $("#order_man").val(),
+			        "oper_date": $("#oper_date").val(),
+			        "oper_id": $("#oper_id").val(),
+			        "pay_way": $("#payWay").val(),
+			        "confirm_name": $("#confirm_name").val(),
+			        "work_date": $("#work_date").val(),
+			        "memo": $("#memo").val()
+				}
+		
+		ajaxing=true;
+        
+		$.ajax({
+	            url:path+"save",
+	            data:{"items":rows,"sheet":sheet},
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	layer.close(lindex);
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							window.backToList();
+						});
+
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	                
+	                ajaxing=false;
+	            }
+	     })
+	}
+	
+})
+</script>
+</body>
+</html>

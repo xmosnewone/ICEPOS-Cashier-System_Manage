@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增调价单</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+    <style>
+		a.back{color:#ff6a08!important}
+		.layui-input{width:130px;}
+		.layui-form-item .layui-input-inline{width: 130px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.sheetno{margin-left:20px;}
+		.approve{position: absolute;filter: alpha(opacity=100,Style=0);width: 150px;border-style: solid;border-width: 2px;border-color: red;
+		    word-break: break-all;table-layout: fixed;font-family: 隶书;color: Red;font-size: 30px;padding-left: 5px;
+		    padding-top: 5px;padding-bottom: 5px;padding-right: 5px;text-align: center;left: 400px;top:80px;z-index:1000;}
+	</style>
+</head>
+<body>
+
+		<div class="layui-card">
+			<div class="layui-card-header">
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="backToList()">
+				<i class="pear-icon pear-icon-back"></i>
+				返回
+				</button>
+				{if condition="$pageParams['approve'] neq 'approve'"}
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="saveCombItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				保存并返回
+				</button>
+				<button class="pear-btn pear-btn-primary pear-btn-md" onclick="selectGoods()">
+				<i class="pear-icon pear-icon-file-open"></i>
+				选择添加商品
+				</button>
+				{if condition="$pageParams['approve'] eq 'update'"}
+				<button class="pear-btn pear-btn-warming pear-btn-md" onclick="approve()">
+				<i class="layui-icon layui-icon-vercode"></i>
+				审核
+				</button>
+				{/if}
+				
+				<button class="pear-btn pear-btn-danger pear-btn-md" onclick="deleteItem()">
+				<i class="pear-icon pear-icon-save"></i>
+				清空当前行
+				</button>
+				{/if}
+				
+				{if condition="$pageParams['approve'] neq 'add'"}
+				<label class="sheetno">单号:【{$pageParams.sheetNo}】</label>
+				{if condition="$pageParams['approve'] eq 'approve'"}
+				<label class="approve">【已审核】</label>
+				{/if}
+				{/if}
+			</div>
+		</div>
+
+		<div class="layui-card">
+					<form class="layui-form" action="" onsubmit="return false">
+						<input type="hidden" id="hidShowSheetNo" name="hidShowSheetNo" value="{$pageParams.sheetNo}" />
+						<div class="layui-container">  
+						  <div class="layui-row">
+						    
+					    		 <div class="layui-form-item">
+					    		 	<div class="layui-form-item layui-inline">
+									    <label class="layui-form-label">调价门店</label>
+									    <div class="layui-input-inline inputdiv">
+									    	<input type="text" name="txtBranchlist" id="txtBranchlist" autocomplete="off" value="{$pageParams['branchNo']}" placeholder="" class="layui-input" onfocus="showBranchs()">
+											<i class="layui-icon layui-icon-home"></i>
+										</div>
+								    </div>
+								    
+								    <div class="layui-form-item layui-inline">
+										<label class="layui-form-label">制单人员</label>
+										<div class="layui-input-inline">
+											<input type="text" name="txtOperNo" id="txtOperNo" value="{$pageParams['orderMan']}" autocomplete="off" placeholder="" class="layui-input">
+										</div>
+									</div>
+									
+									<div class="layui-form-item layui-inline">
+										<label class="layui-form-label">制单日期</label>
+										<div class="layui-input-inline">
+											<input type="text" name="txtOperDate" id="txtOperDate" value="{$pageParams.operDate}" autocomplete="off" placeholder="" class="layui-input">
+										</div>
+									</div>
+								  </div>
+								  
+								  
+								   <div class="layui-form-item">
+					    		 	<div class="layui-form-item layui-inline">
+									    <label class="layui-form-label">审核人员</label>
+									    <div class="layui-input-inline">
+									    	<input type="text" name="txtConfirmMan" id="txtConfirmMan" value="{$pageParams.confirmMan}" autocomplete="off" placeholder="" class="layui-input" readonly="readonly">
+										</div>
+								    </div>
+								    
+								    <div class="layui-form-item layui-inline">
+										<label class="layui-form-label">审核日期</label>
+										<div class="layui-input-inline">
+											<input type="text" name="txtWorkDate" id="txtWorkDate" value="{$pageParams.workDate}" autocomplete="off" placeholder="" class="layui-input" readonly="readonly">
+										</div>
+									</div>
+									
+									<div class="layui-form-item layui-inline">
+										<label class="layui-form-label">备注原因</label>
+										<div class="layui-input-block">
+											<input type="text" name="txtMemo" id="txtMemo" value="{$pageParams.memo}" autocomplete="off" placeholder="" class="layui-input">
+										</div>
+									</div>
+								  </div>
+								  
+						
+						    
+						  </div>
+						  
+						</div>
+					</form>
+		</div>
+		  
+ 		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="pxsheet-table" lay-filter="pxsheet-table"></table>
+			</div>
+		</div>
+		
+		<div id="formula_div" style="display:none;">
+		{include file="product/base/formula" /}
+		</div>
+		
+		<script type="text/html" id="comb-bar">
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove">
+			<i	class="layui-icon layui-icon-delete"></i>
+			</button>
+	    </script>     
+
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script src="__STATIC__/js/admin/common.js"></script>
+<script>
+var $;
+var multiple_items_url="{:U('Controls/multipleItems')}";
+var items_url="{:U('Controls/items')}";
+var item_no="{$model.item_no}";
+var _layerIndex=null;
+var all_item_no=[];
+var rowIndex=0;
+var rowObj=null;
+var jq=null;
+var branchNo='';
+var isSingle=false;
+var formulaChecked=2;
+var stockflag=0;
+var branchs_url="{:U('Controls/branchs')}";
+var ajaxing=false;
+var loadGood=false;
+
+var emptyGrid={rowIndex: '', item_no: '', item_subno: '', item_name: '', price: '',price1:'', sale_price: '', sale_price1:'',mlv:'',new_mlv:'', vip_price: '', vip_price1: '',sup_ly_rate:'',sup_ly_rate1:'', trans_price: '',trans_price1:'', unit_no: ''};
+//计算现毛利率
+function caucMlv(sale_price1,price1){
+	if (parseFloat(sale_price1) > 0) {
+		var lv = parseFloat((parseFloat(sale_price1) - parseFloat(price1)) / parseFloat(sale_price1)).toFixed(4) * 100;
+		return lv + "%";
+	}
+	return '0';
+}
+
+//判断是否未选择分店
+function emptyBranch(){
+	branchNo=$("#txtBranchlist").val();
+	if(branchNo==''){
+			layer.alert("请选择分店仓库");
+			return false;
+	}
+	return true;
+}
+
+layui.use(['form','jquery','table','common'],function(){
+    let form = layui.form;
+    let common = layui.common;
+    let table = layui.table;
+    	$ = layui.jquery;
+    	jq=$;
+    var path="/{$MODULE_NAME}/pcprice/pxflow/";
+    {if condition="$pageParams['approve'] neq 'add'"}
+    let	table_url="/{$MODULE_NAME}/pcprice/Jsondata/getPXFlowDetail/sheetno/{$pageParams['sheetNo']}";
+	{else/}
+	let	table_url="";
+	{/if}
+
+	let cols = [
+		[
+			{
+				title: '行号',
+				field: 'rowIndex',
+				align: 'center',
+				width: 80,
+				fixed: 'left'
+			},
+			{
+				title: '货号',
+				field: 'item_no',
+				align: 'center',
+				width: 180,
+				style:'background-color: #fff6f0;',
+				edit:'text',
+				fixed: 'left'
+			},
+			{
+				title: '商品名称',
+				field: 'item_name',
+				align: 'center',
+				width: 180,
+				fixed: 'left'
+			},
+			{
+				title: '自编码',
+				field: 'item_subno',
+				align: 'center',
+				width: 180,
+			},
+			{
+				title: '原进价',
+				field: 'price',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现进价',
+				field: 'price1',
+				align: 'center',
+				width: 100,
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '原售价',
+				field: 'sale_price',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现售价',
+				field: 'sale_price1',
+				align: 'center',
+				width: 100,
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '原毛利率',
+				field: 'mlv',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现毛利率',
+				field: 'new_mlv',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '原会员价',
+				field: 'vip_price',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现会员价',
+				field: 'vip_price1',
+				align: 'center',
+				style:'background-color: #fff6f0;',
+				width: 100,
+				edit:'text'
+			},
+			{
+				title: '原联营扣率',
+				field: 'sup_ly_rate',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现联营扣率',
+				field: 'sup_ly_rate1',
+				align: 'center',
+				width: 100,
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '原配送价',
+				field: 'trans_price',
+				align: 'center',
+				width: 100,
+			},
+			{
+				title: '现配送价',
+				field: 'trans_price1',
+				align: 'center',
+				width: 100,
+				style:'background-color: #fff6f0;',
+				edit:'text'
+			},
+			{
+				title: '单位',
+				field: 'unit_no',
+				align: 'center',
+				width: 80,
+			}
+			
+		]
+	]
+
+	var emptyData=[];
+	//显示10行空数据
+	for(var i=1;i<=10;i++){
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=i;
+		emptyData.push(grid);
+	}
+
+	table.render({
+		elem: '#pxsheet-table',
+		url: table_url,
+		page: false,
+		cols: cols,
+		limit:1000,
+		data:emptyData,
+		skin: 'line',
+		toolbar: '',
+		defaultToolbar: [],
+		done:function(){
+			
+			{if condition="$pageParams['approve'] neq 'approve'"}
+			rebuildItemNo();
+			editListener();
+			{else /}
+			limitEdit();
+			{/if}
+		}
+	});
+	
+	//在表格的最后面增加一行空数据
+	window.addEmptyRow=function(){
+		var rows=table.getData("pxsheet-table");
+		var grid=new Object();
+		//复制对象
+		$.extend(grid,emptyGrid);
+		grid.rowIndex=rows.length+1;
+		rows.push(grid);
+		
+		reloadTable(rows);
+	}
+	
+	//重载表格
+	window.reloadTable=function(rows){
+		table.reload('pxsheet-table',{
+			url: '',
+			data : rows
+		});
+		rebuildItemNo();
+	}
+	
+	//限制编辑
+	window.limitEdit=function(){
+		$(".layui-table").find('td').data('edit',false);
+	}
+	//复制特定字段
+	window.copyField=function(data){
+		data['price1']=data['price'];
+		data['sale_price1']=data['sale_price'];
+		data['vip_price1']=data['vip_price'];
+		data['sup_ly_rate1']=data['sup_ly_rate'];
+		data['trans_price1']=data['trans_price'];
+		return data;
+	}
+	
+	//删除按钮工具按钮事件
+	table.on('tool(pxsheet-table)', function(obj) {
+		var event=obj.event;
+		var index=obj.tr.attr("data-index");
+		var rows=table.getData("pxsheet-table");
+		if (event === 'remove') {
+			//删除行
+			obj.del();
+			//删除索引
+			rows.splice(index, 1);
+			//重新加载表格
+			reloadTable(rows);
+		}
+		
+		event.stoppropagation();
+	});
+    
+    //监听单元格编辑
+  	table.on('edit(pxsheet-table)', function(obj){
+  		
+    	if(!emptyBranch()){
+    		$(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val("");
+    		return;
+    	}
+    	
+  		//验证数字规则
+  		var regNum =  /^[0-9.]*$/g;
+  		//验证商品编码
+  		var regNo =  /^[0-9a-zA-Z]*$/g;
+  		
+  		var value = obj.value //得到修改后的值
+		    ,data = obj.data //得到所在行所有键值
+		    ,field = obj.field; //得到字段
+	    var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';   
+		var oldtext = $(selector).text();
+
+		 if(field=='item_no'&&!regNo.test(value)){
+	    		layer.alert("请输入字母或数字");
+	    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+	    		return;
+		 }
+		 
+		 if(field=='price1'||field=='sale_price1'||field=='vip_price1'||field=='sup_ly_rate1'||field=='trans_price1'){
+			 if(!regNum.test(value)){
+		    		layer.alert("请输入数字");
+		    	    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+		    		return;
+	    	}
+			 
+			 if(field=='price1'){
+				 var mlv=caucMlv(data['sale_price1'],value);
+				 $(obj.tr.selector + ' td[data-field="new_mlv"] .layui-table-cell').text(mlv);
+			 }
+			 
+			 if(field=='sale_price1'){
+				 var mlv=caucMlv(value,data['price1']);
+				 $(obj.tr.selector + ' td[data-field="new_mlv"] .layui-table-cell').text(mlv);
+			 }
+		 }    
+		 
+		 rowIndex=obj.tr.attr("data-index");
+		 rowIndex=parseInt(rowIndex);
+  		if(field=='item_no'&&$.trim(value)!=''){
+  			
+  			loadGood=true;
+  			//判断商品编码，并且弹出商品选择窗口
+	    	$.ajax({
+				url:"/{$MODULE_NAME}/common/index/getiteminstance",
+				data:{"itemno":value},
+				dataType: 'json',
+				type: 'POST',
+				success: function(result) {
+					//如果不为空，则填充数据
+					if(result.code==1){
+						
+							var tempData=result.data;
+								tempData['rowIndex']=rowIndex+1;
+								tempData=copyField(tempData);
+			
+								window.editRow(rowIndex,tempData);
+					}else{
+							//弹出商品选择窗口
+							selectSingleGoods("");
+					}
+					
+					loadGood=false;
+				}
+			})
+			
+  		}	
+  	});
+    
+	//返回
+	window.backToList=function(){
+		window.location.href="/{$MODULE_NAME}/pcprice/pxflow/index/";
+	}
+	
+	//显示分店选择框
+	window.showBranchs=function(){
+		var branchs=$("#txtBranchlist").val();
+			_layerIndex=openWin("分店仓库选择",branchs_url,"800px","600px");
+	}
+	
+	//操作员选择后的回调函数
+	window.callBackBranch=function(data){
+		
+		var arr=new Array();
+		for(var i in data){
+			arr.push(data[i]['branch_no']);
+		}
+		
+		$("#txtBranchlist").val(arr.join(","));
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+		}
+		_layerIndex=null;
+	}
+	
+	//选择多个商品窗口
+	window.selectGoods=function(param){
+		if(!emptyBranch()){
+    		return;
+    	}
+		isSingle=false;
+		_layerIndex=openWin("商品选择",multiple_items_url,"1100px","600px");
+	}
+	//编辑数据表格选择单个商品窗口
+	window.selectSingleGoods=function(param){
+		isSingle=true;
+		_layerIndex=openWin("商品选择",items_url,"1100px","600px");
+	}
+	//商品选择后的回调函数
+	window.callBack=function(data){
+	
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+		}
+		
+		if(isSingle){
+			var one=data[0];
+			one['rowIndex']=rowIndex+1;
+			one=copyField(one);
+			window.editRow(rowIndex,one);
+			return;	
+		}
+		
+		var repeat=false;
+		for(var i in data){
+			var new_item_no=data[i]['item_no'];
+			if(all_item_no.indexOf(new_item_no)!=-1){
+				repeat=true;
+				data.splice(i,1);
+			}
+		}
+				
+		if(repeat){
+			layer.msg("已存在相同商品");
+		}
+		
+		if(data.length>0){
+			//临时添加行项目
+			addCombItem(data);
+			
+			window.addEmptyRow();
+			
+		}
+	}
+	//成功输入商品编码或单选商品返回成功，编辑当前表格数据
+	//_rowIndex是当前编辑的行号
+	//data是新数据
+	window.editRow=function(_rowIndex,data){
+
+		var new_item_no=data['item_no'];
+		var rindex=data['rowIndex'];
+		if(all_item_no.indexOf(new_item_no)!=-1){
+			layer.msg("已存在相同商品");
+			$.extend(data,emptyGrid);
+			data['rowIndex']=rindex;
+		}
+		
+		var rows=table.getData("pxsheet-table");
+			rows[_rowIndex]=data;
+			reloadTable(rows);
+			
+			return true;
+	}
+	
+	//重新堆栈数组，保存当前所有的商品编号
+	function rebuildItemNo(){
+		
+		all_item_no=new Array();
+		
+		var rows=table.getData("pxsheet-table");
+		
+		for(var i in rows){
+			if(rows[i]['item_no']!=''){
+				all_item_no.push(rows[i]['item_no']);
+			}
+		}
+	}
+
+	//监听单元格编辑
+	function editListener(){
+	    //数据表格点击事件
+	    table.on('row(pxsheet-table)', function(obj){
+			
+	    	if(loadGood){
+	    		return;
+	    	}
+	    	
+	    	var bg=$(this).attr("style");
+	    	if(bg==undefined||bg=='background-color:#ffffff;'){
+	    		$(this).attr({ "style": "background-color:#fafafa;" });
+	    	}else{
+	    		$(this).attr({ "style": "background-color:#ffffff;" });
+	    	}
+	    	
+	    	if(!emptyBranch()){
+	    		return;
+	    	}
+	    	
+	    	rowObj=obj;
+			//当前编辑行的序号
+			rowIndex=rowObj.tr.attr("data-index");
+
+		});
+	}
+	
+	//添加商品
+	function addCombItem(data){
+		//获取当前表格的所有数据
+		var rows=table.getData("pxsheet-table");
+		var update_rows=[];
+		//删除空数据
+		for(var i in rows){
+			if(rows[i]['item_no']!=''){
+				update_rows.push(rows[i]);
+			}
+		}
+		
+		var next=update_rows.length+1;
+		for(var i in data){
+			var obj=data[i];
+			
+			var array=new Object();
+				array=obj;
+				array['rowIndex']=next;
+				array['item_no']=obj['item_no'];
+				array['item_name']=obj['item_name'];
+				array['item_subno']=obj['item_subno'];
+				array['unit_no']=obj['unit_no'];
+				array['item_size']=obj['item_size'];
+				array=copyField(array);
+				
+			update_rows.push(array);
+			next++;
+		}
+			reloadTable(update_rows);
+	}
+	
+	//清空当前行
+	window.deleteItem=function(){
+		
+		if(rowObj==null){
+			layer.msg("请选择要清空的数据行");
+			return;
+		}
+		
+		var rows=table.getData("pxsheet-table");
+		rows.splice(rowIndex,1);
+		
+		var _index=1;
+		for(var i in rows){
+			rows[i]['rowIndex']=_index;
+			_index++;
+		}
+		reloadTable(rows);
+	}
+	
+	//审核调价单
+	window.approve=function(){
+		
+		//防止多次触发
+		if(ajaxing){
+			return;
+		}
+
+		var sheetno=$("#hidShowSheetNo").val();
+		if($.trim(sheetno)==''){
+			layer.msg("缺少调价单号");
+			return;
+		}
+		
+		layer.confirm('确认审核调价单?', {
+			icon: 3,
+			title: '提示'
+		}, function(index) {
+			$.ajax({
+	            url:path+"approve",
+	            data:{"sheetno":sheetno},
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							location.reload();
+						});
+
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	                
+	                ajaxing=false;
+	            }
+	     	})
+		});
+
+	}
+	
+	//添加商品组合
+	window.saveCombItem=function(){
+		
+		//防止多次触发
+		if(ajaxing){
+			return;
+		}
+		
+    	if(!emptyBranch()){
+    		return;
+    	}
+		
+		var lindex=layer.msg("请稍后...");
+		var rows=table.getData("pxsheet-table");
+		
+		if(rows.length<=0){
+			layer.msg("请输入商品明细");
+			return;
+		}
+		
+		var hasGood=false;
+		for(var i in rows){
+			if(rows[i]['item_no']!=''&&rows[i]['item_no']!=undefined){
+				hasGood=true;
+				break;
+			}
+		}
+		
+		if(!hasGood){
+			layer.msg("请输入商品明细");
+			return;
+		}
+		
+		var _data={	"items": rows,
+			        "sheetno": $("#hidShowSheetNo").val(),
+			        "branchno": $("#txtBranchlist").val(), 
+			        "operno": $("#txtOperNo").val(),
+			        "operdate": $("#txtOperDate").val(),
+			        "memo": $("#txtMemo").val(),
+			        "branchlist": $("#txtBranchlist").val()
+				}
+		
+		ajaxing=true;
+        
+		$.ajax({
+	            url:path+"save",
+	            data:_data,
+	            dataType:'json',
+	            type:'post',
+	            success:function(result){
+	                if(result.code){
+	                	layer.close(lindex);
+	                	
+	                	layer.msg(result.msg, {
+							icon: 1,
+							time: 2000
+						}, function() {
+							window.backToList();
+						});
+
+	                }else{
+	                    layer.msg(result.msg,{icon:2,time:2000});
+	                }
+	                
+	                ajaxing=false;
+	            }
+	     })
+	}
+	
+})
+</script>
+</body>
+</html>

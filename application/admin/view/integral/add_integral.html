@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增积分方案</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox" id="tabbox">
+        <div class="main-container">
+            <div class="main-container">
+				 <div class="layui-form-item">
+					 <label class="layui-form-label">方案标题</label>
+					 <div class="layui-input-inline">
+						 <input type="text" id="title" value="{$one['title']}" name="title" class="layui-input" autocomplete="off"/>
+					 </div>
+
+				    <label class="layui-form-label">门店编号</label>
+				    <div class="layui-input-inline">
+				      <input type="text" name="branch_no" value="{$one['branch_no']}" id="branch_no" placeholder="门店编号" onfocus="showBranchs()" autocomplete="off" class="layui-input">
+				    </div>
+				  </div>
+
+					<div class="layui-form-item" id="date-range">
+						<label class="layui-form-label">有效日期</label>
+						<div class="layui-input-inline">
+							<input type="text" name="start_date" value="{$one['start_date']}" autocomplete="off" id="start-date" class="layui-input" placeholder="开始日期">
+						</div>
+						<label class="layui-form-label">-</label>
+						<div class="layui-input-inline">
+							<input type="text" name="end_date" value="{$one['end_date']}" autocomplete="off" id="end-date" class="layui-input" placeholder="结束日期">
+						</div>
+					</div>
+
+				  <div class="layui-form-item">
+				    <label class="layui-form-label">倍率</label>
+				    <div class="layui-input-inline">
+				      <input name="rate" value="{$one['rate']}" placeholder="1" class="layui-input" autocomplete="off"/>
+				    </div>
+
+				  <label class="layui-form-label">状态</label>
+				  <div class="layui-input-inline">
+					  <select name="status" id='status'>
+						  <option {if condition="$one['status'] eq '1'"}selected="selected"{/if} value="2">开启</option>
+						  <option {if condition="$one['status'] neq '1'"}selected="selected"{/if} value="1">暂停</option>
+					  </select>
+				  </div>
+				  </div>
+
+					<input name="id" type="hidden" value="{$one['id']}"/>
+				  	<input name="add" type="hidden" value="{$act}"/>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="integral-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script src="__STATIC__/js/admin/common.js"></script>
+<script>
+layui.use(['form','jquery','common','laydate'],function(){
+    let form = layui.form;
+    let $ = layui.jquery;
+    let laydate = layui.laydate;
+    
+    var path="/{$MODULE_NAME}/integral";
+	var _url="/add";
+	var branchs_url="{:U('Controls/branchs')}";
+	var operator_url="{:U('Controls/operators')}";
+	
+	laydate.render({
+	    elem: '#date-range'
+	    ,range: ['#start-date', '#end-date']
+	});
+	
+	//显示分店选择框
+	window.showBranchs=function(){
+		_layerIndex=openWin("分店选择",branchs_url,"800px","450px");
+	}
+	
+	//门店选择后的回调函数
+	window.callBackBranch=function(data){
+		
+		var arr=new Array();
+		for(var i in data){
+			arr.push(data[i]['branch_no']);
+		}
+		
+		$("#branch_no").val(arr.join(","));
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+		}
+		_layerIndex=null;
+	}
+	
+	//显示操作员选择框
+	window.showOperators=function(){
+		_layerIndex=openWin("操作员选择",operator_url,"800px","450px");
+	}
+	
+	//操作员选择后的回调函数
+	window.callBackOprator=function(data){
+		
+		$("#operator").val(data[0]['oper_id']);
+		
+		if(_layerIndex!=null){
+			layer.close(_layerIndex);
+			_layerIndex=null;
+		}
+	}
+	
+    form.on('submit(integral-save)', function(data){
+        $.ajax({
+            url:path+_url,
+            data:JSON.stringify(data.field),
+            dataType:'json',
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code){
+                    layer.msg(result.msg,{icon:1,time:2000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        parent.layui.table.reload("integral-table");
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:2000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

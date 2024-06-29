@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>日结报表</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:150px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 150px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.layui-table-cell .layui-table-link {color: #ff6a08!important;}}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="" id="searchform">
+					<div class="layui-form-item">
+					
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline" id="date-range">
+							<label class="layui-form-label">日期范围</label>
+							<div class="layui-input-inline">
+					          <input type="text" name="start" value="" autocomplete="off" id="start-date" class="layui-input" placeholder="开始日期">
+					        </div>
+					       
+						</div>
+						<div class="layui-form-item layui-inline">
+								<label class="layui-form-label">分店仓库</label>
+								<div class="layui-input-inline inputdiv">
+									<input type="text" name="branch_no" id="branch_no" autocomplete="off" value="" placeholder="" class="layui-input" onfocus="showBranchs()">
+									<i class="layui-icon layui-icon-home"></i>
+								</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="dayreport-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md" onclick="resetForm()">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+							<a class="pear-btn pear-btn-warming pear-btn-md" onclick="daysum()">
+							<i class="layui-icon layui-icon-set-fill"></i>
+							执行日结
+							</a>
+							<a class="pear-btn pear-btn-warming pear-btn-md" onclick="exportxls()">
+							<i class="pear-icon pear-icon-chart-bar"></i>
+							导出报表
+							</a>
+						</div>
+					</div>
+					</div>
+					
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body" id="dayreport-body">
+				<table id="dayreport-table" lay-filter="dayreport-table"></table>
+			</div>
+		</div>
+		
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			var branch_no="";
+			var _layerIndex=null;
+			var operator_url="{:U('Controls/operators')}";
+			var branchs_url="{:U('Controls/branchs')}";
+			var daysum_url="{:U('Report/dayDetail')}";
+			
+			layui.use(['table', 'form', 'jquery','common','laydate','treetable'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+				let laydate = layui.laydate;
+				let treetable = layui.treetable;
+				
+			  	laydate.render({
+					    elem: '#start-date'
+			    });
+
+				let DATA_PATH = "/{$MODULE_NAME}/report/";
+
+				let cols = [
+					[
+						{
+							title: '门店编号',
+							field: 'branch_name',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: 'POS机编码',
+							field: 'pos_id',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '收银员',
+							field: 'sale_name',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '开始时间',
+							field: 'begin_date',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '结束时间',
+							field: 'end_date',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '应收金额',
+							field: 'sale_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实收金额',
+							field: 'pay_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实收人民币',
+							field: 'pay_rmb_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实收银行卡',
+							field: 'pay_crd_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实收预付费卡',
+							field: 'pay_card_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '应收总额',
+							field: 'sale_sum_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实收总额',
+							field: 'pay_sum_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '找零总额',
+							field: 'pay_giv_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '应退金额',
+							field: 'sale_ret_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实退金额',
+							field: 'pay_ret_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '赠送金额',
+							field: 'sale_giv_amt',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '应销售数量',
+							field: 'sale_qty',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '实际售出数量',
+							field: 'pay_qty',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '退货数量',
+							field: 'ret_qty',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '赠送数量',
+							field: 'giv_qty',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '日结日期',
+							field: 'oper_date',
+							align: 'left',
+							width: 120
+						},
+						{
+							title: '日结人',
+							field: 'oper_name',
+							align: 'left',
+							width: 120
+						}
+					]
+				]
+				;
+				
+				table.render({
+					elem: '#dayreport-table',
+					url: DATA_PATH+"search",
+					page: true,
+					cols: cols,
+					height:600,
+					skin: 'line',
+					toolbar: '',
+					defaultToolbar: [],
+					done:function(res, curr, count){
+						var _width=$("#dayreport-body").width();
+						$("#dayreport-table").css("width", _width);
+					}
+				});
+				
+
+				
+				form.on('submit(dayreport-query)', function(data) {
+					table.reload('dayreport-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+				
+				//显示分店选择框
+				window.showBranchs=function(){
+					_layerIndex=openWin("分店仓库选择",branchs_url,"800px","600px");
+				}
+				
+				//门店选择后的回调函数
+				window.callBackBranch=function(data){
+					
+					var arr=new Array();
+					for(var i in data){
+						arr.push(data[i]['branch_no']);
+					}
+					
+					$("#branch_no").val(arr.join(","));
+					
+					if(_layerIndex!=null){
+						layer.close(_layerIndex);
+					}
+					_layerIndex=null;
+				}
+				
+				//导出报表
+				window.exportxls=function(){
+					var param=$('#searchform').serialize();
+					window.location.href="/{$MODULE_NAME}/report/export?"+param;
+				}
+				
+				//执行日结弹窗
+				window.daysum=function(){
+					_layerIndex=openWin("日结",daysum_url,"500px","300px");
+				}
+				
+				window.refresh = function(param) {
+					table.reload('dayreport-table');
+				}
+			})
+		</script>
+	</body>
+</html>

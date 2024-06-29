@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>单品库存</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:150px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 150px;}
+		.inputdiv{display:flex;height: 38px;line-height: 38px;}
+		.inputdiv i{position:absolute;right:10px;}
+		.layui-table-cell .layui-table-link {color: #ff6a08!important;}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="" id="searchform">
+					<div class="layui-form-item">
+					
+					<div class="layui-row">
+						<div class="layui-form-item layui-inline">
+								<label class="layui-form-label">商品名称</label>
+								<div class="layui-input-inline inputdiv">
+									<input type="text" name="item_name" value="" autocomplete="off" class="layui-input" placeholder="请输入关键词">
+								</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+								<label class="layui-form-label">商品编号</label>
+								<div class="layui-input-inline inputdiv">
+									<input type="text" name="item_no" value="" autocomplete="off" class="layui-input" placeholder="请输入商品编号">
+								</div>
+						</div>
+
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="stock-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md" onclick="resetForm()">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+							<a class="pear-btn pear-btn-warming pear-btn-md" onclick="exportxls()">
+							<i class="pear-icon pear-icon-chart-bar"></i>
+							导出报表
+							</a>
+						</div>
+						</div>
+						
+					</div>
+					
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="stock-table" lay-filter="stock-table"></table>
+			</div>
+		</div>
+
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script src="__STATIC__/js/admin/common.js"></script>
+		<script>
+			var branch_no="";
+			var _layerIndex=null;
+			var operator_url="{:U('Controls/operators')}";
+			var branchs_url="{:U('Controls/branchs')}";
+			layui.use(['table', 'form', 'jquery','common','laydate'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+				let laydate = layui.laydate;
+				
+			  	laydate.render({
+					    elem: '#date-range'
+					    ,range: ['#start-date', '#end-date']
+			    });
+
+				let DATA_PATH = "/{$MODULE_NAME}/stock/Singlestock/search";
+
+				let cols = [
+					[{
+							type: 'checkbox'
+						},
+						{
+							title: '商品货号',
+							field: 'item_no',
+							align: 'left',
+							width: 120,
+						},
+						{
+							title: '商品名称',
+							field: 'item_name',
+							align: 'left',
+							width: 180
+						},
+						{
+							title: '单位',
+							field: 'unit_no',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '规格',
+							field: 'item_size',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '售价',
+							field: 'sale_price',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '库存数量',
+							field: 'stock_qty',
+							align: 'left',
+							width: 100
+						},
+						{
+							title: '箱装数',
+							field: 'purchase_spec',
+							align: 'center',
+							width: 180
+						},
+						{
+							title: '品牌',
+							field: 'item_brandname',
+							align: 'center',
+							width: 180
+						},
+						{
+							title: '供应商',
+							field: 'sp_company',
+							align: 'center',
+							width: 180
+						}
+					]
+				]
+
+				table.render({
+					elem: '#stock-table',
+					url: DATA_PATH,
+					page: true,
+					cols: cols,
+					height:600,
+					skin: 'line',
+					defaultToolbar: []
+				});
+
+				form.on('select(getdate)', function(data) {
+					date = new Array(2);
+					var selc=parseInt(data.value);
+		            switch (selc)
+		            {
+		            	case 1://当前天
+	                    	date[0] = '{php}echo date('Y-m-d');{/php}';
+	                    	date[1] = '{php}echo date('Y-m-d');{/php}';
+	                    break;
+		                case 2://昨天
+		                    date[0] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', strtotime('-1 day'));{/php}';
+		                    break;
+		                case 3://本周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7,date("Y")));{/php}';
+		                    break;
+		                case 4://上周
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),date("d")-date("w")+1-7,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("d")-date("w")+7-7,date("Y")));{/php}';
+		                    break;
+		                case 5://本月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m"),1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,date("m"),date("t"),date("Y")));{/php}';
+		                    break;
+		                case 6://上月
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0 , 0,date("m")-1,1,date("Y")));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d',mktime(23,59,59,date("m") ,0,date("Y")));{/php}';
+		                    break;
+		                case 7://本季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,ceil((date('n'))/3)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,ceil((date('n'))/3)*3,date('t',mktime(0, 0 ,0,ceil((date('n'))/3)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 8://上季度
+		                    date[0] = '{php}echo date('Y-m-d', mktime(0, 0,0,(ceil((date('n'))/3)-1)*3-3+1,1,date('Y')));{/php}';
+		                    date[1] = '{php}echo date('Y-m-d', mktime(23,59,59,(ceil((date('n'))/3)-1)*3,date('t',mktime(0, 0 ,0,(ceil((date('n'))/3)-1)*3,1,date("Y"))),date('Y')));{/php}';
+		                    break;
+		                case 9://本年
+		                    date[0] = '{php}echo date('Y-01-01');{/php}';
+		                    date[1] = '{php}echo date('Y-12-31');{/php}';
+		                    break;
+		            }
+		            $('#start-date').val( date[0]);
+	                $('#end-date').val(date[1]);
+				});
+				
+				form.on('submit(stock-query)', function(data) {
+					table.reload('stock-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+				
+				//导出报表
+				window.exportxls=function(){
+					var param=$('#searchform').serialize();
+					window.location.href="/{$MODULE_NAME}/stock/singlestock/export?"+param;
+				}
+				
+				window.refresh = function(param) {
+					table.reload('stock-table');
+				}
+			})
+		</script>
+	</body>
+</html>

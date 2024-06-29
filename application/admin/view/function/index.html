@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>功能管理</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:180px;display:inline-block;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 130px;}
+		.layui-table td, .layui-table th{border:0;}
+		.layui-table td a{color:#ff6a08!important}
+		</style>
+	</head>
+	<body class="pear-container">
+<div class="options-btn">
+	<button class="pear-btn pear-btn-primary pear-btn-md" onclick="addModule()">添加功能</button>
+</div>
+<style>
+.table-class input.sort {width: auto;text-align: center;}
+</style>
+<input type="hidden" id="pid" value="0" />
+<table class="layui-table">
+	<colgroup>
+		<col style="width: 2%;">
+		<col style="width: 44%;">
+		<col style="width: 34%;">
+		<col style="width: 10%;">
+		<col style="width: 10%;">
+	</colgroup>
+	<thead>
+		<tr class="row-selected">
+			<th></th>
+			<th align="left">功能名称</th>
+			<th style="text-align:center">代码/URL</th>
+			<th>排序</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+	{foreach name="list" item="v1"}
+	<tr class="pid_0" style="height: 30px;">
+		<td>
+			{if condition="$v1['sub_menu'] neq array()"}
+			<a href="javascript:;" onclick="tab_switch({$v1['id']})" class="tab_jia_{$v1['id']}" style="display: block;">[+]</a>
+			<a href="javascript:;" onclick="tab_switch({$v1['id']})" class="tab_jian_{$v1['id']}" style="display: none;">[-]</a>
+			{/if}
+		</td>
+		
+		<td>
+			<input type="text" fieldid="{$v1['id']}" class="layui-input" fieldname="title" value="{$v1['name']}">
+		</td>
+		<td style="text-align: center;">{$v1['url']?$v1['url']:$v1['code']}</td>
+		<td style="text-align: center;">
+			<input onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')" type="text" class="sort layui-input layui-input-sort" fieldid="{$v1['id']}" fieldname="sort" value="{$v1['orderby']}" size="1">
+		</td>
+		<td style="text-align: center;">
+			<a href="{:url('functions/addFunc','id='.$v1['id'])}">修改</a>
+			<a href="javascript:void(0);" onclick="delModule({$v1['id']})">删除</a>
+		</td>
+	</tr>
+		{foreach name="v1['sub_menu']" item="v2"}
+		<tr class="pid_{$v1['id']}" style="height: 30px; display: none;">
+			<td>
+				{if condition="$v2['sub_menu'] neq []"}
+				<a href="javascript:void(0)" onclick="tab_switch({$v2['id']})" class="tab_jian_{$v2['id']} tab_jian_{$v1['id']}" style="display: block;">[-]</a>
+				<a href="javascript:void(0)" onclick="tab_switch({$v2['id']})" class="tab_jia_{$v2['id']} tab_jia_{$v1['id']}" style="display: none;">[+]</a>
+				{/if}
+			</td>
+			
+			<td>
+				<span style="color: #ccc;">|——</span>
+				<input type="text" fieldid="{$v2['id']}" fieldname="title" class="layui-input" value="{$v2['name']}">
+			</td>
+			<td style="text-align: center;">{$v2['url']?$v2['url']:$v2['code']}</td>
+			<td style="text-align: center;">
+				<input onkeyup="value=value.replace(/[^\d+(\.\d+)?]/g,'')" type="text" class="sort layui-input layui-input-sort" fieldid="{$v2['id']}" fieldname="sort" value="{$v2['orderby']}" size="1">
+			</td>
+			<td style="text-align: center;">
+				<a href="{:url('functions/addFunc','id='.$v2['id'])}">修改</a>
+				<a href="javascript:void(0);" onclick="delModule({$v2['id']})">删除</a>
+			</td>
+		</tr>
+			{foreach name="v2['sub_menu']" item="v3"}
+			<tr class="pid_{$v2['id']} pid_{$v1['id']}" style="height: 30px; display: none;">
+				<td></td>
+				<td>
+					<span style="color: #ccc;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|——</span>
+					<input type="text" fieldid="{$v3['id']}" class="layui-input" fieldname="title" value="{$v3['name']}">
+				</td>
+				<td style="text-align: center;">{$v3['url']?$v3['url']:$v3['code']}</td>
+				<td style="text-align: center;">
+					<input type="text" class="sort layui-input layui-input-sort" fieldid="{$v3['id']}" fieldname="sort" value="{$v3['orderby']}" size="1">
+				</td>
+				<td style="text-align: center;">
+					<a href="{:url('functions/addFunc','id='.$v3['id'])}">修改</a>
+					<a href="javascript:void(0);" onclick="delModule({$v3['id']})">删除</a>
+				</td>
+			</tr>
+				{foreach name="v3['sub_menu']" item="v4"}
+				<tr class="pid_{$v3['id']} pid_{$v2['id']} pid_{$v1['id']}" style="height: 30px; display: none;">
+					<td></td>
+					<td>
+						<span style="color: #ccc;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|——</span>
+						<input type="text" fieldid="{$v4['id']}" fieldname="title" value="{$v4['name']}" class="layui-input">
+					</td>
+					<td style="text-align: center;">{$v4['url']?$v4['url']:$v4['code']}</td>
+					<td style="text-align: center;">
+						<input type="text" class="sort layui-input layui-input-sort" fieldid="{$v4['id']}" fieldname="sort" value="{$v4['orderby']}" size="1">
+					</td>
+					<td style="text-align: center;">
+						<a href="{:url('functions/addFunc','id='.$v4['id'])}">修改</a>
+						<a href="javascript:void(0);" onclick="delModule({$v4['id']})">删除</a>
+					</td>
+				</tr>
+					{foreach name="v4['sub_menu']" item="v5"}
+					<tr class="pid_{$v4['id']} pid_{$v3['id']} pid_{$v2['id']} pid_{$v1['id']}" style="height: 30px; display: none;">
+						<td></td>
+						<td>
+							<span style="color: #ccc;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|——</span>
+							<input type="text" fieldid="{$v5['id']}" class="layui-input" fieldname="title" value="{$v5['name']}">
+						</td>
+						<td style="text-align: center;">{$v5['url']?$v5['url']:$v5['code']}</td>
+						<td style="text-align: center;">
+							<input type="text" class="sort layui-input layui-input-sort" fieldid="{$v5['id']}" fieldname="sort" value="{$v5['orderby']}" size="1">
+						</td>
+						<td style="text-align: center;">
+							<a href="{:url('system/node_add','id='.$v5['id'])}">修改</a>
+							<a href="javascript:void(0);" onclick="delModule({$v5['id']})">删除</a>
+						</td>
+					</tr>
+					{/foreach}
+				{/foreach}
+			{/foreach}
+		{/foreach}
+	{/foreach}
+	</tbody>
+</table>
+<script src="__STATIC__/lib/jquery.min.js"></script>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script type="text/javascript">
+function tab_switch(id){
+	if($(".pid_"+id).css('display') != 'none'){
+		$(".tab_jian_"+id).hide();
+		$(".tab_jia_"+id).show();
+		$(".pid_"+id).hide(300);
+	}else{
+		$(".tab_jian_"+id).show();
+		$(".tab_jia_"+id).hide();
+		$(".pid_"+id).show(500);
+	}
+}
+
+function addModule(){
+	location.href = "{:U('Functions/addFunc')}";
+}
+
+function delModule(id){
+	layer.confirm('确定要删除该功能?', {
+		icon: 3,
+		title: '提示'
+	}, function(index) {
+		layer.close(index);
+		let loading = layer.load();
+		$.ajax({
+			url: "/{$MODULE_NAME}/functions/del/id/"+ id,
+			dataType: 'json',
+			type: 'get',
+			success: function(result) {
+				layer.close(loading);
+				if (result.code) {
+					layer.msg(result.msg, {
+						icon: 1,
+						time: 2000
+					}, function() {
+						location.reload();
+					});
+
+				} else {
+					layer.msg(result.msg, {
+						icon: 2,
+						time: 2000
+					});
+				}
+			}
+		})
+	});
+}
+
+
+$(".table-class input").change(function(){
+	var fieldid = $(this).attr('fieldid');
+	var fieldname = $(this).attr('fieldname');
+	var fieldvalue = $(this).val();
+	$.ajax({
+		type:"post",
+		url:"{:url('node/modifyfield')}",
+		data:{'fieldid':fieldid,'fieldname':fieldname,'fieldvalue':fieldvalue},
+		success: function (data) {
+			var flag = "error";
+			if(data.status>0){
+				flag = "success";
+			}
+			showTip(data['message'],flag);
+		}
+	});
+});
+
+layui.use(['table', 'form','common'], function() {
+	let table = layui.table;
+	let form = layui.form;
+	let common = layui.common;
+	
+})
+	
+</script>
+	</body>
+</html>

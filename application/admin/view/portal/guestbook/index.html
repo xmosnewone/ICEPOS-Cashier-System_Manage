@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>留言管理</title>
+		<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+		<style>
+		.layui-input{width:130px;}
+		.layui-form-label{width:auto;}
+		.layui-form-item .layui-input-inline{width: 130px;}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">留言内容</label>
+							<div class="layui-input-inline">
+								<input type="text" name="title" placeholder="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">留言时间</label>
+							<div class="layui-input-inline" style="width:120px;">
+								<input type="text" id="startTime" name="startTime" placeholder="开始时间" autocomplete="off" class="layui-input" style="width:120px;">
+							</div>
+							<div class="layui-input-inline" style="width:120px;">	
+								<input type="text" id="endTime" name="endTime" placeholder="结束时间" autocomplete="off" class="layui-input" style="width:120px;">
+							</div>
+						</div>
+						
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">留言类型</label>
+							<div class="layui-input-inline">
+							<select name="category" lay-verify="">
+								<option value="">全部</option>
+								{volist name="category" id="vo"}
+								<option value="{$vo['guestbook_ctg_id']}">{$vo['ctg_name']}</option>
+								{/volist}
+							</select>
+							</div>
+						</div>
+						
+						<div class="layui-form-item layui-inline">
+							<label class="layui-form-label">审核状态</label>
+							<div class="layui-input-inline">
+							<select name="approve" lay-verify="">
+								<option value="">全部</option>
+								<option value="1">已审核</option>
+								<option value="-1">未审核</option>
+							</select>
+							</div>
+						</div>
+						
+						<div class="layui-form-item layui-inline">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="guestbook-query">
+								<i class="layui-icon layui-icon-search"></i>
+								查询
+							</button>
+							<button type="reset" class="pear-btn pear-btn-md">
+								<i class="layui-icon layui-icon-refresh"></i>
+								重置
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="guestbook-table" lay-filter="guestbook-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="guestbook-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+		        <i class="layui-icon layui-icon-add-1"></i>
+		        新增
+		    </button>
+		    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+		        <i class="layui-icon layui-icon-delete"></i>
+		        删除
+		    </button>
+		</script>
+
+		<script type="text/html" id="guestbook-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i></button>
+		    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i></button>
+		</script>
+
+		<script type="text/html" id="guestbook-enable">
+			<input type="checkbox" name="isEnabled" value="{{d.guestbookId}}" lay-skin="switch" lay-text="已审核|未审核" lay-filter="guestbook-enable" {{ d.checked ==1 ? 'checked' : '' }}>
+		</script>
+		
+		<script type="text/html" id="guestbook-recommend">
+			<input type="checkbox" name="recommend" value="{{d.guestbookId}}" lay-skin="switch" lay-text="推荐|未推荐" lay-filter="guestbook-recommend" {{ d.recommend ==1 ? 'checked' : '' }}>
+		</script>
+
+		<script src="__STATIC__/lib/layui/layui.js"></script>
+		<script src="__PEAR__/component/pear/pear.js"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery','common','laydate'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let common = layui.common;
+				let laydate = layui.laydate;
+				
+				laydate.render({
+				    elem: '#endTime'
+		  		});
+		  	
+		  		laydate.render({
+			    elem: '#startTime'
+	  			});
+		  	
+		  		let MODULE_PATH = "/{$MODULE_NAME}/portal/guestbook/";
+
+				let cols = [
+					[{
+							type: 'checkbox'
+						},
+						{
+							title: '编号',
+							field: 'guestbookId',
+							align: 'center',
+							width: 100
+						},
+						{
+							title: '标题',
+							field: 'title',
+							align: 'center'
+						},
+						{
+							title: '留方内容',
+							field: 'content',
+							align: 'center'
+						},
+						{
+							title: '留方类别',
+							field: 'category',
+							align: 'center'
+						},
+						{
+							title: '回复留言',
+							field: 'reply',
+							align: 'center'
+						},
+						{
+							title: '邮箱',
+							field: 'email',
+							align: 'center'
+						},
+						{
+							title: '电话',
+							field: 'phone',
+							align: 'center'
+						},
+						{
+							title: '是否审核',
+							field: 'checked',
+							align: 'center',
+							templet: '#guestbook-enable',
+						},
+						{
+							title: '是否推荐',
+							field: 'recommend',
+							align: 'center',
+							templet: '#guestbook-recommend',
+						},
+						{
+							title: '操作',
+							toolbar: '#guestbook-bar',
+							align: 'center',
+							width: 130
+						}
+					]
+				]
+
+				table.render({
+					elem: '#guestbook-table',
+					url: MODULE_PATH+"getGuestbookList",
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#guestbook-toolbar',
+					defaultToolbar: []
+				});
+
+				table.on('tool(guestbook-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					} else if (obj.event === 'edit') {
+						window.edit(obj);
+					}
+				});
+
+				table.on('toolbar(guestbook-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					} else if (obj.event === 'refresh') {
+						window.refresh();
+					} else if (obj.event === 'batchRemove') {
+						window.batchRemove(obj);
+					}
+				});
+
+				form.on('submit(guestbook-query)', function(data) {
+					table.reload('guestbook-table', {
+						where: data.field,
+						page:{curr:1}
+					})
+					return false;
+				});
+
+				form.on('switch(guestbook-enable)', function(obj) {
+					var is_enabled=0;
+				   	if(obj.elem.checked){
+				   		is_enabled=1;
+				   	}
+				    var id=this.value;
+				    
+				    $.ajax({
+							url:MODULE_PATH+"updateCheck",
+							data:{"id":id,'status':is_enabled,'action':'check'},
+							dataType: 'json',
+							type: 'POST',
+							success: function(result) {
+								//如果不为空，则填充数据
+								if(result.code){
+									layer.msg("更新成功");
+								}else{
+									layer.msg("更新失败，请重试");
+								}
+							}
+						})
+				});
+
+				form.on('switch(guestbook-recommend)', function(obj) {
+					var is_enabled=0;
+				   	if(obj.elem.checked){
+				   		is_enabled=1;
+				   	}
+				    var id=this.value;
+				    
+				    $.ajax({
+							url:MODULE_PATH+"updateCheck",
+							data:{"id":id,'status':is_enabled,'action':'recommend'},
+							dataType: 'json',
+							type: 'POST',
+							success: function(result) {
+								//如果不为空，则填充数据
+								if(result.code){
+									layer.msg("更新成功");
+								}else{
+									layer.msg("更新失败，请重试");
+								}
+							}
+						})
+				});
+				
+				window.add = function() {
+					layer.open({
+						type: 2,
+						title: '新增留言',
+						shade: 0.1,
+						area: [common.isModile()?'100%':'800px', common.isModile()?'100%':'600px'],
+						content: MODULE_PATH + 'view.html'
+					});
+				}
+
+				window.edit = function(obj) {
+					var _id=obj.data.guestbookId;
+					layer.open({
+						type: 2,
+						title: '编辑留言',
+						shade: 0.1,
+						area: ['800px', '600px'],
+						content: MODULE_PATH + 'view/id/'+_id+'.html'
+					});
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该留言?', {
+						icon: 3,
+						title: '删除提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "delete/id/" + obj.data['guestbookId'],
+							dataType: 'json',
+							type: 'delete',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.batchRemove = function(obj) {
+					
+					var checkIds = common.checkField(obj,'guestbookId');
+					
+					if (checkIds === "") {
+						layer.msg("未选中数据", {
+							icon: 3,
+							time: 1000
+						});
+						return false;
+					}
+					
+					layer.confirm('确定要删除这些留言?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "batchDelete/id/" + checkIds,
+							dataType: 'json',
+							type: 'delete',
+							success: function(result) {
+								layer.close(loading);
+								if (result.code) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										table.reload('guestbook-table');
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+
+				window.refresh = function(param) {
+					table.reload('guestbook-table');
+				}
+			})
+		</script>
+	</body>
+</html>
