@@ -72,7 +72,7 @@ class Member extends Super {
     		$one=MModel::get($uid);
     		$this->assign("one",$one);
     	}
-    	return $this->fetch("Member/edit");
+    	return $this->fetch("member/edit");
     }
     
     //保存会员信息
