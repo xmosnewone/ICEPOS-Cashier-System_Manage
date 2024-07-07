@@ -1473,49 +1473,46 @@ class Api extends Super {
     }
 	// 会员消费记录
 	public function addvip() {
-		$result = $this->ApiConnect ( $_POST );
-		if ($result == 1) {
-			try {
-				if (empty ( $_POST ["vip"] )) {
-					$result = "-10";
-				} else {
-                    $model = json_decode ( $_POST ["vip"], true );
-					$models = array ();
-					if (empty ( $model )) {
-						$result = "-10";
-					} else {
-						//foreach ( $acs as $model ) {
-							$posvip = new PosViplist ();
-							$posvip->flow_no = $model ["flow_no"];
-							$posvip->card_no = $model ["card_no"];
-							$posvip->score = $model ["score"];
-							$posvip->sale_amt = $model ["sale_amt"];
-							$posvip->card_score = $model ["card_score"];
-							$posvip->card_amount = $model ["card_amount"];
-							$posvip->oper_date = $model ["oper_date"];
-							$posvip->voucher_no = $model ["voucher_no"];
-							//array_push ( $models, $posvip );
-						//}
-						$PosViplist = new PosViplist ();
-						$result = $PosViplist->AddModelsForPos ( $posvip );
-					}
-				}
-			} catch ( \Exception $ex ) {
-				$message=$this->getVars("访问方法:会员消费记录(Addvip)");
-				if (! empty ( $_POST ["branch_no"] )) {
-					$message .= ",要货门店:" . $_POST ["branch_no"];
-				}
-				if (! empty ( $_POST ["d_branch_no"] )) {
-					$message .= ",发货门店:" . $_POST ["d_branch_no"];
-				}
-				write_log ( "会员消费记录(Addvip)，异常:" . $ex.$message, "API/api/addvip" );
-				$result = - 2;
-			}
-		}
-		
-		echo $result;
-		exit();
-	}
+        $result = $this->ApiConnect ( $_POST );
+        if ($result == 1) {
+            try {
+                if (empty ( $_POST ["vip"] )) {
+                    $result = "-10";
+                } else {
+                    $models = json_decode ( $_POST ["vip"], true );
+                    if (empty ( $models )) {
+                        $result = "-10";
+                    } else {
+                        $model=$models[0];
+                        $posvip = new PosViplist ();
+                        $posvip->flow_no = $model ["flow_no"];
+                        $posvip->card_no = $model ["card_no"];
+                        $posvip->score = $model ["score"];
+                        $posvip->sale_amt = $model ["sale_amt"];
+                        $posvip->card_score = $model ["card_score"];
+                        $posvip->card_amount = $model ["card_amount"];
+                        $posvip->oper_date = $model ["oper_date"];
+                        $posvip->voucher_no = $model ["voucher_no"];
+                        $PosViplist = new PosViplist ();
+                        $result = $PosViplist->AddModelsForPos ( $posvip );
+                    }
+                }
+            } catch ( \Exception $ex ) {
+                $message=$this->getVars("访问方法:会员消费记录(Addvip)");
+                if (! empty ( $_POST ["branch_no"] )) {
+                    $message .= ",要货门店:" . $_POST ["branch_no"];
+                }
+                if (! empty ( $_POST ["d_branch_no"] )) {
+                    $message .= ",发货门店:" . $_POST ["d_branch_no"];
+                }
+                write_log ( "会员消费记录(Addvip)，异常:" . $ex.$message, "API/api/addvip" );
+                $result = - 2;
+            }
+        }
+
+        echo $result;
+        exit();
+    }
 	
 	// 是否在优惠活动中领取商品
 	public function getIsFirstSale() {
