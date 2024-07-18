@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1:3306
--- 生成日期： 2024-06-27 09:23:42
+-- 生成日期： 2024-07-18 14:01:30
 -- 服务器版本： 5.7.36
 -- PHP 版本： 7.2.34
 
@@ -687,7 +687,15 @@ CREATE TABLE IF NOT EXISTS `ice_bd_base_code_breakpoint` (
   `code_id` char(30) NOT NULL,
   `updatetime` datetime NOT NULL,
   PRIMARY KEY (`rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `ice_bd_base_code_breakpoint`
+--
+
+INSERT INTO `ice_bd_base_code_breakpoint` (`rid`, `rtype`, `type_no`, `code_id`, `updatetime`) VALUES
+(1, 'I', 'PP', 'POSFSL', '2024-07-02 14:59:49'),
+(2, 'D', 'PP', 'POSFSL', '2024-07-02 14:59:55');
 
 -- --------------------------------------------------------
 
@@ -4741,7 +4749,7 @@ CREATE TABLE IF NOT EXISTS `ice_bd_item_info_breakpoint` (
   `item_no` char(20) NOT NULL COMMENT '商品编号',
   `updatetime` datetime NOT NULL COMMENT '编辑时间',
   PRIMARY KEY (`rid`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='商品更新日志';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='商品更新日志';
 
 --
 -- 转存表中的数据 `ice_bd_item_info_breakpoint`
@@ -4753,7 +4761,9 @@ INSERT INTO `ice_bd_item_info_breakpoint` (`rid`, `rtype`, `item_no`, `updatetim
 (3, 'U', '48090102720107D', '2024-06-19 16:37:36'),
 (4, 'U', '48090102720107D', '2024-06-19 16:38:04'),
 (5, 'U', '48090102720107D', '2024-06-19 16:39:36'),
-(6, 'U', '48090102720107D', '2024-06-19 16:39:41');
+(6, 'U', '48090102720107D', '2024-06-19 16:39:41'),
+(7, 'I', '1231', '2024-07-02 15:02:52'),
+(8, 'D', '1231', '2024-07-02 15:02:56');
 
 -- --------------------------------------------------------
 
@@ -4886,6 +4896,13 @@ CREATE TABLE IF NOT EXISTS `ice_bd_supcust_item` (
   KEY `item_no` (`item_no`) USING BTREE,
   KEY `supcust_no` (`supcust_no`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='供应商-物料表';
+
+--
+-- 转存表中的数据 `ice_bd_supcust_item`
+--
+
+INSERT INTO `ice_bd_supcust_item` (`item_no`, `branch_no`, `supcust_no`, `appointed_price`, `top_price`, `bottom_price`, `last_price`, `sale_way`, `contract_date`, `memo`, `other1`, `other2`, `other3`, `num1`, `num2`, `num3`, `pur_status`, `direct_flag`, `default_flag`) VALUES
+('1231', '000', '', '0.0000', '0.0000', '0.0000', '0.0000', 'A', '2024-07-02 15:02:52', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '0', NULL);
 
 -- --------------------------------------------------------
 
@@ -5346,7 +5363,7 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (79, '新闻列表', 'System_News_NewsList', 'layui-icon-component', NULL, '2014-09-16 14:29:02', '34', '/admin/news/index', 1, 3, 79),
 (81, '图片压缩', 'System_Images_ManagerCutimages', 'layui-icon-component', NULL, '2014-09-16 14:29:40', '35', '/admin/manager/compressImg', 1, 3, 81),
 (82, '清理缓存', 'System_DataCapture_ManagerUpdate', 'layui-icon-component', NULL, '2014-09-16 14:30:10', '36', '/admin/manager/cleanup', 1, 3, 82),
-(83, '报 损 单', 'Stock_Else_ImsheetJOSheet', 'layui-icon-component', NULL, '2014-09-17 11:33:44', '25', ' /admin/imsheet/JOSheet', 1, 3, 83),
+(83, '报 损 单', 'Stock_Else_ImsheetJOSheet', 'layui-icon-component', NULL, '1721310836', '25', '/admin/imsheet/Josheet', 1, 3, 83),
 (84, '商品调价', 'Base_Product_Modify_ModifyPrice', 'layui-icon-component', NULL, '2014-09-18 11:37:33', '16', '/admin/pcprice/PXFlow', 1, 3, 84),
 (110, '会员资料', 'Member_Member', 'layui-icon-component', NULL, '2018-07-23 06:10:34', '108', '', 1, 2, 0),
 (88, '库存异常告警', 'Stock_StockQuery_Warning', 'layui-icon-component', NULL, '2014-11-05 13:41:30', '26', '/admin/stock/warning/index', 1, 3, 88),
@@ -5356,10 +5373,10 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (94, '内容设置', 'Portal_Content_Index', 'layui-icon-component', NULL, '2014-11-17 15:46:21', '91', '/admin/portal/Content/index', 1, 3, 94),
 (95, '广告管理', 'Portal_Ad', 'layui-icon-component', NULL, '2014-11-27 17:26:39', '90', '', 1, 2, 95),
 (96, '广告列表', 'Portal_Ad_Index', 'layui-icon-component', NULL, '2014-11-27 17:30:03', '95', '/admin/portal/Ad/Index', 1, 3, 96),
-(97, '广告位设置', 'Portal_Ad_AdSpace_Index', 'layui-icon-component', NULL, '2014-11-27 17:31:20', '95', '/admin/portal/AdSpace/Index', 1, 3, 97),
+(97, '广告位设置', 'Portal_Ad_Adspace_Index', 'layui-icon-component', NULL, '1720100898', '95', '/admin/portal/Adspace/Index', 1, 3, 97),
 (98, '留言管理', 'Portal_Guestbook', 'layui-icon-component', NULL, '2014-12-04 13:31:33', '90', '', 1, 2, 98),
 (99, '留言管理', 'Portal_Guestbook_Index', 'layui-icon-component', NULL, '2014-12-04 13:32:39', '98', '/admin/portal/Guestbook/index', 1, 3, 99),
-(100, '留言类别', 'Portal_Guestbook_GuestbookCtg_Index', 'layui-icon-component', NULL, '2014-12-04 13:33:19', '98', '/admin/portal/GuestbookCtg/index', 1, 3, 100),
+(100, '留言类别', 'Portal_Guestbook_GuestbookCtg_Index', 'layui-icon-component', NULL, '1721310918', '98', '/admin/portal/Guestbookctg/index', 1, 3, 100),
 (102, '首页', 'Index', 'layui-icon-chart', NULL, '2018-06-27 02:31:42', '', '', 1, 1, 0),
 (103, '首页数据', 'Index_Index_data', 'layui-icon-component', NULL, '2018-06-27 02:33:04', '102', '', 1, 2, 103),
 (108, '会员管理', 'Member', 'layui-icon-friends', '', NULL, '', '', 1, 1, 7),
@@ -7194,7 +7211,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_status` (
 INSERT INTO `ice_pos_status` (`branch_no`, `posid`, `hostdisk`, `posdesc`, `hostip`, `hostname`, `hostmac`, `operdate`, `amount`, `orderqty`, `lasttime`, `lastcashier`, `status`, `other`, `com_flag`, `load_flag`, `adurl`) VALUES
 ('004', 'FS001', 'KBG40ZNT512G TOSHIBA MEMORY', '测试', NULL, 'XMOS-DESKTOP', '80:30:49:7C:69:35', '2024-06-27 16:56:52', NULL, NULL, NULL, NULL, '1', NULL, '0', '1', NULL),
 ('MD0001', 'APP01', '', '移动端收银机', NULL, '', '', '2024-06-19 22:49:15', NULL, NULL, NULL, NULL, '1', NULL, '0', '0', NULL),
-('MD0002', 'MD0002', '', '收银机测试专用', NULL, '', '', '2024-06-27 16:56:47', NULL, NULL, NULL, NULL, '1', NULL, '0', '0', NULL);
+('MD0002', 'MD0002', 'Sony Storage Media USB Device', '收银机测试专用', NULL, 'XMOS-DESKTOP', '80:30:49:7C:69:35', '2024-06-27 23:48:42', NULL, NULL, NULL, NULL, '1', NULL, '0', '1', NULL);
 
 -- --------------------------------------------------------
 
@@ -7211,14 +7228,16 @@ CREATE TABLE IF NOT EXISTS `ice_pos_sync` (
   PRIMARY KEY (`id`),
   KEY `pos_id` (`posid`),
   KEY `branch_no` (`branch_no`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='pos终端联网当天同步记录';
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='pos终端联网当天同步记录';
 
 --
 -- 转存表中的数据 `ice_pos_sync`
 --
 
 INSERT INTO `ice_pos_sync` (`id`, `posid`, `branch_no`, `synctime`) VALUES
-(1, 'FS001', '004', 1719478632);
+(1, 'FS001', '004', 1719478632),
+(2, 'MD0002', 'MD0002', 1719503330),
+(3, 'MD0002', 'MD0002', 1719503503);
 
 -- --------------------------------------------------------
 

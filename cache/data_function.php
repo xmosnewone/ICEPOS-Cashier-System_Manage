@@ -132,16 +132,6 @@ return $function=Array
 		'level' => 1,
 		'orderby' => 6
 		),
-	7 => Array
-		(
-		'id' => 7,
-		'name' => '商品配送',
-		'icon' => 'layui-icon-cart',
-		'parent' => '',
-		'url' => '',
-		'level' => 1,
-		'orderby' => 7
-		),
 	108 => Array
 		(
 		'id' => 108,
@@ -272,16 +262,6 @@ return $function=Array
 		'level' => 2,
 		'orderby' => 22
 		),
-	23 => Array
-		(
-		'id' => 23,
-		'name' => '订单管理',
-		'icon' => 'layui-icon-component',
-		'parent' => 5,
-		'url' => '',
-		'level' => 2,
-		'orderby' => 23
-		),
 	24 => Array
 		(
 		'id' => 24,
@@ -311,16 +291,6 @@ return $function=Array
 		'url' => '',
 		'level' => 2,
 		'orderby' => 26
-		),
-	27 => Array
-		(
-		'id' => 27,
-		'name' => '直调业务',
-		'icon' => 'layui-icon-component',
-		'parent' => 7,
-		'url' => '',
-		'level' => 2,
-		'orderby' => 27
 		),
 	31 => Array
 		(
@@ -472,26 +442,6 @@ return $function=Array
 		'level' => 3,
 		'orderby' => 46
 		),
-	47 => Array
-		(
-		'id' => 47,
-		'name' => '促销方案',
-		'icon' => 'layui-icon-component',
-		'parent' => 19,
-		'url' => '/admin/plan/index',
-		'level' => 3,
-		'orderby' => 47
-		),
-	48 => Array
-		(
-		'id' => 48,
-		'name' => '礼券维护',
-		'icon' => 'layui-icon-component',
-		'parent' => 19,
-		'url' => '/admin/gift/index',
-		'level' => 3,
-		'orderby' => 48
-		),
 	49 => Array
 		(
 		'id' => 49,
@@ -572,36 +522,6 @@ return $function=Array
 		'level' => 3,
 		'orderby' => 56
 		),
-	57 => Array
-		(
-		'id' => 57,
-		'name' => '批发订单',
-		'icon' => 'layui-icon-component',
-		'parent' => 23,
-		'url' => '/admin/wmsheet/SSSheet/index',
-		'level' => 3,
-		'orderby' => 57
-		),
-	58 => Array
-		(
-		'id' => 58,
-		'name' => '批发销售单',
-		'icon' => 'layui-icon-component',
-		'parent' => 23,
-		'url' => '/admin/wmsheet/SOSheet/index',
-		'level' => 3,
-		'orderby' => 58
-		),
-	59 => Array
-		(
-		'id' => 59,
-		'name' => '批发退货单',
-		'icon' => 'layui-icon-component',
-		'parent' => 23,
-		'url' => '/admin/wmsheet/RISheet/index',
-		'level' => 3,
-		'orderby' => 59
-		),
 	60 => Array
 		(
 		'id' => 60,
@@ -652,26 +572,6 @@ return $function=Array
 		'level' => 3,
 		'orderby' => 64
 		),
-	65 => Array
-		(
-		'id' => 65,
-		'name' => '分店要货单',
-		'icon' => 'layui-icon-component',
-		'parent' => 27,
-		'url' => '/admin/pmsheet/YHSheet/index?TransNo=YH',
-		'level' => 3,
-		'orderby' => 65
-		),
-	66 => Array
-		(
-		'id' => 66,
-		'name' => '直调出库单',
-		'icon' => 'layui-icon-component',
-		'parent' => 27,
-		'url' => '/admin/imsheet/MOSheet/index?TransNo=DO',
-		'level' => 3,
-		'orderby' => 66
-		),
 	28 => Array
 		(
 		'id' => 28,
@@ -680,16 +580,6 @@ return $function=Array
 		'parent' => 5,
 		'url' => '',
 		'level' => 2,
-		'orderby' => 67
-		),
-	67 => Array
-		(
-		'id' => 67,
-		'name' => '直调入库单',
-		'icon' => 'layui-icon-component',
-		'parent' => 27,
-		'url' => '/admin/imsheet/rkd/milist?TransNo=DI',
-		'level' => 3,
 		'orderby' => 67
 		),
 	68 => Array
@@ -778,7 +668,7 @@ return $function=Array
 		'name' => '报 损 单',
 		'icon' => 'layui-icon-component',
 		'parent' => 25,
-		'url' => ' /admin/imsheet/JOSheet',
+		'url' => '/admin/imsheet/Josheet',
 		'level' => 3,
 		'orderby' => 83
 		),
@@ -792,26 +682,6 @@ return $function=Array
 		'level' => 3,
 		'orderby' => 84
 		),
-	86 => Array
-		(
-		'id' => 86,
-		'name' => '货架货位',
-		'icon' => 'layui-icon-component',
-		'parent' => 13,
-		'url' => '/admin/shelves/main/index',
-		'level' => 3,
-		'orderby' => 86
-		),
-	87 => Array
-		(
-		'id' => 87,
-		'name' => '商品陈列与存量指标',
-		'icon' => 'layui-icon-component',
-		'parent' => 13,
-		'url' => '/admin/shelves/place/index',
-		'level' => 3,
-		'orderby' => 87
-		),
 	88 => Array
 		(
 		'id' => 88,
@@ -821,16 +691,6 @@ return $function=Array
 		'url' => '/admin/stock/warning/index',
 		'level' => 3,
 		'orderby' => 88
-		),
-	89 => Array
-		(
-		'id' => 89,
-		'name' => '商品存量指标',
-		'icon' => 'layui-icon-component',
-		'parent' => 16,
-		'url' => '/admin/products/ProBase/StockageObjective',
-		'level' => 3,
-		'orderby' => 89
 		),
 	90 => Array
 		(
@@ -898,7 +758,7 @@ return $function=Array
 		'name' => '广告位设置',
 		'icon' => 'layui-icon-component',
 		'parent' => 95,
-		'url' => '/admin/portal/AdSpace/Index',
+		'url' => '/admin/portal/Adspace/Index',
 		'level' => 3,
 		'orderby' => 97
 		),
@@ -928,7 +788,7 @@ return $function=Array
 		'name' => '留言类别',
 		'icon' => 'layui-icon-component',
 		'parent' => 98,
-		'url' => '/admin/portal/GuestbookCtg/index',
+		'url' => '/admin/portal/Guestbookctg/index',
 		'level' => 3,
 		'orderby' => 100
 		),
@@ -1011,56 +871,6 @@ return $function=Array
 		'url' => '/admin/stock/Singlestock/Index',
 		'level' => 3,
 		'orderby' => 119
-		),
-	121 => Array
-		(
-		'id' => 121,
-		'name' => '资金管理',
-		'icon' => 'layui-icon-component',
-		'parent' => 4,
-		'url' => '',
-		'level' => 3,
-		'orderby' => 121
-		),
-	122 => Array
-		(
-		'id' => 122,
-		'name' => '账户管理',
-		'icon' => 'layui-icon-component',
-		'parent' => 121,
-		'url' => '/admin/Capital/Account',
-		'level' => 3,
-		'orderby' => 122
-		),
-	123 => Array
-		(
-		'id' => 123,
-		'name' => '付款单',
-		'icon' => 'layui-icon-component',
-		'parent' => 121,
-		'url' => '/admin/Capital/Payment',
-		'level' => 3,
-		'orderby' => 123
-		),
-	136 => Array
-		(
-		'id' => 136,
-		'name' => '价格层级设置',
-		'icon' => '',
-		'parent' => 22,
-		'url' => '/admin/Wholesale/Index/wsprice',
-		'level' => 3,
-		'orderby' => 123
-		),
-	124 => Array
-		(
-		'id' => 124,
-		'name' => '收款单',
-		'icon' => 'layui-icon-component',
-		'parent' => 121,
-		'url' => '/admin/Capital/Receivables',
-		'level' => 3,
-		'orderby' => 124
 		),
 	130 => Array
 		(
