@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1:3306
--- 生成日期： 2024-07-18 14:01:30
+-- 生成日期： 2024-07-26 15:36:02
 -- 服务器版本： 5.7.36
 -- PHP 版本： 7.2.34
 
@@ -7565,7 +7565,7 @@ CREATE TABLE IF NOT EXISTS `ice_sp_pro_photos` (
 DROP TABLE IF EXISTS `ice_stock_flow`;
 CREATE TABLE IF NOT EXISTS `ice_stock_flow` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
-  `sheet_no` char(20) NOT NULL COMMENT '订单编号',
+  `sheet_no` varchar(30) NOT NULL COMMENT '订单编号',
   `branch_no` char(10) NOT NULL COMMENT '门店编号',
   `db_no` char(1) NOT NULL,
   `item_no` char(20) NOT NULL COMMENT '商品编码',

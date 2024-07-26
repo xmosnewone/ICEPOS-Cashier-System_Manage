@@ -104,7 +104,7 @@ class PosPayFlow extends BaseModel {
                     if ($sale->sell_way == "B") {
                         $db_no = "+";
                     }
-                    if (empty($combs)) {
+                    if (empty($combs)||count($combs)<=0) {
                         if ($PosBranchStock->UpdateStockBySheetNo($pay->flow_no, $sale->branch_no, $sale->item_no, $sale->sale_qnty, $db_no)) {
                             $isok = TRUE;
                         } else {
