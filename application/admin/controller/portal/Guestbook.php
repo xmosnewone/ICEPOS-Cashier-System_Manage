@@ -5,6 +5,9 @@ use app\admin\controller\Super;
 use model\PortalGuestbook;
 use model\PortalGuestbookCtg;
 use model\PortalGuestbookExt;
+use model\PosBranch;
+use model\PosFeedback;
+use model\PosStatus;
 use think\Db;
 use think\Controller;
 
@@ -247,4 +250,136 @@ class Guestbook extends Super {
        	return listJson(0,'',$total,$ary);
     }
 
+    //显示列表页面
+    public function posFeed() {
+        return $this->fetch("portal/guestbook/posfeed");
+    }
+
+    public function getPosFbList() {
+        $page = input('page') ? input('page') : 1;
+        $rows = input('limit') ? input('limit') : 10;
+
+        $PortalGuestbook=new PosFeedback();
+
+        $countSql='SELECT count(*) as total';
+        $fieldSql="SELECT g.* ";
+
+        $sql = " FROM " . $PortalGuestbook->tableName() . " AS g "
+            . " WHERE 1=1";
+
+        $content = input("content");
+        $startTime = input("startTime");
+        $endTime = input("endTime");
+        if ($startTime != "") {
+            $sql .= " AND date(g.oper_date) >= date('" . $startTime . "')";
+        }
+        if ($endTime != "") {
+            $sql .= " AND date(g.oper_date) <=  date('" . $endTime . "')";
+        }
+        if ($content != "") {
+            $sql .= " AND g.content like '%" . $content . "%'";
+        }
+        $sql .= " ORDER BY g.id DESC";
+        $result=Db::query($countSql.$sql);
+        $total=$result[0]['total'];
+
+        $offset = ($page - 1) * $rows;
+        $rowIndex = ($page - 1) * $rows + 1;
+        $model = Db::query($fieldSql.$sql." limit $offset,$rows");
+
+        $ary = array();
+        foreach ($model as $k => $v) {
+            $tt = array();
+            $tt["rowIndex"] = $rowIndex;
+            $tt["guestbookId"] = $v["id"];
+            $tt["branch_no"] = $v["branch_no"];
+            $tt["posid"] = $v["posid"];
+            $tt["reply"] = $v["reply"];
+            $tt["content"] = $v["content"];
+            $tt["oper_date"] = $v["oper_date"];
+            array_push($ary, $tt);
+            $rowIndex++;
+        }
+        $result["rows"] = $ary;
+        return listJson(0,'',$total,$ary);
+    }
+
+    //查看留言
+    public function posview() {
+
+        $id = input("id");
+        if (!empty($id)) {
+            $fb=new PosFeedback();
+            $feedback = $fb->GetById($id);
+            if (empty($feedback)) {
+                return array("code" => false, "msg" => lang("gb_empty"));
+            }
+            $branch_no=$feedback['branch_no'];
+            $posid=$feedback['posid'];
+            //查询门店和pos机
+            $Posbranch=new PosBranch();
+            $branch=$Posbranch->where(['branch_no'=>$branch_no])->find();
+
+            $PosStatus=new PosStatus();
+            $posInfo=$PosStatus->where(['branch_no'=>$branch_no,'posid'=>$posid])->find();
+
+            $feedback['branch_name']=$branch['branch_name'];
+            $feedback['posdesc']=$posInfo['posdesc'];
+
+            $this->assign("feedback", $feedback);
+        }
+
+        return $this->fetch("portal/guestbook/posview");
+    }
+
+    //回复留言
+    public function possave() {
+        $reply = input("reply");
+        $id=input("id");
+        if (!empty($id)&&!empty($reply)) {
+            $fb=new PosFeedback();
+            $ok=$fb->save([
+                'reply'  => $reply,
+                'reply_date' => $this->_G['time']
+            ],['id' => $id]);
+            if ($ok) {
+                return array("code" => true, "msg" => lang("rp_save_success"));
+            }
+        }
+
+        return array("code" =>false, "msg" => lang("rp_save_error"));
+    }
+
+    //删除留言
+    public function pdelete() {
+        $id = input("id");
+
+        if (empty($id)) {
+            return array("code" => false, "msg" => lang("gb_id_empty"));
+        }
+        $posfb=new PosFeedback();
+        $ok=$posfb->where(['id'=>$id])->delete();
+        if ($ok) {
+            return array("code" => true, "msg" => lang("gb_delete_ok"));
+        } else {
+            return array("code" => false, "msg" => lang("gb_delete_error"));
+        }
+    }
+
+    //批量删除留言
+    public function pbatchDelete() {
+        $ids = input("id");
+
+        if (empty($ids)) {
+            return array("code" => false, "msg" => lang("gb_id_empty"));
+        }
+        $posfb=new PosFeedback();
+        $ids=explode(",",$ids);
+
+        foreach($ids as $id){
+            $posfb->where(['id'=>$id])->delete();
+        }
+
+        return array("code" => true, "msg" => lang("gb_delete_ok"));
+    }
 }

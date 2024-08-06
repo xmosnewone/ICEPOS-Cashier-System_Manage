@@ -182,6 +182,8 @@ return array(
 	'gb_id_empty'=>'留言id为空',
 	'gb_delete_ok'=>'留言删除成功',
 	'gb_delete_error'=>'留言删除失败',
+    'rp_save_success'=>'回复保存成功',
+    'rp_save_error'=>'回复保存失败',
 	
 	//新闻
 	'news_title_empty'=>'标题不能为空',

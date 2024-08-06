@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑留言</title>
+    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+<style>
+.longtxt{width:500px;height: 250px;}
+.longlabel{width:300px;text-align: left}
+</style>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+
+				  <div class="layui-form-item">
+				  <div class="layui-col-md12">
+				    <label class="layui-form-label">留言门店</label>
+				    <div class="layui-input-inline">
+						<label class="layui-form-label longlabel">
+						{$feedback.branch_name}  ( {$feedback.branch_no} )
+						</label>
+				    </div>
+				    </div>
+				  </div>
+
+				<div class="layui-form-item">
+					<div class="layui-col-md12">
+						<label class="layui-form-label">POS机</label>
+						<div class="layui-input-inline">
+							<label class="layui-form-label longlabel">
+							{$feedback.posdesc}  ( {$feedback.posid} )
+							</label>
+						</div>
+					</div>
+				</div>
+
+				  <div class="layui-form-item">
+				  <div class="layui-col-md12">
+				    <label class="layui-form-label">留言内容</label>
+				    <div class="layui-input-inline">
+						<label class="layui-form-label longlabel">
+						{$feedback.content}
+						</label>
+				    </div>
+				    </div>
+				  </div>
+				  
+				  <div class="layui-form-item">
+				  <div class="layui-col-md12">
+				    <label class="layui-form-label">回复内容</label>
+				    <div class="layui-input-inline">
+				      <textarea name="reply" placeholder="请输入回复内容" autocomplete="off" class="layui-input longtxt">{$feedback.reply}</textarea>
+				    </div>
+				    </div>
+				  </div>
+				  
+				  <input name="id" type="hidden" value="{$feedback['id']}"/>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="type-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script>
+layui.use(['form','jquery','laydate'],function(){
+	
+	var laydate = layui.laydate;
+    let form = layui.form;
+    let $ = layui.jquery;
+    
+    
+    var path="/{$MODULE_NAME}/portal/Guestbook";
+	var _url="/possave";
+    form.on('submit(type-save)', function(data){
+        $.ajax({
+            url:path+_url,
+            data:JSON.stringify(data.field),
+            dataType:'json',
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code){
+                    layer.msg(result.msg,{icon:1,time:1000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        parent.layui.table.reload("guestbook-table",{
+							where:{}
+						});
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

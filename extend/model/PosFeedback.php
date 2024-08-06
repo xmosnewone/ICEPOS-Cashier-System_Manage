@@ -52,4 +52,7 @@ class PosFeedback extends BaseModel {
         return $res;
     }
 
+    public function GetById($id) {
+        return $this->where("id='$id'")->find();
+    }
 }
