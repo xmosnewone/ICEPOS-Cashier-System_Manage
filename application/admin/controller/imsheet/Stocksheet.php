@@ -283,7 +283,6 @@ class Stocksheet extends Super {
 		$list=Db::name("bd_base_code")
 		->field("code_id, code_name, type_no,memo")
 		->where($where)
-		->limit($offset,$rows)
 		->select();
 	
 		$temp = array ();
