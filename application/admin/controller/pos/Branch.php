@@ -10,7 +10,11 @@ use model\BaseModel;
  */
 class Branch extends Super
 {
-
+    private $trade_type=[
+        1=>'仓库',
+        2=>'加盟店',
+        3=>'总部',
+    ];
     public function branchList(){
       $page=input('page');
       $limit=input('limit');
@@ -36,6 +40,9 @@ class Branch extends Super
         $total=$model->where($where)->count();
         $start=($page-1)*$limit;
         $list = $model->where($where)->limit($start,$limit)->select()->toArray();
+        foreach($list as $k=>$value){
+            $list[$k]['trade_type']=$this->trade_type[$value['trade_type']];
+        }
         return listJson(0,'',$total,$list);
       }
       else{
@@ -129,6 +136,7 @@ class Branch extends Super
 			$content = array ();
 			$content ['branch_no'] = $branch_no;
 			$content ['branch_name'] = input ( 'branch_name' );
+            $content ['trade_type'] = input ( 'trade_type' );
 			$content ['price_type'] = input ( 'price_type' );
 			$content ['branch_man'] = input ( 'branch_man' );
 			$content ['branch_tel'] = input ( 'branch_tel' );
