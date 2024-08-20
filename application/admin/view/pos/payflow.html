@@ -18,7 +18,7 @@
 			<div class="layui-card-body">
 				<form class="layui-form" action="">
 					<div class="layui-form-item">
-					
+
 					<div class="layui-row">
 						<div class="layui-form-item layui-inline" id="date-range">
 							<label class="layui-form-label">日期范围</label>
@@ -47,9 +47,9 @@
 								</select>
 							</div>
 						</div>
-						
+
 					</div>
-					
+
 					<div class="layui-row">
 						<div class="layui-form-item layui-inline">
 								<label class="layui-form-label">分店仓库</label>
@@ -65,7 +65,7 @@
 								<i class="layui-icon layui-icon-username"></i>
 							</div>
 						</div>
-						
+
 						<div class="layui-form-item layui-inline">
 							<label class="layui-form-label">POS机号</label>
 							<div class="layui-input-inline inputdiv">
@@ -74,9 +74,9 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="layui-row">
-						
+
 						<div class="layui-form-item layui-inline">
 							<label class="layui-form-label">会员编号</label>
 							<div class="layui-input-inline">
@@ -96,9 +96,9 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="layui-row">
-						
+
 						<div class="layui-form-item layui-inline">
 							<label class="layui-form-label">付款方式</label>
 							<div class="layui-input-inline" id="payway">
@@ -109,7 +109,7 @@
 									{/volist}
 								</select>
 							</div>
-							
+
 							<div class="layui-input-inline" style="display:none" id="payway1">
 								<select name="payflag1">
 									<option value="">全部</option>
@@ -119,7 +119,7 @@
 								</select>
 							</div>
 						</div>
-						
+
 						<div class="layui-form-item layui-inline">
 							<label class="layui-form-label">销售方式</label>
 							<div class="layui-input-inline">
@@ -131,7 +131,7 @@
 								</select>
 							</div>
 						</div>
-						
+
 						<div class="layui-form-item layui-inline">
 							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="payflow-query">
 								<i class="layui-icon layui-icon-search"></i>
@@ -143,9 +143,9 @@
 							</button>
 						</div>
 					</div>
-					
+
 					</div>
-					
+
 				</form>
 			</div>
 		</div>
@@ -170,14 +170,14 @@
 			var itemcls_url="{:U('Controls/itemcls')}";
 			var brand_url="{:U('Controls/brands')}";
 			var branchs_url="{:U('Controls/branchs')}";
-			
+
 			layui.use(['table', 'form', 'jquery','common','laydate'], function() {
 				let table = layui.table;
 				let form = layui.form;
 				let $ = layui.jquery;
 				let common = layui.common;
 				let laydate = layui.laydate;
-				
+
 			  	laydate.render({
 					    elem: '#date-range'
 					    ,range: ['#start-date', '#end-date']
@@ -216,7 +216,7 @@
 							field: 'flow_no',
 							align: 'left',
 							templet:'#payflowTpl',
-							width: 180
+							width: 220
 						},
 						{
 							title: '销售金额',
@@ -234,7 +234,7 @@
 							title: '操作日期',
 							field: 'oper_date',
 							align: 'left',
-							width: 120
+							width: 180
 						},
 						{
 							title: '付款方式',
@@ -295,7 +295,7 @@
 						$("#payflow-table").css("width", _width);
 					}
 				});
-				
+
 				//单选事件
 				form.on('radio(pos)', function(data){
 				  if(data.value==1){
@@ -305,7 +305,7 @@
 					  $("#payway").show();
 					  $("#payway1").hide();
 				  }
-				}); 
+				});
 
 				form.on('select(getdate)', function(data) {
 					date = new Array(2);
@@ -352,7 +352,7 @@
 		            $('#start-date').val( date[0]);
 	                $('#end-date').val(date[1]);
 				});
-				
+
 				form.on('submit(payflow-query)', function(data) {
 					table.reload('payflow-table', {
 						where: data.field,
@@ -360,123 +360,123 @@
 					})
 					return false;
 				});
-				
+
 				//显示分店选择框
 				window.showBranchs=function(){
 					_layerIndex=openWin("分店仓库选择",branchs_url,"800px","600px");
 				}
-				
+
 				//门店选择后的回调函数
 				window.callBackBranch=function(data){
-					
+
 					var arr=new Array();
 					for(var i in data){
 						arr.push(data[i]['branch_no']);
 					}
-					
+
 					$("#branch_no").val(arr.join(","));
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 					}
 					_layerIndex=null;
 				}
-				
+
 				//显示操作员选择框
 				window.showOperators=function(){
 					var oval=$("#operator").val();
-					
+
 					if(_layerIndex==null||oval==''){
 						_layerIndex=openWin("营业员选择",operator_url,"800px","600px");
 					}
 				}
-				
+
 				//操作员选择后的回调函数
 				window.callBackOprator=function(data){
-					
+
 					$("#operator").val(data[0]['oper_id']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 						_layerIndex=null;
 					}
 				}
-				
+
 				//显示POS机选择框
 				window.showPos=function(){
 					var oval=$("#posid").val();
-					
+
 					if(_layerIndex==null||oval==''){
 						_layerIndex=openWin("POS机选择",pos_url,"800px","600px");
 					}
 				}
-				
+
 				//POS机选择后的回调函数
 				window.callBackPos=function(data){
-					
+
 					$("#posid").val(data[0]['posid']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 						_layerIndex=null;
 					}
 				}
-				
+
 				//选择商品窗口
 				window.selectGoods=function(){
 					_layerIndex=openWin("商品选择",items_url,"1100px","600px");
 				}
-				
+
 				//商品选择后的回调函数
 				window.callBack=function(data){
-					
+
 					$("#item_no").val(data[0]['item_no']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 					}
 				}
-				
+
 				//选择商品分类窗口
 				window.selectCls=function(){
 					_layerIndex=openWin("商品分类选择",itemcls_url,"800px","600px");
 				}
-				
+
 				//商品分类选择后的回调函数
 				window.callBackItemcls=function(data){
-					
+
 					$("#item_cls").val(data[0]['item_clsno']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 					}
 				}
-				
+
 				//选择商品品牌窗口
 				window.selectBrand=function(){
 					_layerIndex=openWin("商品品牌选择",brand_url,"800px","600px");
 				}
-				
+
 				//商品品牌选择后的回调函数
 				window.callBackBrand=function(data){
-					
+
 					$("#brand").val(data[0]['code_id']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 					}
 				}
-				
+
 				//显示供应商选择框
 				window.showSupplier=function(){
 					_layerIndex=openWin("供应商选择",supplier_url,"800px","600px");
 				}
-				
+
 				//供应商选择后的回调函数
 				window.callBackSupplier=function(data){
-					
+
 					$("#supplier").val(data[0]['sp_no']);
-					
+
 					if(_layerIndex!=null){
 						layer.close(_layerIndex);
 						_layerIndex=null;
@@ -487,7 +487,7 @@
 				window.showFlow=function(flowno){
 					openWin("销售流水详细",'/{$MODULE_NAME}/pos/saleflow/saleDetail/flowno/'+flowno,"800px","500px");
 				}
-				
+
 				window.refresh = function(param) {
 					table.reload('payflow-table');
 				}
