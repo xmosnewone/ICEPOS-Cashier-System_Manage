@@ -242,7 +242,7 @@
 						layer.close(index);
 						let loading = layer.load();
 						$.ajax({
-							url: MODULE_PATH + "deletePos/posid/" + obj.data['posid'],
+							url: MODULE_PATH + "deletePos/posid/" + obj.data['posid']+"/branch_no/"+obj.data['branch_no'],
 							dataType: 'json',
 							type: 'delete',
 							success: function(result) {

@@ -240,13 +240,15 @@ class PosStatus extends BaseModel {
     }
 
     //删除
-    public function deleteOne($posid){
-    	$result=$this->where("posid='$posid'")->delete();
+    public function deleteOne($posid,$branch_no){
+    	$result=$this->where("posid='$posid' and branch_no='$branch_no'")->delete();
     	if ($result) {
     		return true;
     	}else{
     		return false;
     	}
     }
+
+
     
 }

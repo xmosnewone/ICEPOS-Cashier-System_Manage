@@ -215,11 +215,15 @@ class Posno extends Super {
 	// 删除POS机记录
 	public function deletePos() {
 		$posid = input ( 'posid' );
+        $branch_no = input ( 'branch_no' );
 		$PosStatus=new PosStatus();
-		$result = $PosStatus->getone ( $posid );
+		$result = $PosStatus->where ( [
+            "branch_no" => $branch_no,
+            "posid" => $posid
+        ] )->find();
 		if ($result) {
 			// 删除对应的POS机，做提示
-			$ok = $PosStatus->deleteOne ( $posid );
+			$ok = $PosStatus->deleteOne ( $posid,$branch_no );
 			if ($ok) {
 				$return ['code'] = true;
 				$return ['msg']=lang("pos_delete_succ");
