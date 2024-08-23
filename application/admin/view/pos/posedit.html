@@ -21,7 +21,7 @@
 				  <div class="layui-form-item">
 				     <label class="layui-form-label">所属门店</label>
 				    <div class="layui-input-inline">
-				      <select name="branch_no" lay-search>
+				      <select name="branch_no" lay-search disabled>
 				        <option value=""></option>
 				        {volist name="branchs" id="vo"}
 				        <option value="{$vo['branch_no']}" {if condition="$one['branch_no'] eq $vo['branch_no']"}selected="selected"{/if}>{$vo['branch_name']}</option>

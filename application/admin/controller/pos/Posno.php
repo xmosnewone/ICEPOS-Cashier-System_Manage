@@ -30,7 +30,16 @@ class Posno extends Super {
 		if(!empty($branchno)){
 			$where.=" and branch_no='$branchno'";
 		}
-		
+
+		//查询门店
+        $branchInfo=new PosBranch();
+		$blist=$branchInfo->GetAllBranch();
+		$branchs=[];
+		foreach($blist as $val){
+		    $branch_no=$val['branch_no'];
+            $branchs[$branch_no]=$val['branch_name'];
+        }
+
 		$field= "branch_no,posid,hostname,lasttime,lastcashier,posdesc,status,load_flag";
 		$model = new PosStatus();
 		$count = $model->where($where)->count();
@@ -43,6 +52,7 @@ class Posno extends Super {
 			$tlist = array ();
 			$tlist ["rowIndex"] = $rowIndex;
 			$tlist ["branch_no"] = $v ["branch_no"];
+            $tlist ["branch_name"] = isset($branchs[$v ["branch_no"]])?$branchs[$v ["branch_no"]].'['.$v ["branch_no"].']':$v ["branch_no"];
 			$tlist ["posid"] = $v ["posid"];
 			$tlist ["hostname"] = $v ["hostname"];
 			$tlist ["lasttime"] = $v ["lasttime"];
@@ -106,8 +116,10 @@ class Posno extends Super {
 		}
 		
 		if($act=='add'){
-			$num = $model->where("posid='{$content ['posid']}'")->count();
+
+            $num = $model->where("posid='{$posid}' and branch_no='{$content['branch_no']}'")->count();
 			if ($num > 0) {
+
 				$return ['code'] = false;
 				$return ['msg'] = lang("pos_id_exists");
 				return $return;
