@@ -84,7 +84,7 @@
 										</div>
 								    </div>
 					    		 	<div class="layui-form-item layui-inline">
-									    <label class="layui-form-label">业务员</label>
+									    <label class="layui-form-label">营业员</label>
 									    <div class="layui-input-inline inputdiv">
 									    	<input type="text" name="oper_id" id="oper_id" value="{$one.operId}" autocomplete="off" placeholder="" class="layui-input" readonly="readonly" onfocus="showOperators()">
 											<input type="hidden" id="oper_name" name="oper_name" value="{$one['operName']}" />
@@ -550,7 +550,7 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 			return;
 		{/if}
 	
-		_layerIndex=openWin("采购员选择",operator_url,"800px","600px");
+		_layerIndex=openWin("营业员选择",operator_url,"800px","600px");
 		
 	}
 	

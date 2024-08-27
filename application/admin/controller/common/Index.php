@@ -29,7 +29,7 @@ class Index extends Super {
         $result = $treeNode->GetItemClsForControls();
         $code=200;
         $message='';
-        return treeJson($code, $msg, $result[0]->children);
+        return treeJson($code, $message, $result[0]->children);
     }
 
     //获取商品信息
@@ -221,7 +221,7 @@ class Index extends Super {
         $page = input("page") ? intval(input("page")) : 1;
         $rows = input("limit") ? intval(input("limit")) : 10;
        
-        $field="oper_id,oper_name";
+        $field="oper_id,oper_name,branch_no";
         $condition="num1='1'";
         
         $keyword=input("keyword");
@@ -242,7 +242,7 @@ class Index extends Super {
         $result = array();
         $result["total"] = $count;
         $temp = array();
-        $colmns = "oper_id,oper_name";
+        $colmns = "oper_id,oper_name,branch_no";
         $rowIndex = ($page - 1) * $rows + 1;
         foreach ($list as $k => $v) {
             $tt = array();
