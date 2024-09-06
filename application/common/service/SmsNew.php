@@ -29,7 +29,7 @@ class SmsNew{
 			 * 以免泄露密钥对危及你的财产安全。
 			 * CAM密匙查询: https://console.cloud.tencent.com/cam/capi*/
 		
-			$cred = new Credential("AKID68yZ2rms4NYWDeHqgMxLaeVDSbZWvdzF", "A3f0h8IDtJSAfuwmBTXLtGPJ0VnGYidL");
+			$cred = new Credential("", "");
 			//$cred = new Credential(getenv("TENCENTCLOUD_SECRET_ID"), getenv("TENCENTCLOUD_SECRET_KEY"));
 		
 			// 实例化一个http选项，可选的，没有特殊需求可以跳过
