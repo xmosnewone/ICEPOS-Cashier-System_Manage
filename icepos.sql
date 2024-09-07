@@ -4798,7 +4798,7 @@ INSERT INTO `ice_bd_item_photo` (`photo_id`, `item_no`, `photo_url`, `photo_name
 
 DROP TABLE IF EXISTS `ice_bd_payment_info`;
 CREATE TABLE IF NOT EXISTS `ice_bd_payment_info` (
-  `pay_way` varchar(3) NOT NULL,
+  `pay_way` varchar(8) NOT NULL,
   `pay_flag` char(1) NOT NULL,
   `pay_name` varchar(20) NOT NULL,
   `rate` decimal(10,4) DEFAULT NULL,
@@ -4814,10 +4814,12 @@ CREATE TABLE IF NOT EXISTS `ice_bd_payment_info` (
 
 INSERT INTO `ice_bd_payment_info` (`pay_way`, `pay_flag`, `pay_name`, `rate`, `default_amt`, `inout_flag`, `pay_memo`) VALUES
 ('01 ', '5', '清洁费', '1.0000', '0.0000', NULL, ''),
+('BCD', '0', '银行卡支付', '1.0000', '0.0000', NULL, '银行卡支付'),
 ('BZ ', '1', '包装箱回收', '1.0000', '0.0000', NULL, ''),
 ('CHA', '0', '余额支付', '1.0000', '0.0000', NULL, '系统默认'),
 ('CHG', '0', '抹零', '1.0000', '0.0000', NULL, '系统默认'),
 ('CHQ', '0', '人民币支票', '1.0000', '0.0000', NULL, '系统默认'),
+('COU', '0', '购物券', '1.0000', '0.0000', NULL, '系统默认'),
 ('CRD', '0', '人民币信用卡', '1.0000', '0.0000', NULL, '系统默认'),
 ('DQ ', '4', '店庆费', '1.0000', '0.0000', NULL, ''),
 ('GIF', '0', '赠送', '1.0000', '0.0000', NULL, '系统默认'),
@@ -4840,15 +4842,15 @@ INSERT INTO `ice_bd_payment_info` (`pay_way`, `pay_flag`, `pay_name`, `rate`, `d
 ('SAV', '0', '充值卡', '1.0000', '0.0000', NULL, '系统默认'),
 ('SEC', '8', '代交水电费', '1.0000', '0.0000', NULL, '系统默认'),
 ('SHC', '0', '不找零', '1.0000', '0.0000', NULL, '系统默认'),
-('SHP', '0', '购物券', '1.0000', '0.0000', NULL, '系统默认'),
 ('SPC', '8', '冲印服务', '1.0000', '0.0000', NULL, '系统默认'),
 ('SWC', '8', '洗衣服务', '1.0000', '0.0000', NULL, '系统默认'),
 ('TPP', '7', '会员充值', '1.0000', '0.0000', NULL, NULL),
 ('USD', '0', '美元现金', '8.0000', '0.0000', NULL, '系统默认'),
 ('USD', '3', '美元', '8.3000', '0.0000', NULL, '系统默认'),
 ('VIP', '0', '会员卡', '1.0000', '0.0000', NULL, '系统默认'),
-('WX', '0', '微信', '1.0000', '0.0000', NULL, '微信支付'),
-('YFF', '8', '预付费卡', '1.0000', '0.0000', NULL, '和付提供');
+('WXQR', '0', '微信扫码', '1.0000', '0.0000', NULL, '微信扫码收款'),
+('YFF', '8', '预付费卡', '1.0000', '0.0000', NULL, '和付提供'),
+('ZFBQR', '0', '支付宝扫码', '1.0000', NULL, NULL, '支付宝扫码收款');
 
 -- --------------------------------------------------------
 
