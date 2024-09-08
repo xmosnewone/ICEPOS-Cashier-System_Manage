@@ -1430,49 +1430,8 @@ class Api extends Super {
 		return $this->ajaxReturn($result);
 	}
 
-    /**
-     * 库存调整单等数据列表
-     */
-    public function imsheetList() {
-        $page = input ( 'page' ) ? intval ( input ( 'page' ) ) : 1;
-        $rows = 10;//每页显示数量
-        $start = input ( "start" );
-        $end = input ( "end" );
-        $sheet_no = input ( "no" );
-        $approve_flag = input ( "approve_flag" );
-        $oper_id = input ( "oper_id" );
-        $branch_no = input ( "branch_no" );//仓库（库存调整单仓库）
-        $d_branch_no = input ( "d_branch_no" );//调出仓库
-        $transno = input ( "transno" )?input ( "transno" ):'OO';//调整标记OO'JO'MO'MI等
-        $ImSheetMaster=new ImSheetMaster();
-        $array=$ImSheetMaster->GetPager ( $rows, $page, $start, $end, $sheet_no, $approve_flag, $oper_id, $d_branch_no, $transno,$branch_no ) ;
-        $pages=0;//总下拉页数
-        if($array ['total']>0){
-            $pages=ceil($array ['total']/$rows);
-        }
-        return $this->ajaxReturn(['list'=>$array ['rows'],'total'=>$array ['total'],'pages'=>$pages]);
-
-    }
-
-    /**
-     * 库存调整单数据统计
-     * 小程序或客户端返回未审核和全部单据数据
-     */
-    public function imsheetStatic() {
-        $approve_flag = input ( "approve_flag" );
-        $oper_id = input ( "oper_id" );
-        $branch_no = input ( "branch_no" );//仓库（库存调整单仓库）
-        $d_branch_no = input ( "d_branch_no" );//调出仓库
-        $transno = input ( "transno" )?input ( "transno" ):'OO';//调整标记OO'JO'MO'MI等
-        $ImSheetMaster=new ImSheetMaster();
-        $total=$ImSheetMaster->staticNum ( '', $oper_id, $d_branch_no, $transno,$branch_no ) ;//全部
-        $un_approved=$ImSheetMaster->staticNum ( -1, $oper_id, $d_branch_no, $transno,$branch_no ) ;//未审核
-        $data['total']=$total;
-        $data['un_approved']=$un_approved;
-        return $this->ajaxReturn($data);
-    }
 	// 会员消费记录
-	public function addvip() {
+    public function addvip() {
         $result = $this->ApiConnect ( $_POST );
         if ($result == 1) {
             try {
@@ -1576,7 +1535,7 @@ class Api extends Super {
 		if ($result != 1) {
 			return strval ( $result );
 		}
-		$result = $this->Auth ( $_POST, 1 );
+		$result = $this->Auth ( $_POST, 0 );
 		if ($result != 1) {
 			return strval ( $result );
 		}
@@ -1740,7 +1699,7 @@ class Api extends Super {
 		if ($result != 1) {
 			return strval ( $result );
 		}
-		$result = $this->Auth ( $_POST, 1 );
+		$result = $this->Auth ( $_POST, 0 );
 		if ($result != 1) {
 			return strval ( $result );
 		}
@@ -1832,7 +1791,7 @@ class Api extends Super {
 		if ($result != 1) {
 			return strval ( $result );
 		}
-		$result = $this->Auth ( $_POST, 1 );
+		$result = $this->Auth ( $_POST, 0 );
 		if ($result != 1) {
 			return strval ( $result );
 		}
@@ -1948,7 +1907,7 @@ class Api extends Super {
 		if ($result != 1) {
 			return strval ( $result );
 		}
-		$result = $this->Auth ( $_POST, 1 );
+		$result = $this->Auth ( $_POST, 0 );
 		if ($result != 1) {
 			return strval ( $result );
 		}
