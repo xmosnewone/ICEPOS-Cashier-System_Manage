@@ -1528,446 +1528,395 @@ class Api extends Super {
 		}
 		return $result;
 	}
-	
-	// 支付宝支付刷卡面对面支付(付款码支付)
-	public function aliPayFtf() {
-		$result = $this->ApiConnect ( $_POST );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		$result = $this->Auth ( $_POST, 0 );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		
-		$flowno = input ( "flow_no" ); // 订单号
-		$payAmount = input ( "pay_amount" ); // 订单金额
-		$authCode = input ( "auth_code" ); // 18位数字授权码
-		$branchno = input ( "branch_no" ); // 商店号
-		$payAmount = floatval ( $payAmount ); // 订单总金额。单位为元
-		
-		$path = "../extend/alipay/f2fpay/";
-		require_once $path . 'model/builder/AlipayTradePayContentBuilder.php';
-		require_once $path . 'service/AlipayTradeService.php';
-		
-		// (必填) 订单标题，粗略描述用户的支付目的”
-		// 查询门店和流水是否存在
-		$posPayFlow = new PosPayFlow ();
-		$one = $posPayFlow->get ( $flowno );
-		if (! $one) {
-			return "-9"; // 不存在流水
-		}
-		
-		// 外向订单号
-		$outTradeNo = $flowno;
-		// 查询门店名称
-		$PosBranchInfo = new PosBranch ();
-		$shop = $PosBranchInfo->getone ( $branchno );
-		if (! $shop) {
-			$branchName = $branchno;
-		} else {
-			$branchName = $shop ['branch_name'];
-		}
-		
-		if (!$shop||empty($shop['alipay_appid'])||empty($shop['alipay_public_key'])||empty($shop['alipay_private_key'])) {
-			$message = $branchno."查询支付宝支付状态缺少配置";
-			write_log ( $message, "API/api/aliPayFtf" );
-			return "-3";
-		}
-		
-		$shop_config=[];
-		$shop_config['app_id'] = $shop ['alipay_appid']; //应用ID
-		$shop_config['alipay_public_key'] = $shop ['alipay_public_key']; // 支付宝公钥
-		$shop_config['merchant_private_key']= $shop ['alipay_private_key']; // 商户私钥
-		
-		//更改门店支付配置
-		$ali_config=isset($config)?array_merge($config,$shop_config):[];
-		
-		//查询收银流水
-		$PosSaleFlow=new PosSaleFlow();
-		$goods=$PosSaleFlow->getFlowItems($flowno);
-		$num=count($goods);
-		
-		$subject = $branchName . "消费订单支付";
-		
-		// (必填) 订单总金额
-		// 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
-		$totalAmount = $payAmount;
-		
-		// (必填) 付款条码
-		$authCode = $authCode; // 28开头18位数字
-		                       
-		// (可选,根据需要使用) 订单可打折金额
-		                       // 如果该值未传入,但传入了【订单总金额】,【不可打折金额】 则该值默认为【订单总金额】- 【不可打折金额】
-		                       // String discountableAmount = "1.00"; //
-		                       
-		// (可选) 订单不可打折金额
-		                       // 如果该值未传入,但传入了【订单总金额】,【打折金额】,则该值默认为【订单总金额】-【打折金额】
-		$undiscountableAmount = "0.00";
-		
-		// 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
-		// 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
-		$sellerId = "";
-		
-		// 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品2件共15.00元"
-		$body = "购买商品{$num}件共{$totalAmount}元";
-		
-		// 商户操作员编号，添加此参数可以为商户操作员做销售统计
-		$operatorId = "";
-		
-		// (可选) 商户门店编号，通过门店号和商家后台可以配置精准到门店的折扣信息，详询支付宝技术支持
-		$storeId = "";
-		
-		// 支付宝的店铺编号
-		$alipayStoreId = "";
-		
-		// 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
-		$providerId = ""; // 系统商pid,作为系统商返佣数据提取的依据
-		$extendParams = new \ExtendParams ();
-		$extendParams->setSysServiceProviderId ( $providerId );
-		$extendParamsArr = $extendParams->getExtendParams ();
-		
-		// 支付超时，线下扫码交易定义为5分钟
-		$timeExpress = "5m";
-		
-		// 商品明细列表，需填写购买商品详细信息，
-		$goodsDetailList = array ();
-		if($num>0){
-			foreach ($goods as $key=>$value){
-				$GDetail = new \GoodsDetail ();
-				$GDetail->setGoodsId ( $value['item_no'] );
-				$GDetail->setGoodsName ( $value['item_name'] );
-				$GDetail->setPrice (  $value['sale_money'] );
-				$GDetail->setQuantity ( $value['sale_qnty'] );
-				// 得到商品1明细数组
-				$GDetailArr = $GDetail->getGoodsDetail ();
-				array_push($goodsDetailList, $GDetailArr);
-			}
-		}
-		
-		// 第三方应用授权令牌,商户授权系统商开发模式下使用
-		$appAuthToken = ""; // 根据真实值填写
-		                    
-		// 创建请求builder，设置请求参数
-		$barPayRequestBuilder = new \AlipayTradePayContentBuilder ();
-		$barPayRequestBuilder->setOutTradeNo ( $outTradeNo );
-		$barPayRequestBuilder->setTotalAmount ( $totalAmount );
-		$barPayRequestBuilder->setAuthCode ( $authCode );
-		$barPayRequestBuilder->setTimeExpress ( $timeExpress );
-		$barPayRequestBuilder->setSubject ( $subject );
-		$barPayRequestBuilder->setBody ( $body );
-		$barPayRequestBuilder->setUndiscountableAmount ( $undiscountableAmount );
-		$barPayRequestBuilder->setExtendParams ( $extendParamsArr );
-		$barPayRequestBuilder->setGoodsDetailList ( $goodsDetailList );
-		$barPayRequestBuilder->setStoreId ( $storeId );
-		$barPayRequestBuilder->setOperatorId ( $operatorId );
-		$barPayRequestBuilder->setAlipayStoreId ( $alipayStoreId );
-		
-		$barPayRequestBuilder->setAppAuthToken ( $appAuthToken );
-		
-		// 调用barPay方法获取当面付应答
-		$barPay = new \AlipayTradeService ( $ali_config );
-		$barPayResult = $barPay->barPay ( $barPayRequestBuilder );
-		// if (!empty($barPayResult->getResponse())) {
-		// print_r($barPayResult->getResponse());
-		// }
-		switch ($barPayResult->getTradeStatus ()) {
-			case "SUCCESS" :
-				// "支付宝支付成功:";
-				// $barPayResult->getResponse();
-				// 添加收银支付流水信息
-				$PosPay = new PosPay ();
-				$PosPay->AddZfbPosPay ( $outTradeNo, $totalAmount );
-				return $result;
-				
-			case "FAILED" :
-				// "支付宝支付失败!!!";
-				return "-2";
-			case "UNKNOWN" :
-				// "系统异常，订单状态未知!!!";
-				return "-3";
-			default :
-				// "不支持的交易状态，交易返回异常!!!";
-				return "-4";
-		}
-		return "-1";
-	}
-	
-	// 返回支付宝支付状态
-	public function getAliPayStatus() {
-		$result = $this->ApiConnect ( $_POST );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		$result = $this->Auth ( $_POST, 0 );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		
-		$flow_no = input ( "flowno" ); // POS系统端的订单号
-		$branchno = input ( "branch_no" ); // 商店号
-            // $flow_no ='sdkphp20180813114905';//POS系统端的订单号
-            // $branchno='004';//商店号
-		if (empty ( $flow_no )) {
-			return "-10";
-		} 
-				
-		$path = "../extend/alipay/f2fpay/";
-		require_once $path.'service/AlipayTradeService.php';
-		
-		try {
-			
-			$posDB = new PosBranch ();
-			$shop = $posDB->getone ( $branchno );
-			if (!$shop||empty($shop['alipay_appid'])||empty($shop['alipay_public_key'])||empty($shop['alipay_private_key'])) {
-				$message = $branchno."查询支付宝支付状态缺少配置";
-				write_log ( $message, "API/api/getAliPayStatus" );
-				return "-3";
-			}
-			
-			$shop_config=[];
-			$shop_config['app_id'] = $shop ['alipay_appid']; //应用ID
-			$shop_config['alipay_public_key'] = $shop ['alipay_public_key']; // 支付宝公钥
-			$shop_config['merchant_private_key']= $shop ['alipay_private_key']; // 商户私钥
-			
-			//更改门店支付配置
-			$ali_config=isset($config)?array_merge($config,$shop_config):[];
-			
-			////获取商户订单号
-			$out_trade_no = trim($flow_no);
-			
-			//第三方应用授权令牌,商户授权系统商开发模式下使用
-			$appAuthToken = "";//根据真实值填写
-			
-			//构造查询业务请求参数对象
-			$queryContentBuilder = new \AlipayTradeQueryContentBuilder();
-			$queryContentBuilder->setOutTradeNo($out_trade_no);
-			
-			$queryContentBuilder->setAppAuthToken($appAuthToken);
-			
-			
-			//初始化类对象，调用queryTradeResult方法获取查询应答
-			$queryResponse = new \AlipayTradeService($ali_config);
-			$queryResult = $queryResponse->queryTradeResult($queryContentBuilder);
-			
-			//根据查询返回结果状态进行业务处理
-			$result="-4";
-			//print_r($queryResult->getResponse())
-			switch ($queryResult->getTradeStatus()){
-				case "SUCCESS":
-					//"支付宝查询交易成功:";
-					$response=$queryResult->getResponse();
-					$transaction_id=$response->trade_no;//支付宝交易号
-					$PosPay = new PosPay ();
-					$PosPay->UpdateZfbPosPay ( $flow_no, $transaction_id); // 更新支付信息
-					$result="1";
-				case "FAILED":
-					$msg="支付宝查询交易失败或者交易已关闭!!!";
-					break;
-				case "UNKNOWN":
-					$msg="系统异常，订单状态未知!!!";
-					break;
-				default:
-					$msg="不支持的查询状态，交易返回异常!!!";
-					break;
-			}
-			
-			if($result!="1"){
-				write_log ($msg, "API/api/getAliPayStatus" );
-			}
-			return $result;
-		} catch ( \Exception $e ) {
-			//检测异常
-			$message = "访问方法:支付宝支付-订单查询(getAliPayStatus)异常，" . json_encode ( $e );
-			write_log ( $message, "API/api/getAliPayStatus" );
-			return "-5";
-		}
-	}
-	
-	// 微信商户刷卡支付接口
-	public function wechatPay() {
-		
-		$result = $this->ApiConnect ( $_POST );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		$result = $this->Auth ( $_POST, 0 );
-		if ($result != 1) {
-			return strval ( $result );
-		}
 
-		$flowno = input ( "flow_no" ); // 订单号
-		$payAmount = input ( "pay_amount" ); // 订单金额
-		$authCode = input ( "auth_code" ); // 18位数字授权码
-		$branchno = input ( "branch_no" ); // 商店号
-		$payAmount = floatval ( $payAmount ) * 100;//以分为单位
-		
-		if (empty ( $flowno ) || ! is_numeric ( $payAmount ) || empty ( $authCode )) {
-			return "-10";
-		}
+    // 支付宝支付刷卡面对面支付(付款码支付)
+    public function aliPayFtf() {
+        $result = $this->ApiConnect ( $_POST );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+        $result = $this->Auth ( $_POST, 0 );
+        if ($result != 1) {
+            return strval ( $result );
+        }
 
-		$posPayFlow = new PosPayFlow ();
-		$one = $posPayFlow->get ( $flowno );
-		if (! $one) {
-			return "-9"; // 不存在流水
-		}
-		
-		$PosBranchInfo = new PosBranch ();
-		$shop = $PosBranchInfo->getone ( $branchno );
-		if (! $shop) {
-			$branchName = $branchno;
-		} else {
-			$branchName = $shop ['branch_name'];
-		}
-		
-		$subject = $branchName . "消费订单支付";
-		
-		$lib_path = "../extend/wxpay/lib/";
-		require_once ($lib_path . "WxPay.Api.php");
-		require_once ($lib_path . "WxPay.Config.Interface.php");
-		require_once ($lib_path . "'WxPay.MicroPay.php'");
-		
-		// 查询当前这个POS或门店的微信支付设置
-		if (!$shop	||empty ($shop ['wechat_appid'])
-					|| empty ($shop ['wechat_merchantid'])
-					|| empty ($shop ['wechat_secret'])
-					||empty($shop ['wechat_paykey'])
-			)
-		{
-			$message = "访问方法:微信刷卡支付(Wechatpay)异常，缺少商户配置";
-			write_log ( $message, "API/api/wechatPay" );
-			return "-4";
-		}
-		
-		$appid = $shop ['wechat_appid']; // 微信公众号appid
-		$merchantid = $shop ['wechat_merchantid']; // 微信商家商户号
-		$appsecret = $shop ['wechat_secret']; // 微信公众号开发者密钥
-		$paykey = $shop ['wechat_paykey']; // 微信商家支付密钥
-		
-		try {
-			
-			//查询收银流水
-			$PosSaleFlow=new PosSaleFlow();
-			$goods=$PosSaleFlow->getFlowItems($flowno);
-			$num=count($goods);
-			$goodsList=[];
-			$goodsDetailList=[];
-			if($num>0){
-				foreach ($goods as $key=>$value){
-					$GDetail = [];
-					$GDetail['goods_id']=$value['item_no'];
-					$GDetail['goods_name']=$value['item_name'];
-					$GDetail['quantity']=$value['sale_qnty'];
-					$GDetail['price']=floatval($value['sale_money'])*100;//以分为单位
-					array_push($goodsList, $GDetail);
-				}
-				$goodsDetailList['goods_detail']=$goodsList;
-			}
-			
-			$input = new \WxPayMicroPay ();
-			$input->SetAuth_code ( $authCode );
-			$input->SetBody ( $subject );
-			$input->SetTotal_fee ( $payAmount );
-			if(count($goodsList)>0){
-				//设置商品信息
-				$input->SetDetail($goodsDetailList);
-			}
-			$input->SetOut_trade_no ( $flowno );
-			
-			$microPay = new \MicroPay ( $appid, $merchantid, $appsecret, $paykey );
-			$wxpay_result = $microPay->pay ( $input );
-			//添加收银支付流水信息
-			$PosPay = new PosPay ();
-			$PosPay->AddWxPosPay ( $flowno, $payAmount );
-			
-			if (strtoupper ( $wxpay_result ['return_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['result_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['return_msg'] ) == 'OK') {
-				$PosPay->UpdatewxPosPay ( $flowno, $wxpay_result ['transaction_id'] ); // 更新支付信息
-				$result = "1";
-			} else {
-				$result = "-4"; // 支付失败
-				$message = "访问方法:微信刷卡支付(Wechatpay)失败 ，" . json_encode ( $wxpay_result );
-				write_log ( $message, "API/api/wechatPay" );
-			}
-			
-			return $result;
-			
-		} catch ( \Exception $e ) {
-			$result = "-2";
-			$message = "访问方法:微信刷卡支付(Wechatpay)失败，" . json_encode ( $e );
-			write_log ( $message, "API/api/wechatPay" );
-			return "-2";
-		}
-		
-	}
-	
-	// 返回微信刷卡支付状态
-	public function getWxPayStatus() {
-		
-		$result = $this->ApiConnect ( $_POST );
-		if ($result != 1) {
-			return strval ( $result );
-		}
-		$result = $this->Auth ( $_POST, 0 );
-		if ($result != 1) {
-			return strval ( $result );
-		}
+        $flowno = input ( "flow_no" ); // 订单号
+        $payAmount = input ( "pay_amount" ); // 订单金额
+        $authCode = input ( "auth_code" ); // 18位数字授权码
+        $branchno = input ( "branch_no" ); // 商店号
+        $payAmount = floatval ( $payAmount ); // 订单总金额。单位为元
 
-		$flow_no = input ( "flowno" ); // POS系统端的订单号
-		$branchno = input ( "branch_no" ); // 商店号
+        $path = "../extend/alipay/f2fpay/";
+        require_once $path . 'model/builder/AlipayTradePayContentBuilder.php';
+        require_once $path . 'service/AlipayTradeService.php';
+
+        // 外向订单号
+        $outTradeNo = $flowno;
+        // 查询门店名称
+        $PosBranchInfo = new PosBranch ();
+        $shop = $PosBranchInfo->getone ( $branchno );
+        if (! $shop) {
+            $branchName = $branchno;
+        } else {
+            $branchName = $shop ['branch_name'];
+        }
+
+        if (!$shop||empty($shop['alipay_appid'])||empty($shop['alipay_public_key'])||empty($shop['alipay_private_key'])) {
+            $message = $branchno."查询支付宝支付状态缺少配置";
+            write_log ( $message, "API/api/aliPayFtf" );
+            return "-3";
+        }
+
+        $shop_config=[];
+        $shop_config['app_id'] = $shop ['alipay_appid']; //应用ID
+        $shop_config['alipay_public_key'] = $shop ['alipay_public_key']; // 支付宝公钥
+        $shop_config['merchant_private_key']= $shop ['alipay_private_key']; // 商户私钥
+
+        //更改门店支付配置
+        $ali_config=isset($config)?array_merge($config,$shop_config):[];
+
+        // (必填) 订单标题，粗略描述用户的支付目的”
+        $subject = $branchName . "消费订单支付";
+
+        // (必填) 订单总金额
+        // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
+        $totalAmount = $payAmount;//单位是(元)
+
+        // (必填) 付款条码
+        $authCode = $authCode; // 28开头18位数字
+
+        // (可选,根据需要使用) 订单可打折金额
+        // 如果该值未传入,但传入了【订单总金额】,【不可打折金额】 则该值默认为【订单总金额】- 【不可打折金额】
+        // String discountableAmount = "1.00"; //
+
+        // (可选) 订单不可打折金额
+        // 如果该值未传入,但传入了【订单总金额】,【打折金额】,则该值默认为【订单总金额】-【打折金额】
+        $undiscountableAmount = "0.00";
+
+        // 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
+        // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
+        $sellerId = "";
+
+        // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品2件共15.00元"
+        $body = "购买商品共{$totalAmount}元";
+
+        // 商户操作员编号，添加此参数可以为商户操作员做销售统计
+        $operatorId = "";
+
+        // (可选) 商户门店编号，通过门店号和商家后台可以配置精准到门店的折扣信息，详询支付宝技术支持
+        $storeId = "";
+
+        // 支付宝的店铺编号
+        $alipayStoreId = "";
+
+        // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
+        $providerId = ""; // 系统商pid,作为系统商返佣数据提取的依据
+        $extendParams = new \ExtendParams ();
+        $extendParams->setSysServiceProviderId ( $providerId );
+        $extendParamsArr = $extendParams->getExtendParams ();
+
+        // 支付超时，线下扫码交易定义为5分钟
+        $timeExpress = "5m";
+
+        // 商品明细列表，需填写购买商品详细信息，
+        $goodsDetailList = array ();
+
+        // 第三方应用授权令牌,商户授权系统商开发模式下使用
+        $appAuthToken = ""; // 根据真实值填写
+
+        // 创建请求builder，设置请求参数
+        $barPayRequestBuilder = new \AlipayTradePayContentBuilder ();
+        $barPayRequestBuilder->setOutTradeNo ( $outTradeNo );
+        $barPayRequestBuilder->setTotalAmount ( $totalAmount );
+        $barPayRequestBuilder->setAuthCode ( $authCode );
+        $barPayRequestBuilder->setTimeExpress ( $timeExpress );
+        $barPayRequestBuilder->setSubject ( $subject );
+        $barPayRequestBuilder->setBody ( $body );
+        $barPayRequestBuilder->setUndiscountableAmount ( $undiscountableAmount );
+        $barPayRequestBuilder->setExtendParams ( $extendParamsArr );
+        $barPayRequestBuilder->setGoodsDetailList ( $goodsDetailList );
+        $barPayRequestBuilder->setStoreId ( $storeId );
+        $barPayRequestBuilder->setOperatorId ( $operatorId );
+        $barPayRequestBuilder->setAlipayStoreId ( $alipayStoreId );
+
+        $barPayRequestBuilder->setAppAuthToken ( $appAuthToken );
+
+        // 调用barPay方法获取当面付应答
+        $barPay = new \AlipayTradeService ( $ali_config );
+        $barPayResult = $barPay->barPay ( $barPayRequestBuilder );
+        // if (!empty($barPayResult->getResponse())) {
+        // print_r($barPayResult->getResponse());
+        // }
+        switch ($barPayResult->getTradeStatus ()) {
+            case "SUCCESS" :
+                // "支付宝支付成功:";
+                // $barPayResult->getResponse();
+                // 添加收银支付流水信息
+                $PosPay = new PosPay ();
+                $PosPay->AddZfbPosPay ( $outTradeNo, $totalAmount );
+                return $result;
+
+            case "FAILED" :
+                // "支付宝支付失败!!!";
+                return "-2";
+            case "UNKNOWN" :
+                // "系统异常，订单状态未知!!!";
+                return "-3";
+            default :
+                // "不支持的交易状态，交易返回异常!!!";
+                return "-4";
+        }
+        return "-1";
+    }
+
+    // 返回支付宝支付状态
+    public function getAliPayStatus() {
+        $result = $this->ApiConnect ( $_POST );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+        $result = $this->Auth ( $_POST, 0 );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+
+        $flow_no = input ( "flowno" ); // POS系统端的订单号
+        $branchno = input ( "branch_no" ); // 商店号
         // $flow_no ='sdkphp20180813114905';//POS系统端的订单号
         // $branchno='004';//商店号
-		if (empty ( $flow_no )) {
-			return "-10";
-		}
-					
-		$lib_path = "../extend/wxpay/lib/";
-		require_once ($lib_path . "WxPay.Api.php");
-		require_once ($lib_path . "WxPay.Config.Interface.php");
-		require_once ($lib_path . "'WxPay.MicroPay.php'");
-		
-		try {
-			
-			$posDB = new PosBranch ();
-			$shop = $posDB->getone ( $branchno );
-			
-			if (!$shop	||trim ($shop ['wechat_appid']) == '' 
-			|| trim ($shop ['wechat_merchantid']) == ''
-			|| trim ($shop ['wechat_secret']) == ''
-			||trim($shop ['wechat_paykey']== '')
-			)
-			{
-				$message = "访问方法:支付宝查询(Wechatpay)异常，缺少商户配置";
-				write_log ( $message, "API/api/wechatPay" );
-				return "-4";
-			}
+        if (empty ( $flow_no )) {
+            return "-10";
+        }
+
+        $path = "../extend/alipay/f2fpay/";
+        require_once $path.'service/AlipayTradeService.php';
+
+        try {
+
+            $posDB = new PosBranch ();
+            $shop = $posDB->getone ( $branchno );
+            if (!$shop||empty($shop['alipay_appid'])||empty($shop['alipay_public_key'])||empty($shop['alipay_private_key'])) {
+                $message = $branchno."查询支付宝支付状态缺少配置";
+                write_log ( $message, "API/api/getAliPayStatus" );
+                return "-3";
+            }
+
+            $shop_config=[];
+            $shop_config['app_id'] = $shop ['alipay_appid']; //应用ID
+            $shop_config['alipay_public_key'] = $shop ['alipay_public_key']; // 支付宝公钥
+            $shop_config['merchant_private_key']= $shop ['alipay_private_key']; // 商户私钥
+
+            //更改门店支付配置
+            $ali_config=isset($config)?array_merge($config,$shop_config):[];
+
+            ////获取商户订单号
+            $out_trade_no = trim($flow_no);
+
+            //第三方应用授权令牌,商户授权系统商开发模式下使用
+            $appAuthToken = "";//根据真实值填写
+
+            //构造查询业务请求参数对象
+            $queryContentBuilder = new \AlipayTradeQueryContentBuilder();
+            $queryContentBuilder->setOutTradeNo($out_trade_no);
+
+            $queryContentBuilder->setAppAuthToken($appAuthToken);
+
+
+            //初始化类对象，调用queryTradeResult方法获取查询应答
+            $queryResponse = new \AlipayTradeService($ali_config);
+            $queryResult = $queryResponse->queryTradeResult($queryContentBuilder);
+
+            //根据查询返回结果状态进行业务处理
+            $result="-4";
+            //print_r($queryResult->getResponse())
+            switch ($queryResult->getTradeStatus()){
+                case "SUCCESS":
+                    //"支付宝查询交易成功:";
+                    $response=$queryResult->getResponse();
+                    $transaction_id=$response->trade_no;//支付宝交易号
+                    $PosPay = new PosPay ();
+                    $PosPay->UpdateZfbPosPay ( $flow_no, $transaction_id); // 更新支付信息
+                    $result="1";
+                case "FAILED":
+                    $msg="支付宝查询交易失败或者交易已关闭!!!";
+                    break;
+                case "UNKNOWN":
+                    $msg="系统异常，订单状态未知!!!";
+                    break;
+                default:
+                    $msg="不支持的查询状态，交易返回异常!!!";
+                    break;
+            }
+
+            if($result!="1"){
+                write_log ($msg, "API/api/getAliPayStatus" );
+            }
+            return $result;
+        } catch ( \Exception $e ) {
+            //检测异常
+            $message = "访问方法:支付宝支付-订单查询(getAliPayStatus)异常，" . json_encode ( $e );
+            write_log ( $message, "API/api/getAliPayStatus" );
+            return "-5";
+        }
+    }
+
+    // 微信商户刷卡支付接口
+    public function wechatPay() {
+
+        $result = $this->ApiConnect ( $_POST );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+        $result = $this->Auth ( $_POST, 0 );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+
+        $flowno = input ( "flow_no" ); // 订单号
+        $payAmount = input ( "pay_amount" ); // 订单金额
+        $authCode = input ( "auth_code" ); // 18位数字授权码
+        $branchno = input ( "branch_no" ); // 商店号
+        $payAmount = floatval ( $payAmount ) * 100;//以分为单位
+
+        if (empty ( $flowno ) || ! is_numeric ( $payAmount ) || empty ( $authCode )) {
+            return "-10";
+        }
+
+        $PosBranchInfo = new PosBranch ();
+        $shop = $PosBranchInfo->getone ( $branchno );
+        if (! $shop) {
+            $branchName = $branchno;
+        } else {
+            $branchName = $shop ['branch_name'];
+        }
+
+        $subject = $branchName . "消费订单支付";
+
+        $lib_path = "../extend/wxpay/lib/";
+        require_once ($lib_path . "WxPay.Api.php");
+        require_once ($lib_path . "WxPay.Config.Interface.php");
+        require_once ($lib_path . "WxPay.MicroPay.php");
+
+        // 查询当前这个POS或门店的微信支付设置
+        if (!$shop	||empty ($shop ['wechat_appid'])
+            || empty ($shop ['wechat_merchantid'])
+            || empty ($shop ['wechat_secret'])
+            ||empty($shop ['wechat_paykey'])
+        )
+        {
+            $message = "访问方法:微信刷卡支付(Wechatpay)异常，缺少商户配置";
+            write_log ( $message, "API/api/wechatPay" );
+            return "-4";
+        }
+
+        $appid = $shop ['wechat_appid']; // 微信公众号appid
+        $merchantid = $shop ['wechat_merchantid']; // 微信商家商户号
+        $appsecret = $shop ['wechat_secret']; // 微信公众号开发者密钥
+        $paykey = $shop ['wechat_paykey']; // 微信商家支付密钥
+
+        try {
+
+            $input = new \WxPayMicroPay ();
+            $input->SetAuth_code ( $authCode );
+            $input->SetBody ( $subject );
+            $input->SetTotal_fee ( $payAmount );
+
+            $input->SetOut_trade_no ( $flowno );
+
+            $microPay = new \MicroPay ( $appid, $merchantid, $appsecret, $paykey );
+            $wxpay_result = $microPay->pay ( $input );
+            //添加收银支付流水信息
+            $PosPay = new PosPay ();
+            $PosPay->AddWxPosPay ( $flowno, round($payAmount/100,2) );
+
+            if (strtoupper ( $wxpay_result ['return_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['result_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['return_msg'] ) == 'OK') {
+                $PosPay->UpdatewxPosPay ( $flowno, $wxpay_result ['transaction_id'] ); // 更新支付信息
+                $result = "1";
+            } else {
+                $result = "-4"; // 支付失败
+                $message = "访问方法:微信刷卡支付(Wechatpay)失败 ，" . json_encode ( $wxpay_result );
+                write_log ( $message, "API/api/wechatPay" );
+            }
+
+            return $result;
+
+        } catch ( \Exception $e ) {
+            $result = "-2";
+            $message = "访问方法:微信刷卡支付(Wechatpay)失败，" . json_encode ( $e );
+            write_log ( $message, "API/api/wechatPay" );
+            return "-2";
+        }
+
+    }
+
+    // 返回微信刷卡支付状态
+    public function getWxPayStatus() {
+
+        $result = $this->ApiConnect ( $_POST );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+        $result = $this->Auth ( $_POST, 0 );
+        if ($result != 1) {
+            return strval ( $result );
+        }
+
+        $flow_no = input ( "flowno" ); // POS系统端的订单号
+        $branchno = input ( "branch_no" ); // 商店号
+        // $flow_no ='sdkphp20180813114905';//POS系统端的订单号
+        // $branchno='004';//商店号
+        if (empty ( $flow_no )) {
+            return "-10";
+        }
+
+        $lib_path = "../extend/wxpay/lib/";
+        require_once ($lib_path . "WxPay.Api.php");
+        require_once ($lib_path . "WxPay.Config.Interface.php");
+        require_once ($lib_path . "WxPay.MicroPay.php");
+
+        try {
+
+            $posDB = new PosBranch ();
+            $shop = $posDB->getone ( $branchno );
+
+            if (!$shop	||trim ($shop ['wechat_appid']) == ''
+                || trim ($shop ['wechat_merchantid']) == ''
+                || trim ($shop ['wechat_secret']) == ''
+                ||trim($shop ['wechat_paykey']== '')
+            )
+            {
+                $message = "访问方法:支付宝查询(Wechatpay)异常，缺少商户配置";
+                write_log ( $message, "API/api/wechatPay" );
+                return "-4";
+            }
 
             $appid=$shop ['wechat_appid'];
             $merchantid=$shop ['wechat_merchantid'];
             $appsecret=$shop ['wechat_secret'];
             $paykey=$shop ['wechat_paykey'];
 
-			$input = new \WxPayOrderQuery ();
-			$input->SetOut_trade_no ( $flow_no );
-			$config = new \WxPayConfig ( $appid, $merchantid, $appsecret, $paykey );
-			
-			$queryResult = \WxPayApi::orderQuery ( $config, $input );
-			if (strtoupper ( $queryResult ['return_code'] ) == 'SUCCESS' && strtoupper ( $queryResult ['result_code'] ) == 'SUCCESS' && strtoupper ( $queryResult ['trade_state'] ) == 'SUCCESS') {
-				$PosPay = new PosPay ();
-				$PosPay->UpdatewxPosPay ( $flow_no, $queryResult ['transaction_id'] ); // 更新支付信息
-				$result = "1";
-			} else {
-				$result = "-4"; // 未支付
-			}
-			
-			return $result;
-			
-		} catch ( \Exception $e ) {
-			// 检测异常
-			$message = "访问方法:微信刷卡支付-订单查询(GetwxPayStatus)异常，" . json_encode ( $e );
-			write_log ( $message, "API/api/getWxPayStatus" );
-			return "- 5";
-		}
-				
-		
-	}
+            $input = new \WxPayOrderQuery ();
+            $input->SetOut_trade_no ( $flow_no );
+            $config = new \WxPayConfig ( $appid, $merchantid, $appsecret, $paykey );
+
+            $queryResult = \WxPayApi::orderQuery ( $config, $input );
+            if (strtoupper ( $queryResult ['return_code'] ) == 'SUCCESS' && strtoupper ( $queryResult ['result_code'] ) == 'SUCCESS' && strtoupper ( $queryResult ['trade_state'] ) == 'SUCCESS') {
+                $PosPay = new PosPay ();
+                $PosPay->UpdatewxPosPay ( $flow_no, $queryResult ['transaction_id'] ); // 更新支付信息
+                $result = "1";
+            } else {
+                $result = "-4"; // 未支付
+            }
+
+            return $result;
+
+        } catch ( \Exception $e ) {
+            // 检测异常
+            $message = "访问方法:微信刷卡支付-订单查询(GetwxPayStatus)异常，" . json_encode ( $e );
+            write_log ( $message, "API/api/getWxPayStatus" );
+            return "- 5";
+        }
+
+
+    }
 }
