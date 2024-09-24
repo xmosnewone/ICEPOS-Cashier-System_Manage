@@ -1022,6 +1022,7 @@ class Api extends Super {
 					} else {
 						$pays = array ();
 						$sales = array ();
+                        $payRelation=array();
 						$PosPayFlow = new PosPayFlow ();
 						foreach ( $pays1 as $k => $v ) {
 							$payflow = new PosPayFlow ();
@@ -1032,10 +1033,14 @@ class Api extends Super {
 								$res = 0;
 								break;
 							}
-							
-							foreach ( $v as $key => $value ) {
-								$payflow->$key = $value;
-							}
+
+                            foreach ( $v as $key => $value ) {
+                                if($key=='pflow_id'){//微信或支付宝等临时支付号
+                                    $payRelation[$flow_no]=$value;// $flow_no唯一流水号对应一个临时流水号$value
+                                }else{
+                                    $payflow->$key = $value;
+                                }
+                            }
 							
 							$payflow->com_flag = '1';
 							if (empty ( $v ["pos_flag"] )) {
@@ -1094,6 +1099,15 @@ class Api extends Super {
 							} else {
 								$PosPayFlow = new PosPayFlow ();
 								$res = $PosPayFlow->AddModelsForPos ( $pays, $sales );
+
+                                //更新微信/支付宝等临时支付流水对应
+                                if(isset($payRelation)&&count($payRelation)>0){
+                                    foreach($payRelation as $k=>$v){
+                                        $posPay=new PosPay();
+                                        $posPay->UpdatePosPayFlowno($k,$v);
+                                    }
+                                }
+
 							}
 						}
 					}

@@ -7043,7 +7043,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_operator_breakpoint` (
 DROP TABLE IF EXISTS `ice_pos_pay`;
 CREATE TABLE IF NOT EXISTS `ice_pos_pay` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `flow_id` int(11) UNSIGNED DEFAULT '0' COMMENT 'pos_payflow表的自增id',
+  `payflow_no` varchar(32) DEFAULT NULL COMMENT 'pos_payflow表的flow_no流水号值',
   `flowno` char(50) DEFAULT NULL,
   `trade_no` char(50) DEFAULT NULL,
   `qrcode` char(100) DEFAULT NULL,
@@ -7053,7 +7053,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_pay` (
   `pay_status` char(1) DEFAULT '0',
   `transaction_id` varchar(68) DEFAULT NULL COMMENT '微信/支付宝支付订单号',
   PRIMARY KEY (`id`),
-  KEY `flow_id` (`flow_id`)
+  KEY `flow_id` (`payflow_no`),
+  KEY `payflow_no` (`payflow_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='微信和支付宝等接口支付记录流水表';
 
 -- --------------------------------------------------------

@@ -57,7 +57,7 @@ class PosPayFlow extends BaseModel {
             if ($payflow->save()) {
             	$PosSaleFlow=new PosSaleFlow();
                 foreach ($saleflow as $k => $v) {
-                    $v->flow_no = $model->flow_no;
+                    $v->flow_no = $payflow->flow_no;
                     if (!empty($v["item_no"])) {
                         if ($PosSaleFlow->add($v) == FALSE) {
                             $iscommit = FALSE;

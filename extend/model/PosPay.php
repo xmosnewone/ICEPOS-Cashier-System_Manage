@@ -117,7 +117,26 @@ class PosPay extends BaseModel {
         return $result;
     }
 
-
+    //$flowno 是微信/支付宝的临时流水订单号
+    //$payflow_no 是收银机的唯一支付流水订单号
+    public function UpdatePosPayFlowno($payflow_no,$flowno) {
+        $result = 0;
+        try {
+            $pay = $this->where("flowno='$flowno'")->find();
+            if (!empty($pay)) {
+                $pay->payflow_no = $payflow_no;
+                if ($pay->save()) {
+                    $result = 1;
+                }
+            } else {
+                $result = -1;
+            }
+        } catch (\Exception $ex) {
+            $result = -2;
+            write_log("更新payflow_no异常:" . $ex,"PosPay");
+        }
+        return $result;
+    }
 
     public function UpdatePosPay($qrcode, $trade_no) {
         $result = 0;
