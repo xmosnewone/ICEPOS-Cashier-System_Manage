@@ -215,6 +215,7 @@ class PosPayFlow extends BaseModel {
         $result = array();
         $result["total"] = $rowCount;
         $temp = array();
+        $vip_code=array();
         $footer = array();
         $footer_detail = array();
 
@@ -237,6 +238,11 @@ class PosPayFlow extends BaseModel {
             $tt["pay_name"] = $v["pay_name"];
             $tt["card_no"] = $v["card_no"];
             $tt["vip_no"] = $v["vip_no"];
+            $tt["nickname"] = $v["vip_no"];
+            $tt["mobile"] = '';
+            if(!empty($v["vip_no"])){
+                $vip_code[]=trim($v["vip_no"]);
+            }
             $tt["sale_way"] = $v["sale_way"];
             $tt["sale_amount"] = formatMoneyDisplay($v["sale_amount"]);
             $tt["pay_amount"] = formatMoneyDisplay($v["pay_amount"]);
@@ -248,6 +254,25 @@ class PosPayFlow extends BaseModel {
             $tt["oper_name"] = $v["oper_name"];
             $rowIndex++;
             array_push($temp, $tt);
+        }
+        if(count($vip_code)>0){
+            $vip_code=array_unique($vip_code);
+            $whereVip="ucode in (".simplode($vip_code).")";
+            $members=Db::name("member")->where($whereVip)->field("uname,nickname,ucode,mobile")->select();
+            $vips=array();
+            if(is_array($members)&&count($members)>0){
+                foreach($members as $val){
+                    $vips[$val['ucode']]['nickname']=$val['nickname']!=''?$val['nickname']:$val['uname'];
+                    $vips[$val['ucode']]['mobile']=$val['mobile'];
+                }
+                foreach($temp as $k=>$value){
+                    $vip_no=$value['vip_no'];
+                    if(isset($vips[$vip_no])){
+                        $temp[$k]['nickname']=$vips[$vip_no]['nickname'];
+                        $temp[$k]['mobile']=$vips[$vip_no]['mobile'];
+                    }
+                }
+            }
         }
         array_push($footer, $footer_detail);
         $result["rows"] = $temp;
