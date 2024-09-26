@@ -688,4 +688,46 @@ class Payflow extends Super {
         }
     }
 
+    //导出流水
+    public function pfexport(){
+
+        $page = 1;
+        $rows = 100000;//默认导出十万条，再多数据自己改
+
+        $start = input("start");
+        $end = input("end");
+        $branch_no = input("branch_no");
+        $posid = input("pos_id");
+        $flowno = input("flow_no");
+        $vipno = input("vip_no");
+        $sale_way = input("saleway");
+        $operid = input("oper_id");
+        $posflag = input("posflag");
+        if($posflag==1){
+            $payflag = input("payflag1");//非交易收入
+        }else{
+            $payflag = input("payflag");//交易收入
+        }
+
+        $PosSaleFlow=new PosPayFlow();
+        $res=$PosSaleFlow->SearchModels($start, $end, $branch_no, $posid, $flowno, $vipno, $sale_way, $payflag, $posflag, $page, $rows, $operid);
+
+        $dataList=$res['rows'];//所有结果行数据
+        $field=array();
+        $title=array();
+        $line_title = array (
+            'rowIndex' => '序号','branch_no' => '门店编号','branch_name' => '门店名称','pos_id' => 'POS机编号','flow_no' => '流水号(单号)','sale_amount' => '销售金额'
+        ,'pay_amount' => '付款金额','oper_date'=>'操作日期','pay_name'=>'付款方式','card_no'=>'付款卡号','nickname'=>'会员名称','vip_no'=>'会员号','mobile'=>'会员电话'
+        ,'sale_way'=>'销售方式','oper_name'=>'收银员','voucher_no'=>'退货凭证号','memo'=>'备注'
+        );
+        $doc = array ('creator' => 'icepos', 'title' => '收银流水', 'subject' => '收银流水', 'description' => '收银流水', 'keywords' => '收银流水', 'category' => '收银流水' );
+        //存储英文字段和中文字段
+        foreach($line_title as $key=>$value){
+            $field[]=$key;
+            $title[]=$value;
+        }
+        $this->export_csv($dataList,$field,$title,$doc);
+        exit();
+    }
+
 }

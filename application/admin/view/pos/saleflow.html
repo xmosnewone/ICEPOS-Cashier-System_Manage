@@ -16,7 +16,7 @@
 	<body class="pear-container">
 		<div class="layui-card">
 			<div class="layui-card-body">
-				<form class="layui-form" action="">
+				<form class="layui-form" action="" id="searchform">
 					<div class="layui-form-item">
 					
 					<div class="layui-row">
@@ -150,6 +150,10 @@
 								<i class="layui-icon layui-icon-refresh"></i>
 								重置
 							</button>
+							<a class="pear-btn pear-btn-warming pear-btn-md" onclick="exportxls()">
+								<i class="pear-icon pear-icon-chart-bar"></i>
+								导出报表
+							</a>
 						</div>
 					</div>
 					
@@ -569,7 +573,14 @@
 				window.showFlow=function(flowno){
 					openWin("销售流水详细",DATA_PATH+'saleDetail/flowno/'+flowno,"800px","500px");
 				}
-				
+
+				//导出报表
+				window.exportxls=function(){
+					layer.load(0,  {shade: false,time:3000});
+					var param=$('#searchform').serialize();
+					window.location.href="/{$MODULE_NAME}/pos/saleflow/sfexport?"+param;
+				}
+
 				window.refresh = function(param) {
 					table.reload('saleflow-table');
 				}
