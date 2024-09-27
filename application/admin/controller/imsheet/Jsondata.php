@@ -110,7 +110,7 @@ class Jsondata extends Super {
 			$result [$i] ["sale_price"] = sprintf ( "%.2f", $v ["sale_price"] );
 			$result [$i] ["item_size"] = $v ["item_size"];
 			$result [$i] ["real_qty"] = $v ["real_qty"];
-			$result [$i] ["item_stock"] = $v ["order_qty"];
+			$result [$i] ["item_stock"] = $v ["stock_qty"];
 			$result [$i] ["order_qty"] = $v ["real_qty"];
 			$result [$i] ["unit_no"] = $v ["item_unit"];
 			$result [$i] ["purchase_spec"] = $v ["purchase_spec"];
