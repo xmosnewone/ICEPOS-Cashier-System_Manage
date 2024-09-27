@@ -88,7 +88,7 @@ class Stocksheet extends Super {
 				$detail->item_no = $v ["item_no"];
 				$detail->large_qty = $v ["large_qty"];
 				$detail->real_qty = isset ( $v ["real_qty"] ) ? $v ["real_qty"] : "0.00";
-				$detail->order_qty = $v ["item_stock"];
+				//$detail->order_qty = $v ["item_stock"];
 				$detail->orgi_price = $v ["item_price"];
 				$detail->sub_amt = $v ["sub_amt"];
 				$detail->other1 = isset ( $v ["memo"] ) ? $v ["memo"] : "";

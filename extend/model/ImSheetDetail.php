@@ -152,16 +152,12 @@ class ImSheetDetail extends BaseModel {
                 switch ($kk) {
                     case "large_qty":
                         $result[$i][$kk] = sprintf("%.2f", $vv);
-                        $mod->large_qty = $mod->large_qty + doubleval($vv);
                         break;
                     case "real_qty":
                         $result[$i][$kk] = sprintf("%.2f", $vv);
-                        $mod->real_qty = $mod->order_qty + doubleval($vv);
-                        $mod->order_qty = $mod->order_qty + doubleval($vv);
                         break;
                     case "sub_amt":
                         $result[$i][$kk] = sprintf("%.2f", $vv);
-                        $mod->sub_amt = $mod->sub_amt + doubleval($vv);
                         break;
                 }
             }
@@ -177,7 +173,6 @@ class ImSheetDetail extends BaseModel {
             $result[$i]["memo"] = $v["memo"];
             $result[$i]["sale_price"] = sprintf("%.2f", $v["sale_price"]);
             $result[$i]["sale_amt"] = sprintf("%.2f", $v["sale_price"] * $result[$i]["real_qty"]);
-            $mod->sale_amt = $mod->sale_amt + doubleval($result[$i]["sale_amt"]);
             $i++;
         }
         $res1 = array();
