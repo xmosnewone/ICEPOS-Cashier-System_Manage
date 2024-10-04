@@ -1034,12 +1034,27 @@ class Api extends Super {
 								break;
 							}
 
+                            $coinType="";
+                            $pflow_id="";
                             foreach ( $v as $key => $value ) {
-                                if($key=='pflow_id'){//微信或支付宝等临时支付号
-                                    $payRelation[$flow_no]=$value;// $flow_no唯一流水号对应一个临时流水号$value
+                                $key=trim($key);
+                                $value=trim($value);
+
+                                if($key=='pflow_id'&&$value!=''){//微信或支付宝等临时支付号
+                                    $pflow_id=$value;
                                 }else{
                                     $payflow->$key = $value;
                                 }
+                                //支付方式 是 Wechat / ZFB 则记录
+                                if($key=='coin_type'&&($value=='Wechat'||$value=='ZFB')){
+                                    $coinType=$value;
+                                }
+                            }
+
+                            //记录微信或支付宝对应的支付流水号
+                            if($coinType!=""&&$pflow_id!=""){
+                                $payRelation[$flow_no][$coinType]['coin_type']=$coinType;//支付方式名称Wechat/ZFB
+                                $payRelation[$flow_no][$coinType]['pflow_id']=$pflow_id;// $flow_no唯一流水号对应一个临时流水号$value
                             }
 							
 							$payflow->com_flag = '1';
@@ -1098,16 +1113,7 @@ class Api extends Super {
 								$res = - 10;
 							} else {
 								$PosPayFlow = new PosPayFlow ();
-								$res = $PosPayFlow->AddModelsForPos ( $pays, $sales );
-
-                                //更新微信/支付宝等临时支付流水对应
-                                if(isset($payRelation)&&count($payRelation)>0){
-                                    foreach($payRelation as $k=>$v){
-                                        $posPay=new PosPay();
-                                        $posPay->UpdatePosPayFlowno($k,$v);
-                                    }
-                                }
-
+								$res = $PosPayFlow->AddModelsForPos ( $pays, $sales,$payRelation);
 							}
 						}
 					}

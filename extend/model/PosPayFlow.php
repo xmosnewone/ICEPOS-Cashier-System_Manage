@@ -5,6 +5,7 @@ use think\Db;
 use model\PosSaleFlow;
 use model\BdItemCombsplit;
 use model\PosBranchStock;
+use model\PosPay;
 
 class PosPayFlow extends BaseModel {
 
@@ -93,6 +94,15 @@ class PosPayFlow extends BaseModel {
                 if ($pay->save() == FALSE) {
                     $isok = FALSE;
                     break;
+                }
+                $coin_type=$pay->coin_type;
+                //更新微信/支付宝等临时支付流水对应
+                if($coin_type=="Wechat"||$coin_type=="ZFB"){
+                    if(isset($payRelation[$pay->flow_no])){
+                        $pflow_id=$payRelation[$pay->flow_no][$coin_type]['pflow_id'];//sale.db中t_app_payflow的pflow_id
+                        $posPay=new PosPay();
+                        $posPay->UpdatePosPayFlowno($pay->flow_no,$pay->id,$pflow_id);
+                    }
                 }
             }
             if ($isok) {
