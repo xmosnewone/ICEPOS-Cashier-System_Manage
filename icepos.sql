@@ -5982,7 +5982,7 @@ CREATE TABLE IF NOT EXISTS `ice_member` (
   `passwd` varchar(32) DEFAULT NULL COMMENT '密码',
   `nickname` varchar(50) DEFAULT NULL COMMENT '昵称称呼',
   `mobile` varchar(15) NOT NULL COMMENT '移动电话唯一',
-  `ucode` varchar(20) DEFAULT NULL COMMENT '用户编码-微信等编码统一',
+  `ucode` varchar(50) DEFAULT NULL COMMENT '用户编码-微信等编码统一',
   `level` char(10) DEFAULT NULL COMMENT '用户等级',
   `account` decimal(9,2) DEFAULT '0.00' COMMENT '用户余额',
   `frozen_account` decimal(9,2) UNSIGNED DEFAULT '0.00' COMMENT '冻结余额',
@@ -7043,18 +7043,21 @@ CREATE TABLE IF NOT EXISTS `ice_pos_operator_breakpoint` (
 DROP TABLE IF EXISTS `ice_pos_pay`;
 CREATE TABLE IF NOT EXISTS `ice_pos_pay` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `payflow_id` int(11) UNSIGNED DEFAULT '0' COMMENT 'pos_payflow表的id值',
   `payflow_no` varchar(32) DEFAULT NULL COMMENT 'pos_payflow表的flow_no流水号值',
+  `coin_type` varchar(20) DEFAULT NULL COMMENT '支付方式英文简称',
   `flowno` char(50) DEFAULT NULL,
   `trade_no` char(50) DEFAULT NULL,
   `qrcode` char(100) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `over_time` datetime DEFAULT NULL,
   `pay_amount` decimal(16,4) DEFAULT '0.0000',
-  `pay_status` char(1) DEFAULT '0',
+  `pay_status` char(1) DEFAULT '0' COMMENT '0未支付，1已支付，2已退款',
   `transaction_id` varchar(68) DEFAULT NULL COMMENT '微信/支付宝支付订单号',
   PRIMARY KEY (`id`),
   KEY `flow_id` (`payflow_no`),
-  KEY `payflow_no` (`payflow_no`)
+  KEY `payflow_no` (`payflow_no`),
+  KEY `payflow_id` (`payflow_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='微信和支付宝等接口支付记录流水表';
 
 -- --------------------------------------------------------
@@ -7077,15 +7080,16 @@ CREATE TABLE IF NOT EXISTS `ice_pos_payflow` (
   `convert_amt` decimal(15,2) DEFAULT NULL,
   `card_no` varchar(20) DEFAULT NULL,
   `memo` varchar(50) DEFAULT NULL,
-  `vip_no` varchar(20) DEFAULT NULL,
+  `vip_no` varchar(50) DEFAULT NULL,
   `oper_date` datetime DEFAULT NULL,
   `oper_id` varchar(20) DEFAULT NULL,
   `voucher_no` varchar(30) DEFAULT NULL,
-  `branch_no` varchar(20) DEFAULT NULL,
-  `pos_id` varchar(10) DEFAULT NULL,
+  `branch_no` varchar(32) DEFAULT NULL,
+  `pos_id` varchar(32) DEFAULT NULL,
   `sale_way` char(1) DEFAULT NULL,
   `com_flag` char(1) DEFAULT NULL,
   `pos_flag` char(1) DEFAULT '0',
+  `refund_flag` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '1表示已退款，0正常',
   PRIMARY KEY (`id`,`flow_id`,`flow_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='收银流水表';
 
@@ -7172,8 +7176,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_saleflow` (
   `item_status` char(1) DEFAULT NULL,
   `item_subname` varchar(60) DEFAULT NULL,
   `reasonid` int(11) DEFAULT NULL,
-  `branch_no` varchar(20) DEFAULT NULL,
-  `pos_id` varchar(10) DEFAULT NULL,
+  `branch_no` varchar(32) DEFAULT NULL,
+  `pos_id` varchar(32) DEFAULT NULL,
   `com_flag` char(1) DEFAULT NULL,
   `plan_no` varchar(30) DEFAULT NULL,
   `over_flag` char(1) DEFAULT '0',
