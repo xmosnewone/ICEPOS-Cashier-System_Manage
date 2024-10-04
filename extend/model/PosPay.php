@@ -37,6 +37,7 @@ class PosPay extends BaseModel {
     		$model = $this->where("flowno='$flowno'")->find();
     		if (empty($model)) {
     			$pay = new PosPay();
+                $pay->coin_type = "Wechat";
     			$pay->flowno = $flowno;
     			$pay->pay_amount = $pay_mount;
     			$pay->create_time = date(DATETIME_FORMAT,time());
@@ -80,6 +81,7 @@ class PosPay extends BaseModel {
             $model = $this->where("flowno='$flowno'")->find();
             if (empty($model)) {
                 $pay = new PosPay();
+                $pay->coin_type = "ZFB";
                 $pay->flowno = $flowno;
                 $pay->pay_amount = $pay_mount;
                 $pay->create_time = date(DATETIME_FORMAT,time());
