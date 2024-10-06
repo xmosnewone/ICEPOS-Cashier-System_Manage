@@ -20,3 +20,21 @@ ALTER TABLE `ice_pos_branch_info` ADD `wechat_public_cert` VARCHAR(200) NULL COM
 ALTER TABLE `ice_pos_branch_info` CHANGE `wechat_private_cert` `wechat_apiclient_cert` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '微信支付私钥证书绝对路径';
 ALTER TABLE `ice_pos_branch_info` CHANGE `wechat_public_cert` `wechat_apiclient_key` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '微信支付公钥证书绝对路径';
 ALTER TABLE `ice_pos_branch_info` DROP INDEX `branch_no_2`;
+
+--
+--  2024-10-06
+--
+ALTER TABLE `ice_im_check_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `ice_im_check_init` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '盘点号';
+ALTER TABLE `ice_im_check_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '库存盘点单号';
+ALTER TABLE `ice_im_check_master` CHANGE `check_no` `check_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '盘点批号';
+ALTER TABLE `ice_im_check_sum` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '盘点批号';
+ALTER TABLE `ice_im_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `ice_im_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '单号';
+ALTER TABLE `ice_stock_flow` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '订单编号';
+ALTER TABLE `ice_wm_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `ice_wm_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '单号';
+ALTER TABLE `ice_pm_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '采购单主表编号';
+ALTER TABLE `ice_pm_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '采购订单主编号';
+ALTER TABLE `ice_fm_recpay_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '结算单主编号';
+ALTER TABLE `ice_fm_recpay_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '结算单编号';

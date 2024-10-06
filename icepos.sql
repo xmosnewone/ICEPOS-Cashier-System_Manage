@@ -5136,7 +5136,7 @@ CREATE TABLE IF NOT EXISTS `ice_flow_order_master` (
 DROP TABLE IF EXISTS `ice_fm_recpay_detail`;
 CREATE TABLE IF NOT EXISTS `ice_fm_recpay_detail` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `sheet_no` varchar(18) DEFAULT NULL COMMENT '结算单主编号',
+  `sheet_no` varchar(32) DEFAULT NULL COMMENT '结算单主编号',
   `voucher_no` varchar(18) DEFAULT NULL,
   `discount` decimal(5,4) DEFAULT '1.0000',
   `sheet_amt` decimal(16,4) DEFAULT '0.0000',
@@ -5161,7 +5161,7 @@ CREATE TABLE IF NOT EXISTS `ice_fm_recpay_detail` (
 
 DROP TABLE IF EXISTS `ice_fm_recpay_master`;
 CREATE TABLE IF NOT EXISTS `ice_fm_recpay_master` (
-  `sheet_no` varchar(18) NOT NULL COMMENT '结算单编号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '结算单编号',
   `trans_no` varchar(2) DEFAULT NULL,
   `supcust_no` varchar(8) DEFAULT NULL,
   `settle_date` datetime DEFAULT NULL,
@@ -5405,7 +5405,7 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 DROP TABLE IF EXISTS `ice_im_check_detail`;
 CREATE TABLE IF NOT EXISTS `ice_im_check_detail` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `sheet_no` varchar(20) NOT NULL,
+  `sheet_no` varchar(32) NOT NULL,
   `item_no` varchar(20) NOT NULL,
   `check_date` datetime NOT NULL,
   `in_price` decimal(16,4) DEFAULT '0.0000',
@@ -5424,7 +5424,7 @@ CREATE TABLE IF NOT EXISTS `ice_im_check_detail` (
 
 DROP TABLE IF EXISTS `ice_im_check_init`;
 CREATE TABLE IF NOT EXISTS `ice_im_check_init` (
-  `sheet_no` varchar(20) NOT NULL COMMENT '盘点号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '盘点号',
   `oper_date` datetime DEFAULT NULL COMMENT '申请盘点号日期',
   `oper_range` tinyint(1) UNSIGNED DEFAULT NULL COMMENT '盘点范围',
   `branch_no` varchar(10) DEFAULT NULL COMMENT '盘点仓库',
@@ -5451,8 +5451,8 @@ CREATE TABLE IF NOT EXISTS `ice_im_check_init` (
 
 DROP TABLE IF EXISTS `ice_im_check_master`;
 CREATE TABLE IF NOT EXISTS `ice_im_check_master` (
-  `sheet_no` varchar(20) NOT NULL COMMENT '库存盘点单号',
-  `check_no` varchar(20) NOT NULL COMMENT '盘点批号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '库存盘点单号',
+  `check_no` varchar(32) NOT NULL COMMENT '盘点批号',
   `trans_no` char(10) NOT NULL,
   `branch_no` varchar(20) NOT NULL,
   `oper_range` char(1) DEFAULT NULL,
@@ -5480,7 +5480,7 @@ CREATE TABLE IF NOT EXISTS `ice_im_check_master` (
 DROP TABLE IF EXISTS `ice_im_check_sum`;
 CREATE TABLE IF NOT EXISTS `ice_im_check_sum` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `sheet_no` varchar(20) NOT NULL COMMENT '盘点批号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '盘点批号',
   `branch_no` varchar(10) NOT NULL,
   `item_no` varchar(40) NOT NULL,
   `in_price` decimal(16,4) DEFAULT '0.0000',
@@ -5502,7 +5502,7 @@ CREATE TABLE IF NOT EXISTS `ice_im_check_sum` (
 DROP TABLE IF EXISTS `ice_im_sheet_detail`;
 CREATE TABLE IF NOT EXISTS `ice_im_sheet_detail` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `sheet_no` char(20) NOT NULL,
+  `sheet_no` varchar(32) NOT NULL,
   `item_no` char(20) NOT NULL,
   `order_qty` decimal(16,4) DEFAULT '0.0000',
   `real_qty` decimal(16,4) DEFAULT NULL,
@@ -5530,7 +5530,7 @@ CREATE TABLE IF NOT EXISTS `ice_im_sheet_detail` (
 
 DROP TABLE IF EXISTS `ice_im_sheet_master`;
 CREATE TABLE IF NOT EXISTS `ice_im_sheet_master` (
-  `sheet_no` char(20) NOT NULL COMMENT '单号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '单号',
   `trans_no` char(10) DEFAULT NULL COMMENT '操作标识OO或其他',
   `db_no` char(10) NOT NULL COMMENT '出入库,+是入库,-是出库',
   `branch_no` varchar(20) NOT NULL COMMENT '分店编号',
@@ -6219,7 +6219,7 @@ CREATE TABLE IF NOT EXISTS `ice_pc_price_flow_master` (
 DROP TABLE IF EXISTS `ice_pm_sheet_detail`;
 CREATE TABLE IF NOT EXISTS `ice_pm_sheet_detail` (
   `flow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `sheet_no` char(20) NOT NULL COMMENT '采购单主表编号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '采购单主表编号',
   `item_no` char(20) NOT NULL COMMENT '商品编号',
   `order_qty` decimal(16,4) DEFAULT '0.0000' COMMENT '下单数量',
   `real_qty` decimal(16,4) DEFAULT '0.0000' COMMENT '实际数量',
@@ -6250,7 +6250,7 @@ CREATE TABLE IF NOT EXISTS `ice_pm_sheet_detail` (
 
 DROP TABLE IF EXISTS `ice_pm_sheet_master`;
 CREATE TABLE IF NOT EXISTS `ice_pm_sheet_master` (
-  `sheet_no` char(20) NOT NULL COMMENT '采购订单主编号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '采购订单主编号',
   `trans_no` char(2) DEFAULT NULL,
   `db_no` char(10) NOT NULL,
   `branch_no` varchar(20) NOT NULL COMMENT '仓库门店编号',
@@ -7574,7 +7574,7 @@ CREATE TABLE IF NOT EXISTS `ice_sp_pro_photos` (
 DROP TABLE IF EXISTS `ice_stock_flow`;
 CREATE TABLE IF NOT EXISTS `ice_stock_flow` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
-  `sheet_no` varchar(30) NOT NULL COMMENT '订单编号',
+  `sheet_no` varchar(32) NOT NULL COMMENT '订单编号',
   `branch_no` char(10) NOT NULL COMMENT '门店编号',
   `db_no` char(1) NOT NULL,
   `item_no` char(20) NOT NULL COMMENT '商品编码',
