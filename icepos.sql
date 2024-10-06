@@ -6697,6 +6697,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_branch_info` (
   `wechat_merchantid` varchar(15) DEFAULT NULL COMMENT '微信商家号',
   `wechat_paykey` varchar(35) DEFAULT NULL COMMENT '微信商家支付密钥',
   `wechat_pay_qrcode` varchar(100) DEFAULT NULL COMMENT '微信收款二维码',
+  `wechat_apiclient_cert` varchar(200) DEFAULT NULL COMMENT '微信支付私钥证书绝对路径',
+  `wechat_apiclient_key` varchar(200) DEFAULT NULL COMMENT '微信支付公钥证书绝对路径',
   `use_alipay` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '1表示开启支付宝刷卡支付',
   `alipay_appid` varchar(32) DEFAULT NULL COMMENT '支付宝appid',
   `alipay_public_key` varchar(32) DEFAULT NULL COMMENT '支付宝公钥',
@@ -6706,9 +6708,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_branch_info` (
   `credit_money` int(11) UNSIGNED DEFAULT '0' COMMENT '多少个积分兑换1元',
   `ismall` tinyint(1) UNSIGNED DEFAULT NULL COMMENT '1为从商城同步过来的',
   PRIMARY KEY (`id`),
-  KEY `branch_no` (`branch_no`),
-  KEY `branch_no_2` (`branch_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+  KEY `branch_no` (`branch_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- 转存表中的数据 `ice_pos_branch_info`

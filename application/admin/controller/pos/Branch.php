@@ -155,6 +155,8 @@ class Branch extends Super
 			$content ['wechat_merchantid'] = input ( 'wechat_merchantid' );
 			$content ['wechat_paykey'] = input ( 'wechat_paykey' );
             $content ['wechat_pay_qrcode'] = input ( 'wechat_pay_qrcode' );
+            $content ['wechat_apiclient_cert'] = input ( 'wechat_apiclient_cert' );
+            $content ['wechat_apiclient_key'] = input ( 'wechat_apiclient_key' );
 			$content ['alipay_appid'] = input ( 'alipay_appid' );
 			$content ['alipay_public_key'] = input ( 'alipay_public_key' );
 			$content ['alipay_private_key'] = input ( 'alipay_private_key' );
@@ -271,6 +273,55 @@ class Branch extends Super
             $result['path']=substr($result['path'], 1);
         }
         return $result;
+    }
+
+    //上传证书文件
+    public function uploadCert()
+    {
+        $input="file";//上传文件的名称
+        $branch_no=$_POST['branch_no'];//门店编号
+        if(empty($_FILES[$input])){
+            return ['status'=>0,'msg'=>'file empty'];
+        }
+        if(empty($branch_no)){
+            return ['status'=>0,'msg'=>'branch no empty'];
+        }
+
+        $branch_no=strtolower($branch_no);
+        $folder="../cert/".$branch_no."/";
+        if(!file_exists($folder)){
+            //创建0777权限的文件夹
+            mk_dir($folder);
+        }
+
+        //判断PHP环境的操作系统
+        $os="UNIX";
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $os="WIN";
+        }
+
+        $file = request()->file($input);
+        $info = $file->move($folder);
+        $result=[];
+        if($info){
+            // 成功上传后 获取上传信息
+            $result['status']=1;
+            $result['extension']=$info->getExtension();
+            //完整上传路径  必须是绝对路径
+            if($os=="WIN"){
+                $result['path']=ROOT_PATH."cert"."\\".$branch_no."\\". $info->getSaveName();
+            }else{
+                $result['path']=ROOT_PATH."cert"."/".$branch_no."/".str_replace("\\", "/", $info->getSaveName());
+            }
+            //上传后的名称
+            $result['filename']=$info->getFilename();
+        }else{
+            // 上传失败获取错误信息
+            $result['status']=0;
+            $result['msg']=$file->getError();
+        }
+        return $result;
+
     }
 
 }

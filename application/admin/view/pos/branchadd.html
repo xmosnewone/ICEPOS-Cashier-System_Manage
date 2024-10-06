@@ -6,6 +6,68 @@
     <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
 </head>
 <body>
+<style type="text/css">
+	.uploader-list {
+		margin-left: -15px;
+		text-align: center;
+	}
+
+	.uploader-list .info {
+		position: relative;
+		margin: -25px auto 0 auto;
+		background-color: black;
+		color: white;
+		filter: alpha(Opacity=80);
+		-moz-opacity: 0.5;
+		opacity: 0.5;
+		width: 120px;
+		height: 25px;
+		text-align: center;
+		display: none;
+	}
+
+	.uploader-list .handle {
+		position: relative;
+		background-color: black;
+		color: white;
+		filter: alpha(Opacity=80);
+		-moz-opacity: 0.5;
+		opacity: 0.5;
+		width: 120px;
+		text-align: right;
+		height: 18px;
+		margin: 0 auto -18px auto;
+		display: none;
+		z-index:1000;
+	}
+
+	.uploader-list .handle i {
+		margin-right: 5px;
+	}
+
+	.uploader-list .handle i:hover {
+		cursor: pointer;
+	}
+
+	.uploader-list .file-iteme {
+		margin: 12px 0 0 0;
+		padding: 1px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.uploader-list .default-icon {
+		position: absolute;
+		width: 120px;
+		text-align: center;
+		height: 30px;
+		display:none;
+	}
+	.uploader-list .default-icon i{
+		font-size: 50px;
+		color: #5ff55f;
+	}
+</style>
 <form class="layui-form" action="">
     <div class="mainBox">
         <div class="main-container">
@@ -167,24 +229,83 @@
 				  </div>
 
 				<div class="layui-form-item">
-					<label class="layui-form-label">开启</label>
+					<label class="layui-form-label" >扫码收款</label>
 					<div class="layui-input-inline">
-						<input type="checkbox" name="use_wechatpay" value="1" title="微信刷卡支付" lay-skin="primary" {if condition="$one['use_wechatpay'] eq '1'"} checked {/if} >
+						<input type="checkbox" name="use_wechatpay" value="1" title="开启微信扫码收款" lay-skin="primary" {if condition="$one['use_wechatpay'] eq '1'"} checked {/if} >
 					</div>
 				</div>
 
 				<div class="layui-form-item">
-					<div class="layui-col-md12">
-						<label class="layui-form-label" style="width: 120px;">微信收款二维码</label>
-						<div class="layui-input-inline">
-							<button type="button" class="layui-btn layui-btn-danger" id="wechatloader"><i class="layui-icon"></i>上传图片</button>
-							<img src="{$one['wechat_pay_qrcode']}" width="120" height="auto" id="preview_wechat"/>
+					<label class="layui-form-label" style="width: 130px;">微信个人收款二维码</label>
+					<label class="layui-form-label" style="width: 350px;color:#ff6a08;">
+						没有申请微信商家，在移动端使用个人收款二维码收款
+					</label>
+				</div>
+
+				<div class="layui-form-item">
+						<label class="layui-form-label"></label>
+						<div class="layui-col-md12">
+
+							<div class="layui-input-inline uploader-list">
+								<button type="button" class="layui-btn layui-btn-danger" id="wechatloader">
+									<i class="layui-icon"></i>上传图片
+								</button>
+
+								<div id="wechatpaycode" class="file-iteme" {if condition="$one['wechat_pay_qrcode'] eq ''"}style="display:none;"{/if}>
+								<div class="handle"><i class="layui-icon layui-icon-delete" id="wechatdel"></i></div>
+								<img src="{$one['wechat_pay_qrcode']}" width="120" height="auto" id="preview_wechat"/>
+								<div class="info">{$vo['photo_name']}</div>
+							</div>
+
 							<div class="layui-inline layui-word-aux">
 								图片大小限制 {php}echo $image_size/1024; {/php}M
 							</div>
 						</div>
 					</div>
 				</div>
+
+
+				<div class="layui-form-item">
+					<label class="layui-form-label" style="width: 130px;">微信商户API证书</label>
+					<label class="layui-form-label" style="width: 380px;color:#ff6a08;">
+						退款接口用到的apiclient_cert.pem 和 apiclient_key.pem 证书
+					</label>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
+					<div class="layui-col-md12">
+
+						<div class="layui-input-inline uploader-list">
+								<button type="button" class="layui-btn layui-btn-danger" id="wechatcertloader">
+									<i class="layui-icon"></i>apiclient_cert.pem
+								</button>
+
+								<div id="wechatcert" class="file-iteme" {if condition="$one['wechat_apiclient_cert'] eq ''"}style="display:none;"{/if}>
+									<div class="handle"><i class="layui-icon layui-icon-delete" id="wechatcertdel"></i></div>
+									<img src="__STATIC__/images/admin/cert.png" width="120" height="auto" />
+									<div class="info"></div>
+								</div>
+
+						</div>
+
+
+						<div class="layui-input-inline uploader-list" style="margin-left:60px;">
+							<button type="button" class="layui-btn layui-btn-danger" id="wechatkeyloader">
+								<i class="layui-icon"></i>apiclient_key.pem
+							</button>
+
+							<div id="wechatkey" class="file-iteme" {if condition="$one['wechat_apiclient_key'] eq ''"}style="display:none;"{/if}>
+							<div class="handle"><i class="layui-icon layui-icon-delete" id="wechatkeydel"></i></div>
+							<img src="__STATIC__/images/admin/cert.png" width="120" height="auto" />
+							<div class="info"></div>
+						</div>
+
+					</div>
+
+					</div>
+				</div>
+
 				  
 				   <div class="layui-form-item">
 				  <div class="layui-card-header">支付宝商户配置</div>
@@ -214,11 +335,25 @@
 				  </div>
 
 				<div class="layui-form-item">
+					<label class="layui-form-label" style="width: 140px;">支付宝个人收款二维码</label>
+					<label class="layui-form-label" style="width: 350px;color:#ff6a08;">
+						没有申请支付宝商家，在移动端使用个人收款二维码收款
+					</label>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
 					<div class="layui-col-md12">
-						<label class="layui-form-label" style="width: 120px;">支付宝收款二维码</label>
-						<div class="layui-input-inline">
+
+						<div class="layui-input-inline uploader-list">
 							<button type="button" class="layui-btn layui-btn-danger" id="alipayloader"><i class="layui-icon"></i>上传图片</button>
-							<img src="{$one['alipay_pay_qrcode']}" width="120" height="auto" id="preview_alipay"/>
+
+							<div id="alipaycode" class="file-iteme" {if condition="$one['alipay_pay_qrcode'] eq ''"}style="display:none;"{/if}>
+								<div class="handle"><i class="layui-icon layui-icon-delete" id="alipaydel"></i></div>
+								<img src="{$one['alipay_pay_qrcode']}" width="120" height="auto" id="preview_alipay"/>
+								<div class="info">{$vo['photo_name']}</div>
+							</div>
+
+
 							<div class="layui-inline layui-word-aux">
 								图片大小限制 {php}echo $image_size/1024; {/php}M
 							</div>
@@ -228,6 +363,8 @@
 
 				<input name="wechat_pay_qrcode" id="wechat_pay_qrcode" type="hidden" value="{$one['wechat_pay_qrcode']}"/>
 				<input name="alipay_pay_qrcode" id="alipay_pay_qrcode" type="hidden" value="{$one['alipay_pay_qrcode']}"/>
+				<input name="wechat_apiclient_cert" id="wechat_apiclient_cert" type="hidden" value="{$one['wechat_apiclient_cert']}"/>
+				<input name="wechat_apiclient_key" id="wechat_apiclient_key" type="hidden" value="{$one['wechat_apiclient_key']}"/>
         		<input name="id" type="hidden" value="{$one['id']}"/>
             </div>
         </div>
@@ -248,6 +385,61 @@
 <script src="__STATIC__/lib/layui/layui.js"></script>
 <script src="__PEAR__/component/pear/pear.js"></script>
 <script>
+	//绑定图片上传后小图片事件
+	function bindImgHandler($,layer){
+		//图片上传后删除按钮
+		$(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+			if(event.type === "mouseenter"){
+				//鼠标悬浮
+				$(this).children(".info").fadeIn("fast");
+				$(this).children(".handle").fadeIn("fast");
+				$(this).children(".default-icon").show();
+			}else if(event.type === "mouseleave") {
+				//鼠标离开
+				$(this).children(".info").hide();
+				$(this).children(".handle").hide();
+				var data=$(this).children(".default-icon").attr("data");
+				if(data==null||data!=1){
+					$(this).children(".default-icon").hide();
+				}
+			}
+		});
+
+		//图片上传后删除按钮点击事件
+		$(document).on("click", ".file-iteme .handle i.layui-icon", function(event){
+			event.stopPropagation();
+			//异步删除图片
+			var id=$(this).attr("id");
+			if(id=="wechatdel"){
+				$("#preview_wechat").attr("src","");
+				$("#wechat_pay_qrcode").val("");
+				$("#wechatpaycode").hide();
+			}if(id=="wechatcertdel"){
+				$("#wechat_apiclient_cert").val("");
+				$("#wechatcert").hide();
+			}if(id=="wechatkeydel"){
+				$("#wechat_apiclient_key").val("");
+				$("#wechatkey").hide();
+			}else if(id=="alipaydel"){
+				$("#preview_alipay").attr("src","");
+				$("#alipay_pay_qrcode").val("");
+				$("#alipaycode").hide();
+			}
+		});
+
+	}
+
+	//解绑事件
+	function unbindImgHandler($){
+		$(document).off("mouseenter mouseleave", ".file-iteme");
+
+		//图片上传后删除按钮点击事件
+		$(document).off("click", ".file-iteme .handle i.layui-icon");
+
+		//图片上传后删除按钮点击事件
+		$(document).off("click", ".file-iteme img");
+	}
+
 layui.use(['form','jquery','upload', 'element','layer'],function(){
     let form = layui.form;
     let $ = layui.jquery;
@@ -256,6 +448,10 @@ layui.use(['form','jquery','upload', 'element','layer'],function(){
 	let layer = layui.layer;
 
 	var path="{:U('pos/branch','','')}";
+	var branch_no="{$one['branch_no']}";
+
+	//绑定事件
+	bindImgHandler($,layer);
 
 	//微信文件上传
 	upload.render({
@@ -265,14 +461,76 @@ layui.use(['form','jquery','upload', 'element','layer'],function(){
 		,size: {$image_size} //限制文件大小，单位 KB
 		,done: function(res){
 			if(res.status==1){
+
+				//解绑事件
+				unbindImgHandler($);
+				//重新绑定事件
+				bindImgHandler($,layer);
+
 				$("#preview_wechat").attr("src",res.path);
 				$("#wechat_pay_qrcode").val(res.path);
+				$("#wechatpaycode").show();
 				layer.msg('上传成功');
 			}else{
 				layer.msg('上传失败，请重试');
 			}
 		}
 	});
+
+	{if condition="$one['branch_no'] neq '' "}
+	//微信cert证书上传
+	upload.render({
+		elem: '#wechatcertloader'
+		,url: path+'/uploadCert/branch_no/'+branch_no //Super控制器公共接口
+		,method: 'post'
+		,size: {$image_size} //限制文件大小，单位 KB
+		,accept: 'file' //普通文件
+		,exts: 'pem' //只允许上传pem文件
+		,data:{"branch_no":branch_no}
+		,done: function(res){
+			if(res.status==1){
+
+				//解绑事件
+				unbindImgHandler($);
+				//重新绑定事件
+				bindImgHandler($,layer);
+
+				$("#wechat_apiclient_cert").val(res.path);
+				$("#wechatcert").show();
+				layer.msg('上传成功');
+			}else{
+				layer.msg('上传失败，请重试：'+res.msg);
+			}
+		}
+	});
+
+	upload.render({
+		elem: '#wechatkeyloader'
+		,url: path+'/uploadCert/branch_no/'+branch_no //Super控制器公共接口
+		,method: 'post'
+		,size: {$image_size} //限制文件大小，单位 KB
+		,accept: 'file' //普通文件
+		,exts: 'pem' //只允许上传pem文件
+		,data:{"branch_no":branch_no}
+		,done: function(res){
+			if(res.status==1){
+
+				//解绑事件
+				unbindImgHandler($);
+				//重新绑定事件
+				bindImgHandler($,layer);
+
+				$("#wechat_apiclient_key").val(res.path);
+				$("#wechatkey").show();
+				layer.msg('上传成功');
+			}else{
+				layer.msg('上传失败，请重试：'+res.msg);
+			}
+		}
+	});
+
+	{/if}
+
 	//支付宝文件上传
 	upload.render({
 		elem: '#alipayloader'
@@ -281,8 +539,15 @@ layui.use(['form','jquery','upload', 'element','layer'],function(){
 		,size: {$image_size} //限制文件大小，单位 KB
 		,done: function(res){
 			if(res.status==1){
+
+				//解绑事件
+				unbindImgHandler($);
+				//重新绑定事件
+				bindImgHandler($,layer);
+
 				$("#preview_alipay").attr("src",res.path);
 				$("#alipay_pay_qrcode").val(res.path);
+				$("#alipaycode").show();
 				layer.msg('上传成功');
 			}else{
 				layer.msg('上传失败，请重试');

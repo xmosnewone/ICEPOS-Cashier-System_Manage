@@ -5,6 +5,8 @@ class WxPayConfig extends WxPayConfigInterface
 	public $merchantid;
 	public $paykey;
 	public $appsecret;
+    public $apiclient_cert;
+    public $apiclient_key;
 	//=======【基本信息设置】=====================================
 	/**
 	 * TODO: 修改这里配置为您自己申请的商户信息
@@ -15,7 +17,7 @@ class WxPayConfig extends WxPayConfigInterface
 	 * MCHID：商户号（必须配置，开户邮件中可查看）
 	 *
 	 */
-	public function __construct($appid,$merchantid,$appsecret='',$paykey=''){
+	public function __construct($appid,$merchantid,$appsecret='',$paykey='',$apiclient_cert='',$apiclient_key=''){
 		$this->appid=$appid;
 		$this->merchantid=$merchantid;
 		if(!empty($paykey)){
@@ -24,16 +26,20 @@ class WxPayConfig extends WxPayConfigInterface
 		if(!empty($appsecret)){
 			$this->appsecret=$appsecret;
 		}
+        if(!empty($apiclient_cert)){
+            $this->apiclient_cert=$apiclient_cert;
+        }
+        if(!empty($apiclient_key)){
+            $this->apiclient_key=$apiclient_key;
+        }
 	}
 	public function GetAppId()
 	{
 		return $this->appid;
-		//return 'wxb2eb729a629ed238';
 	}
 	public function GetMerchantId()
 	{
 		return $this->merchantid;
-		//return '1461059102';
 	}
 
 	//=======【支付相关配置：支付成功回调地址/签名方式】===================================
@@ -90,12 +96,10 @@ class WxPayConfig extends WxPayConfigInterface
 	public function GetKey()
 	{
 		return $this->paykey;
-		//return '53e4468ff56df50402c2ccd0a6bca11f';
 	}
 	public function GetAppSecret()
 	{
 		return $this->appsecret;
-		//return 'ba18ec32df88b08ff692e730a91c3880';
 	}
 
 
@@ -112,8 +116,8 @@ class WxPayConfig extends WxPayConfigInterface
 	 */
 	public function GetSSLCertPath(&$sslCertPath, &$sslKeyPath)
 	{
-		$sslCertPath = '../cert/apiclient_cert.pem';
-		$sslKeyPath = '../cert/apiclient_key.pem';
+		$sslCertPath = $this->apiclient_cert;
+		$sslKeyPath = $this->apiclient_key;
 	}
 }
 /**
