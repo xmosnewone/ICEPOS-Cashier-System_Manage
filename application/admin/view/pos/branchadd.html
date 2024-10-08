@@ -316,23 +316,28 @@
 				    <div class="layui-input-inline">
 				      <input type="text" name="alipay_appid" value="{$one['alipay_appid']}" placeholder="" autocomplete="off" class="layui-input">
 				    </div>
-				    
-				     <label class="layui-form-label">公钥</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="alipay_public_key" value="{$one['alipay_public_key']}"  placeholder="" autocomplete="off" class="layui-input">
-				    </div>
+					  <label class="layui-form-label">开启</label>
+					  <div class="layui-input-inline">
+						  <input type="checkbox" name="use_alipay" value="1" title="支付宝刷卡支付" lay-skin="primary" {if condition="$one['use_alipay'] eq '1'"} checked {/if} >
+					  </div>
+
 				  </div>
-				  
-				  <div class="layui-form-item">
-				    <label class="layui-form-label">私钥</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="alipay_private_key" value="{$one['alipay_private_key']}" placeholder="" autocomplete="off" class="layui-input">
-				    </div>
-					<label class="layui-form-label">开启</label>
-					<div class="layui-input-inline">
-					  <input type="checkbox" name="use_alipay" value="1" title="支付宝刷卡支付" lay-skin="primary" {if condition="$one['use_alipay'] eq '1'"} checked {/if} >
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">支付宝公钥</label>
+					<div class="layui-input-inline"  style="width:450px;">
+						<textarea style="width:450px;" name="alipay_public_key"  placeholder="请输入支付宝开发平台获取的支付宝公钥" autocomplete="off" class="layui-textarea">{$one['alipay_public_key']}</textarea>
 					</div>
+				</div>
+
+				  <div class="layui-form-item">
+				    <label class="layui-form-label">商户私钥</label>
+				    <div class="layui-input-inline"  style="width:450px;">
+				      <textarea style="width:450px;" name="alipay_private_key" placeholder="开放平台密钥工具生成的应用私钥即商户私钥" autocomplete="off" class="layui-textarea">{$one['alipay_private_key']}</textarea>
+				    </div>
 				  </div>
+
+
 
 				<div class="layui-form-item">
 					<label class="layui-form-label" style="width: 140px;">支付宝个人收款二维码</label>

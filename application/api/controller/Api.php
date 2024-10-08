@@ -1664,29 +1664,35 @@ class Api extends Super {
         // 调用barPay方法获取当面付应答
         $barPay = new \AlipayTradeService ( $ali_config );
         $barPayResult = $barPay->barPay ( $barPayRequestBuilder );
-        // if (!empty($barPayResult->getResponse())) {
-        // print_r($barPayResult->getResponse());
-        // }
+
+        $code="-1";
         switch ($barPayResult->getTradeStatus ()) {
             case "SUCCESS" :
                 // "支付宝支付成功:";
-                // $barPayResult->getResponse();
-                // 添加收银支付流水信息
+                //添加支付信息
                 $PosPay = new PosPay ();
                 $PosPay->AddZfbPosPay ( $outTradeNo, $totalAmount );
-                return $result;
+                $response=$barPayResult->getResponse();
+                // 添加收银支付流水信息
+                //支付宝交易号 trade_no
+                $trade_no=isset($response->trade_no)?$response->trade_no:'';
+                $PosPay->UpdatewxPosPay ( $outTradeNo, $trade_no); // 更新支付信息
+                return "1";
 
             case "FAILED" :
                 // "支付宝支付失败!!!";
-                return "-2";
+                $code="-2";
             case "UNKNOWN" :
                 // "系统异常，订单状态未知!!!";
-                return "-3";
+                $code="-3";
             default :
                 // "不支持的交易状态，交易返回异常!!!";
-                return "-4";
+                $code="-4";
         }
-        return "-1";
+
+        $message = "访问方法:支付宝扫码支付(aliPayFtf)失败 :" .$code ;
+        write_log ( $message, "API/api/aliPayFtf" );
+        return $code;
     }
 
     // 返回支付宝支付状态
@@ -1702,8 +1708,6 @@ class Api extends Super {
 
         $flow_no = input ( "flowno" ); // POS系统端的订单号
         $branchno = input ( "branch_no" ); // 商店号
-        // $flow_no ='sdkphp20180813114905';//POS系统端的订单号
-        // $branchno='004';//商店号
         if (empty ( $flow_no )) {
             return "-10";
         }
@@ -1845,11 +1849,11 @@ class Api extends Super {
 
             $microPay = new \MicroPay ( $appid, $merchantid, $appsecret, $paykey );
             $wxpay_result = $microPay->pay ( $input );
-            //添加收银支付流水信息
-            $PosPay = new PosPay ();
-            $PosPay->AddWxPosPay ( $flowno, round($payAmount/100,2) );
 
             if (strtoupper ( $wxpay_result ['return_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['result_code'] ) == 'SUCCESS' && strtoupper ( $wxpay_result ['return_msg'] ) == 'OK') {
+                //添加收银支付流水信息
+                $PosPay = new PosPay ();
+                $PosPay->AddWxPosPay ( $flowno, round($payAmount/100,2) );
                 $PosPay->UpdatewxPosPay ( $flowno, $wxpay_result ['transaction_id'] ); // 更新支付信息
                 $result = "1";
             } else {
@@ -1883,8 +1887,7 @@ class Api extends Super {
 
         $flow_no = input ( "flowno" ); // POS系统端的订单号
         $branchno = input ( "branch_no" ); // 商店号
-        // $flow_no ='sdkphp20180813114905';//POS系统端的订单号
-        // $branchno='004';//商店号
+
         if (empty ( $flow_no )) {
             return "-10";
         }
@@ -1936,7 +1939,5 @@ class Api extends Super {
             write_log ( $message, "API/api/getWxPayStatus" );
             return "- 5";
         }
-
-
     }
 }
