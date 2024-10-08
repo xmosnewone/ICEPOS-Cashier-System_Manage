@@ -32,9 +32,13 @@ ALTER TABLE `ice_im_check_sum` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTE
 ALTER TABLE `ice_im_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 ALTER TABLE `ice_im_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '单号';
 ALTER TABLE `ice_stock_flow` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '订单编号';
-ALTER TABLE `ice_wm_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `ice_wm_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '单号';
 ALTER TABLE `ice_pm_sheet_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '采购单主表编号';
 ALTER TABLE `ice_pm_sheet_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '采购订单主编号';
 ALTER TABLE `ice_fm_recpay_detail` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '结算单主编号';
 ALTER TABLE `ice_fm_recpay_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '结算单编号';
+
+--
+--  2024-10-08
+--
+ALTER TABLE `ice_pos_branch_info` CHANGE `alipay_public_key` `alipay_public_key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付宝公钥';
+ALTER TABLE `ice_pos_branch_info` CHANGE `alipay_private_key` `alipay_private_key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户私钥';
