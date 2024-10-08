@@ -204,7 +204,7 @@ class PosPayFlow extends BaseModel {
         
         $list=Db::name($this->name)
         		->alias('s')
-        		->field("s.id,s.branch_no,s.flow_no,s.oper_date,s.coin_type,s.pay_name," .
+        		->field("s.id,s.branch_no,s.flow_no,s.oper_date,s.coin_type,s.pay_name,s.pay_way," .
                 "s.card_no,s.vip_no,s.sale_amount,s.pay_amount," .
                 "s.pos_id,s.oper_id,s.voucher_no,s.memo,a.branch_name,b.oper_name," .
                 "case s.sale_way when 'A' then '销售' when 'B' then '退货' when 'C' then '赠送' else '找零' end as sale_way")
@@ -255,6 +255,7 @@ class PosPayFlow extends BaseModel {
                 $vip_code[]=trim($v["vip_no"]);
             }
             $tt["sale_way"] = $v["sale_way"];
+            $tt["pay_way"] = $v["pay_way"];
             $tt["sale_amount"] = formatMoneyDisplay($v["sale_amount"]);
             $tt["pay_amount"] = formatMoneyDisplay($v["pay_amount"]);
             $tt["pos_id"] = $v["pos_id"];
