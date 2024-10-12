@@ -42,3 +42,8 @@ ALTER TABLE `ice_fm_recpay_master` CHANGE `sheet_no` `sheet_no` VARCHAR(32) CHAR
 --
 ALTER TABLE `ice_pos_branch_info` CHANGE `alipay_public_key` `alipay_public_key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付宝公钥';
 ALTER TABLE `ice_pos_branch_info` CHANGE `alipay_private_key` `alipay_private_key` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户私钥';
+
+--
+--  2024-10-11
+--
+ALTER TABLE `ice_bd_item_combsplit` CHANGE `memo` `memo` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL;

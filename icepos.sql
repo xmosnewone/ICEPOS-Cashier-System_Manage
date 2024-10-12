@@ -1110,7 +1110,7 @@ CREATE TABLE IF NOT EXISTS `ice_bd_item_combsplit` (
   `comb_item_no` varchar(20) NOT NULL,
   `item_no` varchar(20) NOT NULL,
   `item_qty` decimal(16,4) NOT NULL,
-  `memo` varchar(20) NOT NULL,
+  `memo` varchar(20) DEFAULT NULL,
   `relation_px` char(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`comb_item_no`,`item_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

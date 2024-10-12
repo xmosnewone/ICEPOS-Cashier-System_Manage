@@ -252,18 +252,6 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 				fixed: 'left'
 			},
 			{
-				title: '单位',
-				field: 'item_unit',
-				align: 'center',
-				width: 100
-			},
-			{
-				title: '规格',
-				field: 'item_size',
-				align: 'center',
-				width: 100,
-			},
-			{
 				title: '箱数',
 				field: 'large_qty',
 				align: 'center',
@@ -314,6 +302,18 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 				style:'background-color: #fff6f0;',
 				width: 150,
 				edit:'text'
+			},
+			{
+				title: '单位',
+				field: 'item_unit',
+				align: 'center',
+				width: 100
+			},
+			{
+				title: '规格',
+				field: 'item_size',
+				align: 'center',
+				width: 100,
 			}
 			
 		]
@@ -387,7 +387,7 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 	
 	//计算总金额
 	window.sumTotal=function(data){
-		data['sub_amt']=data['order_qty']*data['item_price'];//采购数量*商品价格
+		data['sub_amt']=(data['order_qty']*data['item_price']).toFixed(2);//采购数量*商品价格
 		return data;
 	}
 	
@@ -442,7 +442,7 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 		 }    
 		 
 		 //修改当前行得的值，刷新表格
-		 if(field=='large_qty'||field=='order_qty'){
+		 if(field=='large_qty'||field=='order_qty'||field=='item_price'){
 			 	var index=obj.tr.attr("data-index");
 				var rows=table.getData("podetail-table");
 					//修改多个字段值
