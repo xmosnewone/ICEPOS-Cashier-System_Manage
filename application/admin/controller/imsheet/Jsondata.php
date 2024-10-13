@@ -94,9 +94,25 @@ class Jsondata extends Super {
 	//返回库存调整单详细
 	public function getImSheetDetail() {
 		$no = input ( "sheetno" );
-		
-		$ImSheetDetail = new ImSheetDetail ();
-		$model = $ImSheetDetail->GetSheetDetails ( $no );
+
+        $ImSheetMaster=new ImSheetMaster();
+        $master=$ImSheetMaster->GetModel($no);
+        if($master->trans_no!="MO"){
+            $branch_no=$master->branch_no;
+        }else{
+            $branch_no=$master->d_branch_no;
+        }
+
+        $ImSheetDetail = new ImSheetDetail ();
+        $model = $ImSheetDetail->GetSheetDetails ( $no);
+
+        //返回的记录可能有非当前库存调整单门店编号的库存记录，要删除
+        foreach ( $model as $k=>$v ) {
+            if(!empty($v['branch_no'])&&$v['branch_no']!=$branch_no){
+                unset($model[$k]);
+            }
+        }
+
 		$result = array ();
 		
 		$i = 0;

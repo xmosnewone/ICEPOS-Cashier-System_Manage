@@ -208,7 +208,7 @@ class ImSheetDetail extends BaseModel {
 
     public function GetMoStatus($sheet_no) {
         $model = $this->where("order_qty!=real_qty and sheet_no='$sheet_no'")->select();
-        if (empty($model)) {
+        if (empty($model)||count($model)<=0) {
             return 2;
         } else {
             $modelList = $this->where("sheet_no='$sheet_no'")->select();
@@ -225,7 +225,7 @@ class ImSheetDetail extends BaseModel {
         return $list=Db::name($this->name)
             ->alias('p')
             ->field("p.item_no,p.large_qty,p.real_qty,p.order_qty,p.real_qty as real_qty1,p.orgi_price as item_price,p.sub_amt,p.other1 as memo,p.tax," .
-                "b.item_subno,b.item_name,b.unit_no as item_unit,b.item_size,b.purchase_spec,b.purchase_tax,b.sale_price,s.stock_qty")
+                "b.item_subno,b.item_name,b.unit_no as item_unit,b.item_size,b.purchase_spec,b.purchase_tax,b.sale_price,s.branch_no,s.stock_qty")
             ->join('bd_item_info b','p.item_no=b.item_no ',"LEFT")
             ->join('pos_branch_stock s','p.item_no=s.item_no ',"LEFT")
             ->where("p.sheet_no='$sheetno'")
