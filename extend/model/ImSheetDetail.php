@@ -138,7 +138,7 @@ class ImSheetDetail extends BaseModel {
         
         $model=Db::table($this->table)
         ->alias('p')
-        ->field("p.item_no,p.large_qty,p.real_qty,p.real_qty as real_qty1,p.orgi_price as item_price,p.sub_amt,p.other1 as memo,p.tax," .
+        ->field("p.item_no,p.order_qty,p.large_qty,p.real_qty,p.real_qty as real_qty1,p.orgi_price as item_price,p.sub_amt,p.other1 as memo,p.tax," .
                 "b.item_subno,b.item_name,b.unit_no as item_unit,b.item_size,b.purchase_spec,b.purchase_tax,b.sale_price")
         ->join('bd_item_info b','p.item_no=b.item_no',"LEFT")
         ->where("p.sheet_no='$mino'")
@@ -167,7 +167,7 @@ class ImSheetDetail extends BaseModel {
             $result[$i]["item_subno"] = $v["item_subno"];
             $result[$i]["item_size"] = $v["item_size"];
             $result[$i]["item_unit"] = $v["item_unit"];
-            $result[$i]["order_qty"] = floatval($v["purchase_spec"]*$v["large_qty"]);
+            $result[$i]["order_qty"] = floatval($v["order_qty"]);
             $result[$i]["purchase_spec"] = $v["purchase_spec"];
             $result[$i]["purchase_tax"] = $v["purchase_tax"];
             $result[$i]["memo"] = $v["memo"];
@@ -223,13 +223,13 @@ class ImSheetDetail extends BaseModel {
 
     public function GetSheetDetails($sheetno) {
         return $list=Db::name($this->name)
-            ->alias('p')
-            ->field("p.item_no,p.large_qty,p.real_qty,p.order_qty,p.real_qty as real_qty1,p.orgi_price as item_price,p.sub_amt,p.other1 as memo,p.tax," .
+        ->alias('p')
+        ->field("p.item_no,p.large_qty,p.real_qty,p.order_qty,p.real_qty as real_qty1,p.orgi_price as item_price,p.sub_amt,p.other1 as memo,p.tax," .
                 "b.item_subno,b.item_name,b.unit_no as item_unit,b.item_size,b.purchase_spec,b.purchase_tax,b.sale_price,s.branch_no,s.stock_qty")
-            ->join('bd_item_info b','p.item_no=b.item_no ',"LEFT")
-            ->join('pos_branch_stock s','p.item_no=s.item_no ',"LEFT")
-            ->where("p.sheet_no='$sheetno'")
-            ->select();
+        ->join('bd_item_info b','p.item_no=b.item_no ',"LEFT")
+        ->join('pos_branch_stock s','p.item_no=s.item_no ',"LEFT")
+        ->where("p.sheet_no='$sheetno'")
+        ->select();
     }
 
     public function AddMi($model) {
@@ -282,7 +282,7 @@ class ImSheetDetail extends BaseModel {
             if (!empty($mino) && !empty($mono)) {
                 $details_mi = $this->where("sheet_no='$mino'")->select();
                 $details_mo = $this->where("sheet_no='$mono'")->select();
-                if (empty($details_mi) || empty($details_mo)) {
+                if (empty($details_mi)||count($details_mi)<=0 || empty($details_mo)||count($details_mo)<=0) {
                     $isok = FALSE;
                 } else {
                 	$posBranchStock=new PosBranchStock();

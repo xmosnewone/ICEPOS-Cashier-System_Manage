@@ -185,7 +185,7 @@ class PmSheetDetail extends BaseModel {
 
     public function GetOrderStatus($sheet_no) {
         $records = $this->where("real_qty < order_qty and sheet_no='$sheet_no'")->select();
-        if (empty($records)) {
+        if (empty($records)||count($records)<=0) {
             return 2;
         } else {
             $records_all = $this->where("sheet_no='$sheet_no'")->select();
@@ -249,7 +249,7 @@ class PmSheetDetail extends BaseModel {
         $result = 1;
         try {
             $detail_po = $this->where("sheet_no='$po_no'")->select();
-            if (empty($detail_po)) {
+            if (empty($detail_po)||count($detail_po)<=0) {
                 $result = -1;
             }
             $PcBranchPrice=new PcBranchPrice();
@@ -314,10 +314,10 @@ class PmSheetDetail extends BaseModel {
             $result[$i]["item_no"] = $v["item_no"];
             $result[$i]["sp_name"] = $v["sp_name"];
             $result[$i]["large_qty"] = sprintf("%.2f", $v["large_qty"]);
-            $result[$i]["sub_amt"] = sprintf("%.2f", $v["sub_amt"]);
             $result[$i]["order_qty"] = sprintf("%.2f", $v["order_qty"]);
             $result[$i]["item_name"] = $v["item_name"];
             $result[$i]["item_price"] = sprintf("%.2f", $v["item_price"]);
+            $result[$i]["sub_amt"] = sprintf("%.2f", ($v["item_price"]*$v["order_qty"]));
             $result[$i]["item_subno"] = $v["item_subno"];
             $result[$i]["item_size"] = $v["item_size"];
             $result[$i]["item_unit"] = $v["item_unit"];
@@ -333,7 +333,6 @@ class PmSheetDetail extends BaseModel {
             $i++;
         }
         $res1 = array();
-        $temp = array();
         $res1["total"] = count($model);
         $res1["rows"] = $result;
         return $res1;

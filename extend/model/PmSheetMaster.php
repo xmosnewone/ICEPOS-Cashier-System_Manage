@@ -427,7 +427,7 @@ class PmSheetMaster extends BaseModel {
         if($limit){
         	$list=Db::name($this->name)
         	->alias('s')
-        	->field("s.sheet_no,s.branch_no,b.branch_name,s.approve_flag,s.oper_date,case s.order_status when '1' then '$lang_part' when '2' then '$lang_all' when '4' then '$lang_stop' else '$lang_un' end as order_status," .
+        	->field("s.sheet_no,s.branch_no,b.branch_name,s.approve_flag,s.voucher_no,s.work_date,s.oper_date,case s.order_status when '1' then '$lang_part' when '2' then '$lang_all' when '4' then '$lang_stop' else '$lang_un' end as order_status," .
         			"s.oper_id,d.oper_name,s.sheet_amt,s.supcust_no,c.sp_company as sp_name," .
         			"f.username as confirm_name")
         			->join('pos_branch_info b','s.branch_no = b.branch_no',"LEFT")
@@ -443,7 +443,7 @@ class PmSheetMaster extends BaseModel {
         	
         	$list=Db::name($this->name)
         	->alias('s')
-        	->field("s.sheet_no,s.branch_no,b.branch_name,s.approve_flag,s.oper_date,case s.order_status when '1' then '$lang_part' when '2' then '$lang_all' when '4' then '$lang_stop' else '$lang_un' end as order_status," .
+        	->field("s.sheet_no,s.branch_no,b.branch_name,s.approve_flag,s.voucher_no,s.work_date,s.oper_date,case s.order_status when '1' then '$lang_part' when '2' then '$lang_all' when '4' then '$lang_stop' else '$lang_un' end as order_status," .
         			"s.oper_id,d.oper_name,s.sheet_amt,s.supcust_no,c.sp_company as sp_name," .
         			"f.username as confirm_name")
         			->join('pos_branch_info b','s.branch_no = b.branch_no',"LEFT")
@@ -470,6 +470,7 @@ class PmSheetMaster extends BaseModel {
             $tt["sheet_amt"] = $v["sheet_amt"];
             $tt["approve_flag"] = $v["approve_flag"];
             $tt["oper_date"] = $v["oper_date"];
+            $tt["work_date"] = $v["work_date"];
             $tt["branch_name"] = $v["branch_name"];
             $tt["oper_name"] = $v["oper_name"];
             $tt["username"] = $v["username"];
@@ -478,6 +479,7 @@ class PmSheetMaster extends BaseModel {
             $tt["branch_no"] = $v["branch_no"];
             $tt["oper_id"] = $v["oper_id"];
             $tt["supcust_no"] = $v["supcust_no"];
+            $tt["voucher_no"] = $v["voucher_no"];
             array_push($temp, $tt);
             $rowIndex++;
         }
