@@ -10,7 +10,7 @@ class PosBranch extends BaseModel {
 	protected $name="pos_branch_info";
 	
     public $rowIndex;
-    
+
     //添加门店功能
     private $branc_functions="
 INSERT INTO `dbprefix_pos_function` (`branch_no`, `func_id`, `func_name`, `func_udname`, `pos_key`, `flag`, `type`, `memo`, `other1`) VALUES
@@ -22,7 +22,7 @@ INSERT INTO `dbprefix_pos_function` (`branch_no`, `func_id`, `func_name`, `func_
 ('{branch_no}', 'csc', '储值付费', '储值付费', '\\\\', '1', '2', NULL, NULL),
 ('{branch_no}', 'cut', '客户信息', '客户信息', 'n', '1', '1', NULL, NULL),
 ('{branch_no}', 'dct', '折扣', '折扣', 'o', '1', '1', NULL, NULL),
-('{branch_no}', 'dou', '外送', '外送', 'l', '1', '1', NULL, NULL),
+('{branch_no}', 'dou', '营业员', '营业员', 'l', '1', '1', NULL, NULL),
 ('{branch_no}', 'fkf', '付款方式', '付款方式', ',', '1', '2', NULL, NULL),
 ('{branch_no}', 'gdj', '挂单', '挂单', 'p', '1', '1', NULL, NULL),
 ('{branch_no}', 'giv', '赠送', '赠送', 's', '1', '1', NULL, NULL),
@@ -39,6 +39,7 @@ INSERT INTO `dbprefix_pos_function` (`branch_no`, `func_id`, `func_name`, `func_
 ('{branch_no}', 'tot', '结算', '结算', '+', '1', '1', NULL, NULL),
 ('{branch_no}', 'vip', '会员', '会员', 'm', '1', '1', NULL, NULL),
 ('{branch_no}', 'wsh', '外送', '外送', 't', '1', '1', NULL, NULL),
+('{branch_no}', 'barcode', '条码', '条码', 'd', '1', '1', NULL, NULL),                                                                                                                                             
 ('{branch_no}', 'yezf', '余额支付', '余额支付', '=', '1', '2', NULL, NULL);";
     
     public function getone($branch_no) {
