@@ -178,6 +178,11 @@ class Branch extends Super
 			
 			$posModel=new PosBranch();
 			if ($posModel->save ($content,['id'=>$id])) {
+                //删除该门店快捷键
+                $posModel->delFunction($content['branch_no']);
+                //添加funtion-pos端功能键
+                $posModel->addFunction($content['branch_no']);
+
 				$return ['code'] = true;
 				$return['msg']=lang("update_success");
 			} else {
