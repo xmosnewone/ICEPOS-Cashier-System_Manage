@@ -48,7 +48,7 @@ class Search extends Super {
 		$PosBranch = new PosBranch ();
 		$Supcust = new Supcust ();
 		
-		$fieldSql = "select f.branch_no, f.branch_name,i.item_no,i.item_name,i.item_brand,i.purchase_spec,item_rem,i.item_brandname
+		$fieldSql = "select f.branch_no, f.branch_name,i.item_no,i.item_name,i.item_brand,i.purchase_spec,i.item_rem,i.item_brandname
 				,i.price,i.item_clsno,c.item_clsname,i.sale_price,i.unit_no,i.item_size,b.stock_qty,p.sp_company";
 		
 		$countSql = "select count(*) as total";
@@ -58,7 +58,7 @@ class Search extends Super {
 				. "right join " . $PosBranchStock->tableName () . " as b on i.item_no=b.item_no " 
 				. "left join " . $PosBranch->tableName () . " as f on f.branch_no=b.branch_no " 
 				. "left join " . $Supcust->tableName () . " as p on i.main_supcust=p.sp_no";
-		
+        $sql="";
 		if (! empty ( $array )) {
 			$prefix=$this->dbprefix;
 			if ($array ["chkstock_notnil"] == "on") {
@@ -104,8 +104,7 @@ class Search extends Super {
 		
 		$model = Db::query ( $fieldSql . $from . $sql . " limit $offset,$rows" );
 		
-		$colmns = "branch_no,branch_name,item_no,item_name,item_brand,item_brandname,purchase_spec,item_rem
-					,price,item_clsno,item_clsname,sale_price,unit_no,item_size,stock_qty,sp_company";
+		$colmns = "branch_no,branch_name,item_no,item_name,item_brand,item_brandname,purchase_spec,item_rem,price,item_clsno,item_clsname,sale_price,unit_no,item_size,stock_qty,sp_company";
 		$temp = array ();
 		foreach ( $model as $k => $v ) {
 			$tt = array ();
