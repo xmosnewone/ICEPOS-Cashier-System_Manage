@@ -47,3 +47,22 @@ ALTER TABLE `ice_pos_branch_info` CHANGE `alipay_private_key` `alipay_private_ke
 --  2024-10-11
 --
 ALTER TABLE `ice_bd_item_combsplit` CHANGE `memo` `memo` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
+
+--
+--  2024-10-31
+--
+DROP TABLE IF EXISTS `ice_pos_feedback`;
+CREATE TABLE IF NOT EXISTS `ice_pos_feedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `branch_no` varchar(10) NOT NULL,
+  `posid` varchar(10) NOT NULL,
+  `oper_id` varchar(10) NOT NULL,
+  `content` varchar(50) NOT NULL,
+  `reply` text COMMENT '回复',
+  `reply_date` int(11) UNSIGNED DEFAULT '0' COMMENT '回复日期',
+  `oper_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, `parent`, `url`, `is_display`, `level`, `orderby`) VALUES
+(139, 'POS端留言', 'POS_Feedback', '', NULL, '1730384721', '98', '/admin/portal/Guestbook/posFeed', 1, 3, 109);

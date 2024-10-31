@@ -1105,14 +1105,17 @@ INSERT INTO `ice_bd_item_cls_breakpoint` (`rid`, `rtype`, `item_clsno`, `updatet
 -- 表的结构 `ice_bd_item_combsplit`
 --
 
-DROP TABLE IF EXISTS `ice_bd_item_combsplit`;
-CREATE TABLE IF NOT EXISTS `ice_bd_item_combsplit` (
-  `comb_item_no` varchar(20) NOT NULL,
-  `item_no` varchar(20) NOT NULL,
-  `item_qty` decimal(16,4) NOT NULL,
-  `memo` varchar(20) DEFAULT NULL,
-  `relation_px` char(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`comb_item_no`,`item_no`)
+DROP TABLE IF EXISTS `ice_pos_feedback`;
+CREATE TABLE IF NOT EXISTS `ice_pos_feedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `branch_no` varchar(10) NOT NULL,
+  `posid` varchar(10) NOT NULL,
+  `oper_id` varchar(10) NOT NULL,
+  `content` varchar(50) NOT NULL,
+  `reply` text COMMENT '回复',
+  `reply_date` int(11) UNSIGNED DEFAULT '0' COMMENT '回复日期',
+  `oper_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
