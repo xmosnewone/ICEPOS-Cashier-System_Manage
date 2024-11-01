@@ -76,7 +76,7 @@
 										</div>
 								    </div>
 					    		 	<div class="layui-form-item layui-inline">
-									    <label class="layui-form-label">仓库</label>
+									    <label class="layui-form-label">门店</label>
 									    <div class="layui-input-inline inputdiv">
 									    	<input type="text" name="branch_no" id="branch_no" autocomplete="off" value="{$one['branchNo']}" placeholder="" class="layui-input" onfocus="showBranchs()">
 											<input type="hidden" id="branch_name" name="branch_name" value="{$one['branchName']}" />
@@ -542,16 +542,22 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 		}
 		_layerIndex=null;
 	}
-	
+
 	//显示采购员选择框
 	window.showOperators=function(){
-		
+
 		{if condition="$one['approve'] eq '1'"}
-			return;
+		return;
 		{/if}
-	
-		_layerIndex=openWin("营业员选择",operator_url,"800px","600px");
-		
+			var branch_no=$("#branch_no").val();
+			var _url="";
+			if(branch_no!=""){
+				_url=operator_url+"?branch_no="+branch_no;
+			}else {
+				_url=operator_url;
+			}
+			_layerIndex=openWin("营业员选择",_url,"800px","600px");
+			return;
 	}
 	
 	//操作员选择后的回调函数

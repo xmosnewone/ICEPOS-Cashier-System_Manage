@@ -230,7 +230,7 @@ class ImSheetMaster extends BaseModel {
     public function GetPager($rows, $page, $start, $end, $sheet_no, $approve_flag, $oper_id, $d_branch_no, $tran_no, $branch_no='') {
         
         $offset = ($page - 1) * $rows;
-        $order= "s.work_date DESC,s.oper_date DESC";
+        $order= "s.sheet_no desc,s.work_date DESC";
         
         $where=$this->GetCondition( $start, $end, $sheet_no, $approve_flag, $oper_id, $d_branch_no, $tran_no, $branch_no);
         
@@ -271,7 +271,7 @@ class ImSheetMaster extends BaseModel {
             $tt["oper_name"] = $v["oper_name"];
             $tt["oper_day"] = substr($v["oper_date"],0,10);
             $tt["username"] = $v["username"];
-            $tt["confirm_name"] = $v["confirm_name"];
+            $tt["confirm_name"] = $v["confirm_name"]?$v["confirm_name"]:$v["oper_name"];
             array_push($temp, $tt);
         }
         $result["rows"] = $temp;

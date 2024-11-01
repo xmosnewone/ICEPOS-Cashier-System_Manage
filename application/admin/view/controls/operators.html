@@ -52,6 +52,7 @@
 				let MODULE_PATH = "/{$MODULE_NAME}/common/";
 				let DATA_PATH = MODULE_PATH+"index/";
 				let TREE_PATH=DATA_PATH+"itemClass";
+				let branch_no="{$_GET['branch_no']}";
 
 				let cols = [
 					[
@@ -65,13 +66,13 @@
 							width:100
 						},
 						{
-							title: '营业人编号',
+							title: '营业员编号',
 							field: 'oper_id',
 							align: 'left',
 							width:120,
 						},
 						{
-							title: '营业人名称',
+							title: '营业员名称',
 							field: 'oper_name',
 							align: 'left',
 							width:150
@@ -87,7 +88,7 @@
 
 				table.render({
 					elem: '#operators-table',
-					url: DATA_PATH+'getOperInfo',
+					url: DATA_PATH+'getOperInfo?branch_no='+branch_no,
 					width:750,
 					height: 430,
 					cellMinWidth: 100,
