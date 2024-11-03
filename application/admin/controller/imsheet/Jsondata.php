@@ -104,7 +104,7 @@ class Jsondata extends Super {
         }
 
         $ImSheetDetail = new ImSheetDetail ();
-        $model = $ImSheetDetail->GetSheetDetails ( $no);
+        $model = $ImSheetDetail->GetSheetDetails ( $no,$branch_no);
 
         //返回的记录可能有非当前库存调整单门店编号的库存记录，要删除
         foreach ( $model as $k=>$v ) {
