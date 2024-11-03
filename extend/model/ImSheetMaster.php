@@ -21,6 +21,7 @@ class ImSheetMaster extends BaseModel {
                 Db::startTrans();
                 $iscommit = TRUE;
                 $imDetail=new ImSheetDetail();
+                $model->add_date=time();
                 $iscommit = $model->save();
                 if ($operFunc == "update") {
                 	$iscommit = $imDetail->Del($model->sheet_no);
@@ -230,7 +231,7 @@ class ImSheetMaster extends BaseModel {
     public function GetPager($rows, $page, $start, $end, $sheet_no, $approve_flag, $oper_id, $d_branch_no, $tran_no, $branch_no='') {
         
         $offset = ($page - 1) * $rows;
-        $order= "s.sheet_no desc,s.work_date DESC";
+        $order= "s.add_date desc,s.work_date DESC";
         
         $where=$this->GetCondition( $start, $end, $sheet_no, $approve_flag, $oper_id, $d_branch_no, $tran_no, $branch_no);
         

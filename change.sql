@@ -66,3 +66,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_feedback` (
 
 INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, `parent`, `url`, `is_display`, `level`, `orderby`) VALUES
 (139, 'POS端留言', 'POS_Feedback', '', NULL, '1730384721', '98', '/admin/portal/Guestbook/posFeed', 1, 3, 109);
+
+--
+--  2024-11-03
+--
+ALTER TABLE `ice_im_sheet_master` ADD `add_date` INT(11) UNSIGNED NULL DEFAULT '0' COMMENT '新建单据时间戳' AFTER `approve_flag`;

@@ -5547,6 +5547,7 @@ CREATE TABLE IF NOT EXISTS `ice_im_sheet_master` (
   `dept_id` varchar(10) DEFAULT NULL,
   `dept_flag` char(1) DEFAULT NULL,
   `approve_flag` char(1) NOT NULL DEFAULT '0',
+  `add_date` int(11) UNSIGNED DEFAULT '0' COMMENT '新建单据时间戳',
   `oper_date` datetime DEFAULT NULL,
   `work_date` datetime DEFAULT NULL,
   `order_man` varchar(20) DEFAULT NULL,

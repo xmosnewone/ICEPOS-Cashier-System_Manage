@@ -173,7 +173,7 @@ class Stocksheet extends Super {
 			$model->approve_flag = '1';
 			$model->work_date = date ( DATETIME_FORMAT, $this->_G['time']);
 			$model->confirm_man = session ('loginname');
-			
+            $model->order_status=2;
 			if (! $model->save ()) {
 				 Db::rollback();
 				return - 3;
