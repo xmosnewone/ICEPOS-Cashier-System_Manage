@@ -39,7 +39,7 @@ class Branch extends Super
         $model = new PosBranch();
         $total=$model->where($where)->count();
         $start=($page-1)*$limit;
-        $list = $model->where($where)->limit($start,$limit)->select()->toArray();
+        $list = $model->where($where)->limit($start,$limit)->order("init_date desc")->select()->toArray();
         foreach($list as $k=>$value){
             $list[$k]['trade_type']=$this->trade_type[$value['trade_type']];
         }
