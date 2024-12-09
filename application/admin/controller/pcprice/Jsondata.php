@@ -19,7 +19,7 @@ class Jsondata extends Super {
     public function sheetIndex() {
         $fields = "sheet_no,(case approve_flag when 1 then '已审核' when 0 then '未审核' end) approve_flag,branch_no,d_branch_no,sheet_amt,order_man,oper_date,confirm_man";
         $model = new ImSheetMaster();
-        $list = $model->field($fields)->where("confirm_man='' and approve_flag=0")->select($criteria)->toArray();
+        $list = $model->field($fields)->where("confirm_man='' and approve_flag=0")->select()->toArray();
         return listJson ( 0, '', count($list), $list);
     }
 
@@ -50,7 +50,7 @@ class Jsondata extends Super {
         
         $code=200;
         $message='';
-        return treeJson($code, $msg, $tree,lang("alltypes"));
+        return treeJson($code, $message, $tree,lang("alltypes"));
     }
 
 	//商品品牌
@@ -153,7 +153,7 @@ class Jsondata extends Super {
             array_push($temp, $tt);
         }
         
-        return listJson ( 0, '', $rowCount, $temp );
+        return listJson ( 0, '', $total, $temp );
     }
 
 	//获取审核或者未审核调价单

@@ -36,7 +36,7 @@ class Jsondata extends Super {
         $tree = $bta->getTreeArray();
         $code=200;
         $message='';
-        return treeJson($code, $msg, $tree,lang("channel_top"));
+        return treeJson($code, $message, $tree,lang("channel_top"));
     }
 
 	//获取子栏目分类

@@ -71,6 +71,7 @@ class Singlestock extends Super {
 				. "left join " . $Supcust->tableName () . " as p on i.main_supcust=p.sp_no";
 		
 		if (! empty ( $array )) {
+            $sql="";
 			$prefix=$this->dbprefix;
 			if ($array ["chkstock_notnil"] == "on") {
 				$sql .= " where b.stock_qty > 0";
@@ -161,7 +162,7 @@ class Singlestock extends Super {
 	
 		$result = $this->GetSeachPager ( $rows, $page, $where );
 		
-		$doc['title']=$start.'单品库存报表';
+		$doc['title']=date("YmdHis").'单品库存报表';
 		$field=['item_no','item_name','unit_no','item_size'
 				,'sale_price','stock_qty','purchase_spec','item_brandname','sp_company'
 				];

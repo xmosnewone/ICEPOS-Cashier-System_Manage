@@ -166,7 +166,7 @@ class BaseCode extends BaseModel
     		$where.=" and type_no='$type_no'";
     	}
     	if (!empty($arr_code_ids)) {
-    		$where.=" and code_id in (".simplode(",",$arr_code_ids).") ";
+    		$where.=" and code_id in (".simplode($arr_code_ids).") ";
     	}
     	
     	return $this->field("code_name")->where($where)->select();

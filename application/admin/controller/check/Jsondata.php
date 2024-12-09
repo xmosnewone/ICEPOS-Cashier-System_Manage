@@ -45,7 +45,7 @@ class Jsondata extends Super {
 		->alias('i')
 		->field("i.sheet_no, i.branch_no, b.branch_name,i.oper_id,i.start_time,i.oper_range, i.check_cls, i.memo")
 		->join('pos_branch_info b','b.branch_no=i.branch_no',"LEFT")
-		->order($order)
+        ->order("i.oper_date desc")
 		->where($where)
 		->limit($offset,$rows)
 		->select();
