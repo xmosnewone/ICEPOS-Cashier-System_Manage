@@ -220,6 +220,7 @@ layui.use(['form','jquery','table','common'],function(){
 		if (event === 'remove') {
 			//删除行
 			obj.del();
+			removeOne(obj);
 			//删除索引
 			rows.splice(index, 1);
 			//重新加载表格
@@ -230,9 +231,32 @@ layui.use(['form','jquery','table','common'],function(){
 		}
 		
 		rebuildItemNo();
-		event.stoppropagation();
 	});
-	
+
+	window.removeOne=function (obj){
+
+		$.ajax({
+			url:  path+"delComb/comb_item_no/{$model.item_no}"+"/item_no/" + obj.data['item_no'],
+			dataType: 'json',
+			type: 'delete',
+			success: function(result) {
+				if (result.code) {
+					layer.msg(result.msg, {
+						icon: 1,
+						time: 1000
+					}, function() {
+
+					});
+				} else {
+					layer.msg(result.msg, {
+						icon: 2,
+						time: 1000
+					});
+				}
+			}
+		})
+	}
+
 	//返回
 	window.backToList=function(){
 		window.location.href="{:U('Product/comblist')}";

@@ -56,8 +56,8 @@ class Itemcls extends Super {
     
     //添加或者编辑商品分类
     public function clspost() {
-        
-            $cls_parent = input('cls_parent');
+
+            $cls_parent = input('cls_parent','0');
             $item_clsno = input('item_clsno');
             $item_clsname = input('item_clsname');
             $display_flag = input("display_flag");
@@ -65,13 +65,15 @@ class Itemcls extends Super {
             $is_modify = input("modify");
 
             $Item_cls=new Item_cls();
-            if ($cls_parent != '') {
+            if (!empty($cls_parent)) {
                 $num = $Item_cls->where("item_clsno='$cls_parent'")->count();
                 if ($num == '0') {
                     $r['code']=false;
                     $r['msg']=lang("cls_parent_empty");
                     return $r;
                 }
+            }else{
+                $cls_parent='0';
             }
             $is_add = true;
 			$ok=false;

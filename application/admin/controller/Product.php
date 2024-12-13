@@ -735,14 +735,14 @@ class Product extends Super {
     
     //删除组合
     public function delComb(){
-    	$comb_item_no = input("comb_item_no");
+        $comb_item_no = input("comb_item_no");
         $item_no = input("item_no");
-    	if (!empty($comb_item_no)&&!empty($item_no)) {
-    		$BdItemCombsplit=new BdItemCombsplit();
-    		$result = $BdItemCombsplit->delComb($comb_item_no,$item_no);
-    		return $result;
-    	}
-    	return false;
+        if (!empty($comb_item_no)&&!empty($item_no)) {
+            $BdItemCombsplit=new BdItemCombsplit();
+            $result = $BdItemCombsplit->delComb($comb_item_no,$item_no);
+            return json(["code" => true, "msg" => lang("delete_success")]);
+        }
+        return json(["code" => true, "msg" => lang("delete_error")]);
     }
     
 

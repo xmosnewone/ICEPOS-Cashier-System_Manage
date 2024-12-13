@@ -21,7 +21,7 @@
 				  <div class="layui-form-item">
 				    <label class="layui-form-label">分类编码</label>
 				    <div class="layui-input-inline">
-				      <input type="text" name="item_clsno" value="{$one['item_clsno']}" required  lay-verify="required" placeholder="请输入唯一的分类编码" autocomplete="off" class="layui-input">
+				      <input type="text" name="item_clsno" value="{$one['item_clsno']}" {if condition="$one['item_clsno'] neq '' AND !empty($one)"}readonly="readonly"{/if} required  lay-verify="required" placeholder="请输入唯一的分类编码" autocomplete="off" class="layui-input">
 				    </div>
 				  </div>
 				  

@@ -183,7 +183,6 @@ class BdItemCombsplit extends BaseModel {
         ->join('bd_base_code b','s.item_brand=b.code_id',"LEFT")
         ->join('bd_item_combsplit c','s.item_no=c.item_no',"LEFT")
         ->where("s.combine_sta ='0' and b.type_no ='PP' $where")
-        ->limit($offset,$rows)
         ->select();
         
         $result = array();
@@ -305,8 +304,8 @@ class BdItemCombsplit extends BaseModel {
     	if(!$result){
     		return false;
     	}
-    	
-    	$Breakpoint=new BdItemCombsplitBreakpoint;
+
+        $bdBreakPoint=new BdItemCombsplitBreakpoint;
     	$bdBreakPoint->rtype = EOperStatus::DELETE;
     	$bdBreakPoint->item_no = $item_no;
     	$bdBreakPoint->comb_item_no = $comb_item_no;
