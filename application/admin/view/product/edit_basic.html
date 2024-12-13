@@ -25,7 +25,7 @@
  <div class="layui-form-item">
     <label class="layui-form-label">品 牌</label>
     <div class="layui-input-inline">
-      <select name="brand" id='brand'>
+      <select name="brand" id='brand' lay-verify="required">
              <option value="">请选择品牌</option>
              {volist name="brandarr" id="vo"}
              <option value="{$vo.code_id}|{$vo.code_name}" {if condition="$one['item_brand'] eq $vo['code_id']"}selected="selected"{/if}>{$vo.code_name}</option>
