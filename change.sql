@@ -71,3 +71,9 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 --  2024-11-03
 --
 ALTER TABLE `ice_im_sheet_master` ADD `add_date` INT(11) UNSIGNED NULL DEFAULT '0' COMMENT '新建单据时间戳' AFTER `approve_flag`;
+
+--
+--  2024-12-20
+--
+ALTER TABLE `ice_pos_operator` CHANGE `num1` `num1` DOUBLE NULL DEFAULT '1';
+ALTER TABLE `ice_pos_operator` CHANGE `cashier_status` `cashier_status` CHAR(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '正常';
