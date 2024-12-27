@@ -5606,6 +5606,7 @@ CREATE TABLE IF NOT EXISTS `ice_integral_member` (
   `flowno` varchar(30) NOT NULL COMMENT '订单流水号',
   `credit` decimal(9,2) UNSIGNED DEFAULT '0.00' COMMENT '获得的积分',
   `add_date` int(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT '获得积分日期',
+  `refund_flag` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '0未退款，1已退款',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='消费者积分表';
 

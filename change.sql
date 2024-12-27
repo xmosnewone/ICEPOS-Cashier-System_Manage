@@ -77,3 +77,8 @@ ALTER TABLE `ice_im_sheet_master` ADD `add_date` INT(11) UNSIGNED NULL DEFAULT '
 --
 ALTER TABLE `ice_pos_operator` CHANGE `num1` `num1` DOUBLE NULL DEFAULT '1';
 ALTER TABLE `ice_pos_operator` CHANGE `cashier_status` `cashier_status` CHAR(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '正常';
+
+--
+--  2024-12-27
+--
+ALTER TABLE `ice_integral_member` ADD `refund_flag` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '0未退款，1已退款' AFTER `add_date`;
