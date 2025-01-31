@@ -52,6 +52,15 @@ class Member extends BaseModel{
         }
     }
 
+    //更新消费金额
+    public function updateConsum($action='inc',$where,$amount){
+        if($action=='inc'){
+            return Db::name($this->name)->where($where)->setInc('total_consu',$amount);
+        }else{
+            return Db::name($this->name)->where($where)->setDec('total_consu',$amount);
+        }
+    }
+
     //更新数据
     public function updateData($where,$data){
        return Db::name($this->name)->where($where)->update($data);

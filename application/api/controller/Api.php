@@ -1,5 +1,6 @@
 <?php
 namespace app\api\controller;
+use model\Member;
 use think\Db;
 use think\facade\Request;
 use think\Controller;
@@ -1020,6 +1021,10 @@ class Api extends Super {
 					if (empty ( $pays1 )) {
 						$res = - 10;
 					} else {
+                        //记录会员消费金额的支付方式
+                        $consumPayMent=['RMB','BCD','CHA','CHQ','CRD','HF','PTZ','WXQR','ZFBQR','WECHAT','ZFB'];
+                        $consum=0;//消费总金额
+                        $vip_no='';//记录会员编号
 						$pays = array ();
 						$sales = array ();
                         $payRelation=array();
@@ -1063,6 +1068,14 @@ class Api extends Super {
 							} else {
 								$payflow->pos_flag = $v ["pos_flag"];
 							}
+
+                            //记录消费金额
+                            if(in_array(strtoupper($v['pay_way']),$consumPayMent)){
+                                $consum+=$v['pay_amount'];
+                                if($v['vip_no']!=''&&$vip_no==''){
+                                    $vip_no=$v['vip_no'];
+                                }
+                            }
 							
 							array_push ( $pays, $payflow );
 						} // end of foreach
@@ -1114,6 +1127,12 @@ class Api extends Super {
 							} else {
 								$PosPayFlow = new PosPayFlow ();
 								$res = $PosPayFlow->AddModelsForPos ( $pays, $sales,$payRelation);
+
+                                //添加会员消费总额
+                                if($consum>0){
+                                    $mb=new Member();
+                                    $mb->updateConsum('inc',['ucode'=>$vip_no],$consum);
+                                }
 							}
 						}
 					}
