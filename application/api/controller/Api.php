@@ -1022,7 +1022,7 @@ class Api extends Super {
 						$res = - 10;
 					} else {
                         //记录会员消费金额的支付方式
-                        $consumPayMent=['RMB','BCD','CHA','CHQ','CRD','HF','PTZ','WXQR','ZFBQR','WECHAT','ZFB'];
+                        $consumPayMent=consume_payment();
                         $consum=0;//消费总金额
                         $vip_no='';//记录会员编号
 						$pays = array ();
@@ -1129,7 +1129,7 @@ class Api extends Super {
 								$res = $PosPayFlow->AddModelsForPos ( $pays, $sales,$payRelation);
 
                                 //添加会员消费总额
-                                if($consum>0){
+                                if($consum>0&&$vip_no!=''){
                                     $mb=new Member();
                                     $mb->updateConsum('inc',['ucode'=>$vip_no],$consum);
                                 }
