@@ -5333,7 +5333,7 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (28, '客户结算', 'Settlement_CustomerSettlement', 'layui-icon-component', NULL, '1648205557', '5', '', 1, 2, 67),
 (31, '进销存报表', 'Report_InvoicingReport', 'layui-icon-component', NULL, '2014-09-16 09:50:05', '11', '', 1, 2, 31),
 (32, '用户管理', 'System_User', 'layui-icon-component', NULL, '2014-09-16 09:50:31', '12', '', 1, 2, 32),
-(34, '新闻管理', 'System_News', 'layui-icon-component', NULL, '2014-09-16 09:51:05', '12', '', 1, 2, 34),
+(34, '新闻管理', 'System_News', 'layui-icon-component', NULL, '2014-09-16 09:51:05', '90', '', 1, 2, 34),
 (35, '图片管理', 'System_Images', 'layui-icon-component', NULL, '2014-09-16 09:51:22', '12', '', 1, 2, 35),
 (36, '缓存管理', 'System_DataCapture', 'layui-icon-component', NULL, '2014-09-16 09:52:02', '12', '', 1, 2, 36),
 (37, '门店仓库', 'Base_Mechanism_Branch', 'layui-icon-component', NULL, '2014-09-16 09:52:02', '13', '/admin/pos/branch/branchlist', 1, 3, 37),
@@ -5397,7 +5397,9 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (130, '零库存', '', 'layui-icon-component', NULL, NULL, '116', '/admin/stock/Singlestock/Zerostock', 1, 3, 130),
 (137, '收货明细', 'reveive', 'layui-icon-component', NULL, '1653376338', '31', '/admin/report/reveive', 1, 3, 107),
 (132, '分店要货', 'Purchase_Order_PmSheetyPo', 'layui-icon-component', NULL, '1640773325', '18', '/admin/pmsheet/Yhsheet/index', 1, 3, 132),
-(138, '积分方案', 'JF', '', NULL, '1698739569', '19', '/admin/integral/index', 1, 3, 107);
+(138, '积分方案', 'JF', '', NULL, '1698739569', '19', '/admin/integral/index', 1, 3, 107),
+(139, 'POS端留言', 'POS_Feedback', '', NULL, '1730384721', '98', '/admin/portal/Guestbook/posFeed', 1, 3, 109),
+(148, '新闻分类', 'newstype', '', NULL, '1739674554', '34', '/admin/news/typeindex', 1, 3, 114);
 
 -- --------------------------------------------------------
 
@@ -6074,6 +6076,7 @@ DROP TABLE IF EXISTS `ice_news_type`;
 CREATE TABLE IF NOT EXISTS `ice_news_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
+  `orderby` int(6) UNSIGNED DEFAULT '0' COMMENT '排序',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -179,4 +179,97 @@ class News extends Super {
     	$result['path']=substr($result['path'], 1);
     	return array("code" => '0', "msg" =>'success','data'=>$result);
     }
+
+    //新闻分类
+    public function typeindex() {
+        return $this->fetch('news/typeindex');
+    }
+
+    //json 数据
+    public function getTypeList(){
+        $News = new NewsType();
+        $page =input('page') ? intval(input('page')) : 1;
+        $rows =input('limit') ? intval(input('limit')) : 10;
+
+        $where="1=1";
+
+        $title=input("name");
+        if(!empty($title)){
+            $where.=" and name like '%$title%'";
+        }
+
+        $rowCount = $News->where($where)->count();
+        $offset = ($page - 1) * $rows;
+        $list = $News->where($where)->limit($offset,$rows)->select()->toArray();
+
+        return listJson(0,lang("success_data"),$rowCount, $list);
+    }
+
+    //添加/编辑文章
+    public function addType(){
+        //当前分类
+        $id=input("id");
+        if($id){
+            $one=NewsType::get($id);
+            $this->assign("one",$one);
+        }
+        return $this->fetch('news/typeview');
+    }
+
+    //保存文章
+    public function saveType(){
+        $name = input('name');
+        $orderby = input("orderby");
+
+        $id=input("id");
+        $error="";
+        if (empty($name)) {
+            $error = lang("newstype_title_empty");
+        }
+
+        if($error != ''){
+            return ['code'=>false,'msg'=>$error];
+        }
+
+        $new = new NewsType();
+        $content = array(
+            'name' => $name,
+            'orderby' => $orderby
+        );
+
+        //保存
+        if(empty($id)){
+            $ok=$new->save($content);
+        }else{
+            $ok=$new->save($content,['id'=>$id]);
+        }
+        if($ok){
+            $code=true;
+            $msg=lang("save_success");
+
+        }else{
+            $code=false;
+            $msg=lang("save_error");
+        }
+        return ['code'=>$code,'msg'=>$msg];
+
+    }
+
+    //删除文章
+    public function delType() {
+
+        $id = input('id');
+        $code=false;
+        if ($id) {
+            $rs =NewsType::get($id);
+            $ok=$rs->delete();
+            if($ok){
+                $code=true;
+                $msg=lang("delete_success");
+            }else{
+                $msg=lang("delete_error");
+            }
+        }
+        return ['code'=>$code,'msg'=>$msg];
+    }
 }

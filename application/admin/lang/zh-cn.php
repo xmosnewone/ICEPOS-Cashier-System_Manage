@@ -191,6 +191,8 @@ return array(
     'news_content_empty'=>'内容不能为空',
     'news_wechat_big'=>'微信资讯需上传微信大图',
     'news_wechat_small'=>'微信资讯需上传微信小图',
+    'newstype_title_empty'=>'分类标题不能为空',
+
     //功能节点
     'func_child_notempty'=>'子功能数大于0',
     'func_name_empty'=>'功能名称不能为空',

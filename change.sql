@@ -82,3 +82,8 @@ ALTER TABLE `ice_pos_operator` CHANGE `cashier_status` `cashier_status` CHAR(6) 
 --  2024-12-27
 --
 ALTER TABLE `ice_integral_member` ADD `refund_flag` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '0未退款，1已退款' AFTER `add_date`;
+
+--
+--  2025-02-13
+--
+ALTER TABLE `ice_news_type` ADD `orderby` INT(6) UNSIGNED NULL DEFAULT '0' COMMENT '排序' AFTER `name`;
