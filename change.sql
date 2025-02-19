@@ -87,3 +87,5 @@ ALTER TABLE `ice_integral_member` ADD `refund_flag` TINYINT(1) UNSIGNED NULL DEF
 --  2025-02-13
 --
 ALTER TABLE `ice_news_type` ADD `orderby` INT(6) UNSIGNED NULL DEFAULT '0' COMMENT '排序' AFTER `name`;
+ALTER TABLE `ice_news` ADD `link` TEXT NULL COMMENT '链接' AFTER `username`;
+ALTER TABLE `ice_news` ADD `is_enabled` TINYINT(1) UNSIGNED NULL DEFAULT '1' COMMENT '1表示显示，0隐藏' AFTER `content`;

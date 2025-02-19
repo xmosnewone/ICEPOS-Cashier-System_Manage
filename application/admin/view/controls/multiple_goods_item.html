@@ -66,6 +66,7 @@
 		<script src="__STATIC__/js/admin/common.js"></script>
 		<script>
 			var _parent="";
+			var s_branch_no="{$branch_no}";
 			
 			layui.use(['table', 'form', 'jquery', 'dtree'], function() {
 				let table = layui.table;
@@ -150,7 +151,7 @@
 
 				table.render({
 					elem: '#goodsItem-table',
-					url: DATA_PATH+'getItemInfo',
+					url: DATA_PATH+'getItemInfo?s_branch_no='+s_branch_no,
 					width:750,
 					height: 430,
 					cellMinWidth: 100,

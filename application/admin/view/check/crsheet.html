@@ -485,15 +485,17 @@ layui.use(['form','jquery','table','common','laydate'],function(){
 	//选择多个商品窗口
 	window.selectGoods=function(param){
 		if(!emptyOptions()){
-    		return;
-    	}
+			return;
+		}
+		var branch_no=$("#branch_no").val();
 		isSingle=false;
-		_layerIndex=openWin("商品选择",multiple_items_url,"1100px","600px");
+		_layerIndex=openWin("商品选择",multiple_items_url+"?branch_no="+branch_no,"1100px","600px");
 	}
 	//编辑数据表格选择单个商品窗口
 	window.selectSingleGoods=function(param){
+		var branch_no=$("#branch_no").val();
 		isSingle=true;
-		_layerIndex=openWin("商品选择",items_url,"1100px","600px");
+		_layerIndex=openWin("商品选择",items_url+"?branch_no="+branch_no,"1100px","600px");
 	}
 	//商品选择后的回调函数
 	window.callBack=function(data){

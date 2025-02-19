@@ -131,6 +131,35 @@ class Index extends Super {
             	$clsList[$v['item_clsno']]=$v;
             }
             unset($cls);
+
+            //查询门店库存
+            $s_branch_no=input("s_branch_no");
+            if(!empty($s_branch_no)&&count($list)>0){
+                $item_nos=[];
+                foreach($list as $k=>$v){
+                    if(!in_array($v['item_no'],$item_nos)&&!empty($v['item_no'])){
+                        $item_nos[]=trim($v['item_no']);
+                    }
+                }
+                if(count($item_nos)>0){
+                    $str=simplode($item_nos);
+                    $stockList=$PosBranchStock
+                        ->field("item_no,branch_no,stock_qty")
+                        ->where("item_no in ($str) and branch_no='$s_branch_no' and stock_qty>0")
+                        ->select()
+                        ->toArray();
+                    if(is_array($stockList)&&count($stockList)>0){
+
+                        foreach($list as $k2=>$v2){
+                            foreach($stockList as $v){
+                                if($v2['item_no']==$v['item_no']){
+                                    $list[$k2]['item_stock']=$v['stock_qty'];
+                                }
+                            }
+                        }//end of foreach
+                    }
+                }
+            }
             
             $result = array();
             $result["total"] = $rowCount;

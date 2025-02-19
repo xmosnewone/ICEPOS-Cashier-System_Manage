@@ -6062,7 +6062,9 @@ CREATE TABLE IF NOT EXISTS `ice_news` (
   `time` varchar(19) DEFAULT NULL,
   `lastedit_time` varchar(19) DEFAULT NULL,
   `username` varchar(20) DEFAULT NULL,
+  `link` text DEFAULT NULL,
   `content` text,
+  `is_enabled` tinyint(1) UNSIGNED DEFAULT '1' COMMENT '1表示显示，0隐藏',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

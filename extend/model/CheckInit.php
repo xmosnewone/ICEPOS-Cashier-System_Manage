@@ -140,35 +140,35 @@ class CheckInit extends BaseModel {
 
 
                 if ($rangeno == ECheckRange::ALL) {
-                	$delNum=$checkSum->where("sheet_no='{$initModel->sheet_no}'")->delete();
+                    $delNum=$checkSum->where("sheet_no='{$initModel->sheet_no}'")->delete();
                     if ($delNum > 0) {
                         foreach ($items as $k => $v) {
                             $newDetail = new CheckSum();
                             $newDetail->sheet_no = $initModel->sheet_no;
                             $newDetail->branch_no = $initModel->branch_no;
-                            $newDetail->item_no = $v->item_no == '' ? 0.00 : $v->item_no;
-                            $newDetail->in_price = $v->item_price == '' ? 0.00 : $v->item_price;
-                            $newDetail->sale_price = $v->sale_price == '' ? 0.00 : $v->sale_price;
-                            $newDetail->stock_qty = $v->item_stock == '' ? 0.00 : $v->item_stock;
-                            $newDetail->check_qty = $v->check_qty == '' ? 0.00 : $v->check_qty;
-                            $newDetail->balance_qty = abs($v->check_qty - $v->real_qty);
+                            $newDetail->item_no = $v['item_no'] == '' ? 0.00 : $v['item_no'];
+                            $newDetail->in_price = $v['item_price'] == '' ? 0.00 : $v['item_price'];
+                            $newDetail->sale_price = $v['sale_price'] == '' ? 0.00 : $v['sale_price'];
+                            $newDetail->stock_qty = $v['item_stock'] == '' ? 0.00 : $v['item_stock'];
+                            $newDetail->check_qty = $v['check_qty'] == '' ? 0.00 : $v['check_qty'];
+                            $newDetail->balance_qty = abs($v['check_qty'] - $v['real_qty']);
                             $newDetail->process_status = 1;
-                            $newDetail->memo = $v->memo == '' ? '' : $v->memo;
+                            $newDetail->memo = $v['memo'] == '' ? '' : $v['memo'];
                             $sumModel=new CheckSum();
                             if ($sumModel->Add($newDetail) == FALSE) {
                                 $iscommit = FALSE;
                                 break;
                             }
                             $posBranchStock=new PosBranchStock();
-                            if ($posBranchStock->UpdateStockQty($initModel->sheet_no, $initModel->branch_no, $v->item_no, $v->check_qty)) {
+                            if ($posBranchStock->UpdateStockQty($initModel->sheet_no, $initModel->branch_no, $v['item_no'], $v['check_qty'])) {
                                 $iscommit = TRUE;
                             } else {
-                               Db::rollback();
+                                Db::rollback();
                                 return -3;
                             }
                         }
                     }
-                   
+
                 } else {
                     foreach ($chkSum as $key => $value) {
                     	$posBranchStock=new PosBranchStock();

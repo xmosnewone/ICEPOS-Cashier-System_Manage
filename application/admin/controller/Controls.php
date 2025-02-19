@@ -7,11 +7,15 @@ class Controls extends Super {
 
 	//商品选择的窗口
 	public function items(){
+        $branch_no=input("branch_no")?input("branch_no"):'';
+        $this->assign("branch_no",$branch_no);
 		return $this->fetch("controls/goods_item");
 	}
 	
 	//多选商品选择的窗口
 	public function multipleItems(){
+        $branch_no=input("branch_no")?input("branch_no"):'';
+        $this->assign("branch_no",$branch_no);
 		return $this->fetch("controls/multiple_goods_item");
 	}
 	
