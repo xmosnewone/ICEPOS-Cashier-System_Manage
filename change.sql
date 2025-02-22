@@ -89,3 +89,11 @@ ALTER TABLE `ice_integral_member` ADD `refund_flag` TINYINT(1) UNSIGNED NULL DEF
 ALTER TABLE `ice_news_type` ADD `orderby` INT(6) UNSIGNED NULL DEFAULT '0' COMMENT '排序' AFTER `name`;
 ALTER TABLE `ice_news` ADD `link` TEXT NULL COMMENT '链接' AFTER `username`;
 ALTER TABLE `ice_news` ADD `is_enabled` TINYINT(1) UNSIGNED NULL DEFAULT '1' COMMENT '1表示显示，0隐藏' AFTER `content`;
+
+--
+--  2025-02-19
+--
+ALTER TABLE `ice_pos_branch_info` CHANGE `branch_mj` `branch_mj` DOUBLE NULL DEFAULT NULL COMMENT '所占面积（㎡）';
+ALTER TABLE `ice_pos_branch_info` ADD `logo` VARCHAR(200) NULL COMMENT '门店logo' AFTER `ismall`;
+ALTER TABLE `ice_member` ADD `headimg` VARCHAR(250) NULL COMMENT '头像图片' AFTER `wechat`;
+ALTER TABLE `ice_member` ADD `unionid` VARCHAR(50) NULL COMMENT ' 微信或其他平台统一的用户跨平台uid' AFTER `openid`;

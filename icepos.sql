@@ -5996,7 +5996,9 @@ CREATE TABLE IF NOT EXISTS `ice_member` (
   `total_consu` decimal(9,2) UNSIGNED DEFAULT '0.00' COMMENT '消费次数',
   `credit` decimal(10,2) UNSIGNED DEFAULT '0.00' COMMENT '积分',
   `openid` varchar(35) DEFAULT NULL COMMENT '微信用户的openid',
+  `unionid` varchar(50) DEFAULT NULL COMMENT '微信或其他平台统一的用户跨平台uid',
   `wechat` varchar(30) DEFAULT NULL COMMENT '微信号',
+  `headimg` varchar(250) DEFAULT NULL COMMENT '头像图片',
   `phone` varchar(30) DEFAULT NULL COMMENT '联系电话',
   `email` varchar(50) DEFAULT NULL COMMENT '邮件',
   `address` varchar(100) DEFAULT NULL COMMENT '地址',
@@ -6690,7 +6692,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_branch_info` (
   `oper_flag` char(1) DEFAULT NULL,
   `allow_cz` char(1) DEFAULT NULL,
   `order_num` double DEFAULT NULL,
-  `branch_mj` double DEFAULT NULL COMMENT '佛照所占面积（㎡）',
+  `branch_mj` double DEFAULT NULL COMMENT '所占面积（㎡）',
   `lon` varchar(20) DEFAULT NULL COMMENT '经度',
   `lat` varchar(20) DEFAULT NULL COMMENT '纬度',
   `baidu_location` varchar(100) DEFAULT NULL COMMENT '百度地图经纬度',
@@ -6717,6 +6719,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_branch_info` (
   `use_credit` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '1表示开启积分兑现金支付',
   `credit_money` int(11) UNSIGNED DEFAULT '0' COMMENT '多少个积分兑换1元',
   `ismall` tinyint(1) UNSIGNED DEFAULT NULL COMMENT '1为从商城同步过来的',
+  `logo` varchar(200) DEFAULT NULL COMMENT '门店logo',
   PRIMARY KEY (`id`),
   KEY `branch_no` (`branch_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

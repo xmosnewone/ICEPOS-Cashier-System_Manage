@@ -144,7 +144,7 @@ class PosSaleFlow extends BaseModel {
         
         $list=$this->alias("s")
         		->field("s.branch_no,a.branch_name,s.flow_no,s.oper_date,s.item_name," .
-                "s.item_no,b.unit_no,b.item_size," .
+                "s.item_no,b.unit_no,b.item_size,b.price as cost_price," .
                  "ROUND(s.sale_price/s.unit_price,4)*100 as zk," .
                 "case s.sell_way when 'A' then '销售' when 'B' then '退货' when 'C' then '赠送' else '找零' end as sell_way," .
                 "s.sale_qnty,s.sale_price,s.sale_money,s.unit_price,(s.unit_price*s.sale_qnty) as unit_money," .
@@ -216,6 +216,11 @@ class PosSaleFlow extends BaseModel {
             $tt["vip_no"] = $v["vip_no"];
             $tt["nickname"] = $v["vip_no"];
             $tt["mobile"] = '';
+            if(floatval($v["in_price"])<=0){
+                $tt["in_price"] = formatMoneyDisplay($v["cost_price"]);
+                $tt["in_money"] = formatMoneyDisplay($v["cost_price"]*$v["sale_qnty"]);
+                $footer_detail["in_money"]+=doubleval($v["cost_price"]*$v["sale_qnty"]);
+            }
             if(!empty($v["vip_no"])){
                 $vip_code[]=trim($v["vip_no"]);
             }
