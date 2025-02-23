@@ -216,11 +216,11 @@ class PosSaleFlow extends BaseModel {
             $tt["vip_no"] = $v["vip_no"];
             $tt["nickname"] = $v["vip_no"];
             $tt["mobile"] = '';
-            if(floatval($v["in_price"])<=0){
+            /*if(floatval($v["in_price"])<=0&&$v["sell_way"]!='赠送'){
                 $tt["in_price"] = formatMoneyDisplay($v["cost_price"]);
                 $tt["in_money"] = formatMoneyDisplay($v["cost_price"]*$v["sale_qnty"]);
                 $footer_detail["in_money"]+=doubleval($v["cost_price"]*$v["sale_qnty"]);
-            }
+            }*/
             if(!empty($v["vip_no"])){
                 $vip_code[]=trim($v["vip_no"]);
             }
