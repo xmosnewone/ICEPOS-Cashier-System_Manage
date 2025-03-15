@@ -97,3 +97,55 @@ ALTER TABLE `ice_pos_branch_info` CHANGE `branch_mj` `branch_mj` DOUBLE NULL DEF
 ALTER TABLE `ice_pos_branch_info` ADD `logo` VARCHAR(200) NULL COMMENT '门店logo' AFTER `ismall`;
 ALTER TABLE `ice_member` ADD `headimg` VARCHAR(250) NULL COMMENT '头像图片' AFTER `wechat`;
 ALTER TABLE `ice_member` ADD `unionid` VARCHAR(50) NULL COMMENT ' 微信或其他平台统一的用户跨平台uid' AFTER `openid`;
+
+--
+--  2025-02-25
+--
+--
+-- 表的结构 `ice_sms`
+--
+
+DROP TABLE IF EXISTS `ice_sms`;
+CREATE TABLE IF NOT EXISTS `ice_sms` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `mobile` varchar(20) NOT NULL COMMENT '手机号码',
+  `code` varchar(20) NOT NULL COMMENT '验证码',
+  `send_time` int(11) UNSIGNED DEFAULT NULL COMMENT '发送时间戳',
+  `expire_time` int(11) UNSIGNED DEFAULT NULL COMMENT '有效时间戳',
+  PRIMARY KEY (`id`),
+  KEY `mobile` (`mobile`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='发送短信验证码记录表';
+
+--
+-- 表的结构 `ice_system_config`
+--
+
+DROP TABLE IF EXISTS `ice_system_config`;
+CREATE TABLE IF NOT EXISTS `ice_system_config` (
+  `key` varchar(50) NOT NULL COMMENT '设置名称',
+  `value` text NOT NULL COMMENT '设置内容',
+  UNIQUE KEY `key` (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='系统设置';
+
+--
+-- 表的结构 `ice_system_log`
+--
+
+DROP TABLE IF EXISTS `ice_system_log`;
+CREATE TABLE IF NOT EXISTS `ice_system_log` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `loginnam` varchar(50) DEFAULT NULL COMMENT '登陆名',
+  `uid` int(11) UNSIGNED NOT NULL COMMENT '登录uid',
+  `logtxt` text COMMENT '日志',
+  `add_time` int(11) UNSIGNED DEFAULT NULL COMMENT '添加日期',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='后台管理员操作日志';
+
+ALTER TABLE `ice_news` ADD `visit` INT(11) UNSIGNED NULL DEFAULT '0' COMMENT '浏览次数' AFTER `is_enabled`;
+
+ALTER TABLE `ice_portal_ad` ADD `link` VARCHAR(250) NULL COMMENT '超链接' AFTER `ad_code`;
+
+ALTER TABLE `ice_pos_payflow` CHANGE `memo` `memo` VARCHAR(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `ice_pos_status` ADD `postype` TINYINT(2) UNSIGNED NULL DEFAULT '0' COMMENT '收银机终端类型，0人工收银，1自助机' AFTER `hostmac`;

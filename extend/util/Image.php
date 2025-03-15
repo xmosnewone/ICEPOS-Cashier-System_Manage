@@ -276,17 +276,20 @@ class Image {
             else
                 $thumbImg = imagecreate($maxWidth, $maxHeight);
 
+
+            if ('gif' == $type || 'png' == $type) {
+                //imagealphablending($thumbImg, false);//取消默认的混色模式
+                imagesavealpha($thumbImg,true);//设定保存完整的 alpha 通道信息
+                $background_color = imagecolorallocatealpha($thumbImg, 0, 0, 0,127);  //  指派一个绿色
+                //imagecolortransparent($thumbImg, $background_color);  //  设置为透明色，若注释掉该行则输出绿色的图
+                imagefill($thumbImg, 0, 0, $background_color);
+            }
+
             // 复制图片
             if (function_exists("ImageCopyResampled"))
                 imagecopyresampled($thumbImg, $srcImg, 0, 0, $srcX, $srcY, $maxWidth, $maxHeight, $cutWidth, $cutHeight);
             else
                 imagecopyresized($thumbImg, $srcImg, 0, 0, $srcX, $srcY, $maxWidth, $maxHeight, $cutWidth, $cutHeight);
-            if ('gif' == $type || 'png' == $type) {
-                //imagealphablending($thumbImg, false);//取消默认的混色模式
-                //imagesavealpha($thumbImg,true);//设定保存完整的 alpha 通道信息
-                $background_color = imagecolorallocate($thumbImg, 0, 255, 0);  //  指派一个绿色
-                imagecolortransparent($thumbImg, $background_color);  //  设置为透明色，若注释掉该行则输出绿色的图
-            }
 
             // 对jpeg图形设置隔行扫描
             if ('jpg' == $type || 'jpeg' == $type)

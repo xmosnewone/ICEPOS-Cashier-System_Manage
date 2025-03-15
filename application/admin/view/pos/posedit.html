@@ -29,6 +29,16 @@
 				      </select>
 				    </div>
 				  </div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">POS机类型</label>
+					<div class="layui-input-inline">
+						<select name="postype">
+							<option value="0" {if condition="$one['postype'] eq '0'"}selected="selected"{/if}>人工收银</option>
+							<option value="1" {if condition="$one['postype'] eq '1'"}selected="selected"{/if}>自助收银</option>
+						</select>
+					</div>
+				</div>
 				  
 				  <div class="layui-form-item">
 				    <label class="layui-form-label">POS描述</label>

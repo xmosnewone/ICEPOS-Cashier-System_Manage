@@ -97,6 +97,7 @@ class Branch extends Super
           $content['alipay_public_key']=input('alipay_public_key');
           $content['alipay_private_key']=input('alipay_private_key');
           $content ['alipay_pay_qrcode'] = input ( 'alipay_pay_qrcode' );
+          $content['logo']=input('logo');
           $content ['use_credit'] = input ( 'use_credit' )?input ( 'use_credit' ):'0';
           $content ['credit_money'] = input ( 'credit_money' )?intval(input ( 'credit_money' )):'0';
           $content ['use_wechatpay'] = input ( 'use_wechatpay' )?input ( 'use_wechatpay' ):'0';
@@ -161,6 +162,7 @@ class Branch extends Super
 			$content ['alipay_public_key'] = input ( 'alipay_public_key' );
 			$content ['alipay_private_key'] = input ( 'alipay_private_key' );
             $content ['alipay_pay_qrcode'] = input ( 'alipay_pay_qrcode' );
+            $content['logo']=input('logo');
             $content ['use_credit'] = input ( 'use_credit' )?input ( 'use_credit' ):'0';
             $content ['credit_money'] = input ( 'credit_money' )?intval(input ( 'credit_money' )):'0';
             $content ['use_wechatpay'] = input ( 'use_wechatpay' )?input ( 'use_wechatpay' ):'0';
@@ -215,11 +217,14 @@ class Branch extends Super
     		}else{
     			$model->deleteOne($branch_no);
     			$model->delFunction($branch_no);
-    			if($result->wechat_pay_qrcode!=''){
-                    @unlink(".".$result->wechat_pay_qrcode);
+                if($result['wechat_pay_qrcode']!=''){
+                    @unlink(".".$result['wechat_pay_qrcode']);
                 }
-                if($result->alipay_pay_qrcode!=''){
-                    @unlink(".".$result->alipay_pay_qrcode);
+                if($result['alipay_pay_qrcode']!=''){
+                    @unlink(".".$result['alipay_pay_qrcode']);
+                }
+                if($result['logo']!=''){
+                    @unlink($result['logo']);
                 }
     			$return['code']=true;
     			$return['msg']=lang("update_success");
@@ -252,11 +257,14 @@ class Branch extends Super
     			foreach($branchs as $no){
                     $result= $model->getone($no);
                     if($result){
-                        if($result->wechat_pay_qrcode!=''){
-                            @unlink(".".$result->wechat_pay_qrcode);
+                        if($result['wechat_pay_qrcode']!=''){
+                            @unlink(".".$result['wechat_pay_qrcode']);
                         }
-                        if($result->alipay_pay_qrcode!=''){
-                            @unlink(".".$result->alipay_pay_qrcode);
+                        if($result['alipay_pay_qrcode']!=''){
+                            @unlink(".".$result['alipay_pay_qrcode']);
+                        }
+                        if($result['logo']!=''){
+                            @unlink($result['logo']);
                         }
                     }
     				$model->deleteOne($no);

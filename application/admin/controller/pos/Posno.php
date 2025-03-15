@@ -106,6 +106,7 @@ class Posno extends Super {
 		
 		$content['branch_no'] = input('branch_no');
 		$content['posdesc'] = input('posdesc');
+        $content['postype'] = input('postype');
 		
 		$PosBranch=new PosBranch();
 		$num = $PosBranch->where("branch_no='{$content ['branch_no']}'")->count();

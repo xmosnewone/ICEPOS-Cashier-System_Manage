@@ -47,7 +47,7 @@ class Ad extends Super{
             return $this->fetch("portal/ad/view");
     }
 
-	//保存广告
+    //保存广告
     public function save() {
         $adId = input("txtAdno");
         $adName = input("txtAdName");
@@ -59,6 +59,7 @@ class Ad extends Super{
         $category = input("sltType");
         $option = input("option");
         $branch_no=input("branch_no");
+        $link=input("link");
         if(strtoupper($branch_no)=='ALL'){
             $branch_no='ALL';
         }
@@ -71,7 +72,7 @@ class Ad extends Super{
         if (empty($category)) {
             return array("code" => false, "msg" => lang("ad_no_category"));
         }
-        
+
         $isOption = array("add", "update");
 
         $attrAry = array();
@@ -81,9 +82,9 @@ class Ad extends Super{
             case "image":
                 $inputs = input('');
                 foreach($inputs as $k=>$value){
-                        if(strpos($k,'attrval')!==false){
-                            $attrval[]=$value;
-                        }
+                    if(strpos($k,'attrval')!==false){
+                        $attrval[]=$value;
+                    }
                 }
                 if (empty($attrval)||count($attrval)<=0) {
                     return array("code" => false, "msg" =>lang("ad_image_empty"));
@@ -124,6 +125,7 @@ class Ad extends Super{
             $ad->ad_code = $adCode;
             $ad->end_time = $endTime;
             $ad->is_enabled = $isenabled;
+            $ad->link=$link;
 
             if ($ad_id=$ad->Add($ad, $attrAry)) {
                 if(count($attrval)>0&&$category=='image'){
@@ -135,13 +137,13 @@ class Ad extends Super{
                     }
                 }
 
-            	return array("code" => true, "msg" => lang("save_ad_success"));
+                return array("code" => true, "msg" => lang("save_ad_success"));
             } else {
                 return array("code" => false, "msg" =>lang("save_ad_error"));
             }
         }
         else{
-           	$PortalAd=new PortalAd();
+            $PortalAd=new PortalAd();
             $ad = $PortalAd->GetOneById($adId);
             if (empty($ad)) {
                 return array("code" => false, "msg" => lang("ad_not_exists"));
@@ -155,6 +157,7 @@ class Ad extends Super{
             $ad->ad_code = $adCode;
             $ad->end_time = $endTime;
             $ad->is_enabled = $isenabled;
+            $ad->link=$link;
             if ($ad->Add($ad, $attrAry)) {
                 if(count($attrval)>0&&$category=='image'){
                     foreach($attrval as $v){

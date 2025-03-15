@@ -1121,6 +1121,22 @@ CREATE TABLE IF NOT EXISTS `ice_pos_feedback` (
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `ice_bd_item_combsplit`
+--
+
+DROP TABLE IF EXISTS `ice_bd_item_combsplit`;
+CREATE TABLE IF NOT EXISTS `ice_bd_item_combsplit` (
+  `comb_item_no` varchar(20) NOT NULL,
+  `item_no` varchar(20) NOT NULL,
+  `item_qty` decimal(16,4) NOT NULL,
+  `memo` varchar(20) DEFAULT NULL,
+  `relation_px` char(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`comb_item_no`,`item_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `ice_bd_item_combsplit_breakpoint`
 --
 
@@ -5368,7 +5384,7 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (81, '图片压缩', 'System_Images_ManagerCutimages', 'layui-icon-component', NULL, '2014-09-16 14:29:40', '35', '/admin/manager/compressImg', 1, 3, 81),
 (82, '清理缓存', 'System_DataCapture_ManagerUpdate', 'layui-icon-component', NULL, '2014-09-16 14:30:10', '36', '/admin/manager/cleanup', 1, 3, 82),
 (83, '报 损 单', 'Stock_Else_ImsheetJOSheet', 'layui-icon-component', NULL, '1721310836', '25', '/admin/imsheet/Josheet', 1, 3, 83),
-(84, '商品调价', 'Base_Product_Modify_ModifyPrice', 'layui-icon-component', NULL, '2014-09-18 11:37:33', '16', '/admin/pcprice/PXFlow', 1, 3, 84),
+(84, '商品调价', 'Base_Product_Modify_ModifyPrice', 'layui-icon-component', NULL, '2014-09-18 11:37:33', '16', '/admin/pcprice/pxflow', 1, 3, 84),
 (110, '会员资料', 'Member_Member', 'layui-icon-component', NULL, '2018-07-23 06:10:34', '108', '', 1, 2, 0),
 (88, '库存异常告警', 'Stock_StockQuery_Warning', 'layui-icon-component', NULL, '2014-11-05 13:41:30', '26', '/admin/stock/warning/index', 1, 3, 88),
 (90, '终端管理', 'Portal', 'layui-icon-home', NULL, '2014-11-17 15:40:26', '', '', 1, 1, 90),
@@ -6064,9 +6080,10 @@ CREATE TABLE IF NOT EXISTS `ice_news` (
   `time` varchar(19) DEFAULT NULL,
   `lastedit_time` varchar(19) DEFAULT NULL,
   `username` varchar(20) DEFAULT NULL,
-  `link` text DEFAULT NULL,
+  `link` text COMMENT '链接',
   `content` text,
   `is_enabled` tinyint(1) UNSIGNED DEFAULT '1' COMMENT '1表示显示，0隐藏',
+  `visit` int(11) UNSIGNED DEFAULT '0' COMMENT '浏览次数',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -6320,6 +6337,7 @@ CREATE TABLE IF NOT EXISTS `ice_portal_ad` (
   `ad_name` varchar(100) NOT NULL COMMENT '广告名称',
   `category` varchar(20) NOT NULL COMMENT '广告类型',
   `ad_code` longtext,
+  `link` varchar(250) DEFAULT NULL COMMENT '超链接',
   `ad_weight` int(11) DEFAULT '1',
   `display_count` int(11) DEFAULT '0' COMMENT '显示次数',
   `click_count` int(11) DEFAULT '0' COMMENT '点击数量',
@@ -7093,7 +7111,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_payflow` (
   `coin_rate` decimal(5,4) DEFAULT NULL,
   `convert_amt` decimal(15,2) DEFAULT NULL,
   `card_no` varchar(20) DEFAULT NULL,
-  `memo` varchar(50) DEFAULT NULL,
+  `memo` varchar(250) DEFAULT NULL,
   `vip_no` varchar(50) DEFAULT NULL,
   `oper_date` datetime DEFAULT NULL,
   `oper_id` varchar(20) DEFAULT NULL,
@@ -7213,6 +7231,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_status` (
   `hostip` varchar(20) DEFAULT NULL,
   `hostname` varchar(20) DEFAULT NULL,
   `hostmac` varchar(20) DEFAULT NULL,
+  `postype` tinyint(2) UNSIGNED DEFAULT '0' COMMENT '收银机终端类型，0人工收银，1自助机',
   `operdate` varchar(20) DEFAULT NULL,
   `amount` decimal(16,4) DEFAULT NULL,
   `orderqty` decimal(6,0) DEFAULT NULL,
@@ -7453,6 +7472,21 @@ INSERT INTO `ice_send_type` (`send_no`, `send_name`, `send_content`, `send_statu
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `ice_sms`
+--
+
+DROP TABLE IF EXISTS `ice_sms`;
+CREATE TABLE IF NOT EXISTS `ice_sms` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `mobile` varchar(20) NOT NULL COMMENT '手机号码',
+  `code` varchar(20) NOT NULL COMMENT '验证码',
+  `send_time` int(11) UNSIGNED DEFAULT NULL COMMENT '发送时间戳',
+  `expire_time` int(11) UNSIGNED DEFAULT NULL COMMENT '有效时间戳',
+  PRIMARY KEY (`id`),
+  KEY `mobile` (`mobile`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='发送短信验证码记录表';
+
+--
 -- 表的结构 `ice_sp_accounts`
 --
 
@@ -7598,6 +7632,36 @@ CREATE TABLE IF NOT EXISTS `ice_stock_flow` (
   `oper_date` datetime NOT NULL COMMENT '操作日期',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='库存变动记录表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ice_system_config`
+--
+
+DROP TABLE IF EXISTS `ice_system_config`;
+CREATE TABLE IF NOT EXISTS `ice_system_config` (
+  `key` varchar(50) NOT NULL COMMENT '设置名称',
+  `value` text NOT NULL COMMENT '设置内容',
+  UNIQUE KEY `key` (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='系统设置';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ice_system_log`
+--
+
+DROP TABLE IF EXISTS `ice_system_log`;
+CREATE TABLE IF NOT EXISTS `ice_system_log` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `loginnam` varchar(50) DEFAULT NULL COMMENT '登陆名',
+  `uid` int(11) UNSIGNED NOT NULL COMMENT '登录uid',
+  `logtxt` text COMMENT '日志',
+  `add_time` int(11) UNSIGNED DEFAULT NULL COMMENT '添加日期',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='后台管理员操作日志';
 
 -- --------------------------------------------------------
 

@@ -6,6 +6,8 @@ use model\PosSaleFlow;
 use model\BdItemCombsplit;
 use model\PosBranchStock;
 use model\PosPay;
+use model\PosBranch;
+use model\PosStatus;
 
 class PosPayFlow extends BaseModel {
 
@@ -782,6 +784,189 @@ group by p.branch_no,p.pos_id,p.oper_id
             $result = -2;
         }
         return $result;
+    }
+
+    //读取用户订单信息
+    public function getUserOrderCount($vip_no){
+        return $this->where("vip_no='$vip_no'")->group("flow_no")->count();
+    }
+
+    //年内消费
+    public function getUserYearConsume($vip_no){
+        $now=time();
+        $year=date("Y",$now);
+        $year_start=$year."-01-01 00:00:00";
+        $year_end=$year."-12-31 23:59:59";
+        return $this->where("vip_no='$vip_no' and oper_date>='$year_start' and oper_date<='$year_end'")
+            ->sum("pay_amount");
+    }
+
+    //分页获取个人订单列表
+    public function getUserOrderList($vip_no,$status,$start,$limit){
+        //查询所有门店
+        $PosBranch=new PosBranch();
+        $branchs=$PosBranch->GetAllBranchField("branch_no,branch_name,logo");
+        $branchsList=array();
+        foreach ($branchs as $v) {
+            $branchsList[$v["branch_no"]]=$v;
+        }
+
+        $where="";
+        if($status){
+            switch ($status) {
+                case 1:     //未支付==挂账
+                    $where=" and pay_way='GZ' and sale_way='E'";
+                    break;
+                case 2:     //已退款
+                    $where=" and refund_flag=1 ";
+                    break;
+                case 3:     //已完成
+                    $where=" and (sale_way='A' or sale_way='C') and refund_flag=0 ";
+                    break;
+            }
+        }
+        //通过$start,$limit 分页定位到paly_flow表的的flow_no范围
+        $pageList=$this->where("vip_no='$vip_no'".$where)
+            ->order("oper_date desc")
+            ->group("flow_no")
+            ->limit($start,$limit)
+            ->select();
+        $listCount=$this->where("vip_no='$vip_no'".$where)
+            ->order("oper_date desc")
+            ->group("flow_no")
+            ->count();
+
+        $flow_no=array();
+        if($pageList&&count($pageList)>0){
+            $pageList=$pageList->toArray();
+            foreach($pageList as $k=>$v){
+                $no=trim($v['flow_no']);
+                $flow_no[$no]=$no;
+            }
+        }else{
+            return ['list'=>[],'total'=>$listCount];
+        }
+
+        unset($pageList);
+
+        $flow_nos=simplode($flow_no);
+        $consume=consume_payment();//用于统计支付总金额的支付方式
+        $list=$this->where("vip_no='$vip_no' and flow_no in ($flow_nos)")
+            ->order("oper_date desc,id asc")
+            ->select()
+            ->toArray();
+
+        $flows=array();
+        foreach ($list as $k=>$v){
+            if(!isset($flows[$v['flow_no']])){
+                $t=array();
+                $payways=array();
+                $memo=array();
+                $amount_pay=0;
+                $sale_qnty=0;
+                $same_flow=array();
+                //统计金额
+                foreach($list as $k1=>$v1){
+                    //统计需要支付的总金额
+                    if($v1['flow_no']==$v['flow_no']){
+                        $same_flow[]=$v1;
+                        $amount_pay+=$v1['pay_amount'];
+                        $payways[]=$v1['pay_name'];
+                        $memo[]=$v1['memo'];
+                    }
+                }
+                if(isset($branchsList[$v['branch_no']])){
+                    $t['branch_no']=$v['branch_no'];
+                    $t['branch_name']=$branchsList[$v['branch_no']]['branch_name'];
+                    $t['branch_logo']=$branchsList[$v['branch_no']]['logo'];
+                }else{
+                    $t['branch_no']=$v['branch_no'];
+                    $t['branch_name']="总店";
+                    $t['branch_logo']="";
+                }
+                $t['flow_no']=$v['flow_no'];
+                $t['sale_amount']=sprintf("%.2f", $v['sale_amount']);
+                $t['pay_amount']=sprintf("%.2f", $amount_pay);
+                $t['pay_way']=$payways;
+                $t['oper_date']=$v['oper_date'];
+                $t['oper_id']=$v['oper_id'];
+                $t['pos_id']=$v['pos_id'];
+                $t['refund_flag']=$v['refund_flag'];
+                $t['order_status']=$this->OrderStatus($same_flow);
+
+                //查询商品
+                $salesInfo=$this->SalesInfo($v['flow_no']);
+                $t['sales_info']=$salesInfo;
+                foreach($salesInfo as $sv){
+                    $sale_qnty+=$sv['sale_qnty'];
+                }
+                $t['sale_qnty']=$sale_qnty;
+                //查询终端
+                $PosStatus=$this->PosStatus($v['branch_no'],$v['pos_id']);
+                $t['pos_status']=$PosStatus;
+
+                $flows[$v['flow_no']]=$t;
+            }
+        }
+        return ['list'=>$flows,'total'=>$listCount];
+    }
+
+    //根据单号，返回销售数据和商品信息
+    private function SalesInfo($flow_no){
+        $PosSaleFlow=new PosSaleFlow();
+        $goods=$PosSaleFlow->alias("a")
+            ->join("bd_item_info b","b.item_no=a.item_no","LEFT")
+            ->field("a.flow_id,a.flow_no,a.sale_price,a.sale_qnty,a.sell_way,b.item_no,b.item_name,b.img_src")
+            ->where("a.flow_no='$flow_no'")
+            ->select();
+        if($goods&&count($goods)>0){
+            $list=$goods->toArray();
+            foreach($list as $k=>$v){
+                $list[$k]['sale_price']=sprintf("%.2f",$v['sale_price']);
+                $list[$k]['sale_qnty']=intval($v['sale_qnty']);
+            }
+            return $list;
+        }
+        return [];
+    }
+
+    //返回收银机类型
+    private function PosStatus($branch_no,$pos_id){
+        $PosStatus=new PosStatus();
+        $pos=$PosStatus->field("posid,postype")->where("branch_no='$branch_no' and posid='$pos_id'")->find();
+        if(!empty($pos)&&$pos!=null){
+            return $pos;
+        }
+        return ['posid'=>'','postype'=>''];
+    }
+
+    //返回订单状态
+    //$order 是支付流水记录
+    private function OrderStatus($order){
+        $totalRefund=0;
+        $totalUnpay=0;
+        foreach($order as $v){
+            if($v['refund_flag']==1){//其中一个支付流水退款，但其他未退款==部分退款
+                $totalRefund++;
+            }
+            if($v['pay_way']=='GZ'&&$v['sale_way']=='E'){
+                $totalUnpay++;
+            }
+        }
+
+        //退款判断
+        if($totalRefund>0&&count($order)==$totalRefund){
+            return '已退款';
+        }elseif ($totalRefund>0&&count($order)>$totalRefund){
+            return '部分退款';
+        }
+
+        //未支付
+        if($totalUnpay>0){
+            return '未支付';
+        }
+
+        return '已完成';
     }
 
 }

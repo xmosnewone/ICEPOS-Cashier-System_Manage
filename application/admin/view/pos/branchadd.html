@@ -199,6 +199,35 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">门店LOGO</label>
+					<label class="layui-form-label layui-word-aux" style="width: 200px;text-align: left">
+						请上传250*250大小内的图片
+					</label>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
+					<div class="layui-col-md12">
+
+						<div class="layui-input-inline uploader-list">
+							<button type="button" class="layui-btn layui-btn-danger" id="logoloader">
+								<i class="layui-icon"></i>上传图片
+							</button>
+
+							<div id="shoplogo" class="file-iteme" {if condition="$one['logo'] eq ''"}style="display:none;"{/if}>
+							<div class="handle"><i class="layui-icon layui-icon-delete" id="logodel"></i></div>
+							<img src="{$one['logo']}" width="120" height="auto" id="preview_logo"/>
+							<div class="info"></div>
+						</div>
+
+						<div class="layui-inline layui-word-aux">
+							图片大小限制 {php}echo $image_size/1024; {/php}M
+						</div>
+					</div>
+				</div>
+			</div>
 				  
 				  <div class="layui-form-item">
 				  <div class="layui-card-header">微信商户配置</div>
@@ -254,7 +283,7 @@
 								<div id="wechatpaycode" class="file-iteme" {if condition="$one['wechat_pay_qrcode'] eq ''"}style="display:none;"{/if}>
 								<div class="handle"><i class="layui-icon layui-icon-delete" id="wechatdel"></i></div>
 								<img src="{$one['wechat_pay_qrcode']}" width="120" height="auto" id="preview_wechat"/>
-								<div class="info">{$vo['photo_name']}</div>
+								<div class="info"></div>
 							</div>
 
 							<div class="layui-inline layui-word-aux">
@@ -370,7 +399,8 @@
 				<input name="alipay_pay_qrcode" id="alipay_pay_qrcode" type="hidden" value="{$one['alipay_pay_qrcode']}"/>
 				<input name="wechat_apiclient_cert" id="wechat_apiclient_cert" type="hidden" value="{$one['wechat_apiclient_cert']}"/>
 				<input name="wechat_apiclient_key" id="wechat_apiclient_key" type="hidden" value="{$one['wechat_apiclient_key']}"/>
-        		<input name="id" type="hidden" value="{$one['id']}"/>
+				<input name="logo" id="logo" type="hidden" value="{$one['logo']}"/>
+				<input name="id" type="hidden" value="{$one['id']}"/>
             </div>
         </div>
     </div>
@@ -429,6 +459,10 @@
 				$("#preview_alipay").attr("src","");
 				$("#alipay_pay_qrcode").val("");
 				$("#alipaycode").hide();
+			}else if(id=="logodel"){
+				$("#preview_logo").attr("src","");
+				$("#logo").val("");
+				$("#shoplogo").hide();
 			}
 		});
 
@@ -457,6 +491,30 @@ layui.use(['form','jquery','upload', 'element','layer'],function(){
 
 	//绑定事件
 	bindImgHandler($,layer);
+
+	//logo上传
+	upload.render({
+		elem: '#logoloader'
+		,url: path+'/upload' //Super控制器公共接口
+		,method: 'post'
+		,size: {$image_size} //限制文件大小，单位 KB
+		,done: function(res){
+			if(res.status==1){
+
+				//解绑事件
+				unbindImgHandler($);
+				//重新绑定事件
+				bindImgHandler($,layer);
+
+				$("#preview_logo").attr("src",res.path);
+				$("#logo").val(res.path);
+				$("#shoplogo").show();
+				layer.msg('上传成功');
+			}else{
+				layer.msg('上传失败，请重试');
+			}
+		}
+	});
 
 	//微信文件上传
 	upload.render({
