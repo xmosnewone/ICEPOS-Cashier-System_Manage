@@ -372,7 +372,7 @@ class PosPayFlow extends BaseModel {
         		->join('pos_operator c','s.oper_id= c.oper_id',"LEFT")
         		->group("s.branch_no,a.branch_name,s.oper_id,c.oper_name,s.pay_way,s.sale_way," .
                 "s.pos_id,s.pay_name,b.code_name")
-        		->where(['s.flow_no'=>$flowno])
+        		->where($where)
         		->select();
         
         $rowCount=Db::name($this->name)
@@ -382,7 +382,7 @@ class PosPayFlow extends BaseModel {
         		->join('pos_operator c','s.oper_id= c.oper_id',"LEFT")
         		->group("s.branch_no,a.branch_name,s.oper_id,c.oper_name,s.pay_way,s.sale_way," .
                 "s.pos_id,s.pay_name,b.code_name")
-        		->where(['s.flow_no'=>$flowno])
+        		->where($where)
         		->count();
         
         $result = array();
@@ -602,8 +602,6 @@ class PosPayFlow extends BaseModel {
                         $tt["convert_amt"] = formatMoneyDisplay($v["convert_amt"]);
                     }
                 }
-                $footer1["pay_amount"] +=doubleval($tt["pay_amount"]);
-                $footer1["convert_amt"] +=doubleval($tt["convert_amt"]);
                 $rowIndex++;
                 array_push($result, $tt);
             }
@@ -818,10 +816,10 @@ group by p.branch_no,p.pos_id,p.oper_id
                     $where=" and pay_way='GZ' and sale_way='E'";
                     break;
                 case 2:     //已退款
-                    $where=" and refund_flag=1 ";
+                    $where=" and order_refund=1 ";
                     break;
                 case 3:     //已完成
-                    $where=" and (sale_way='A' or sale_way='C') and refund_flag=0 ";
+                    $where=" and (sale_way='A' or sale_way='C') and order_refund=0 ";
                     break;
             }
         }
@@ -912,11 +910,11 @@ group by p.branch_no,p.pos_id,p.oper_id
     }
 
     //根据单号，返回销售数据和商品信息
-    private function SalesInfo($flow_no){
+    public function SalesInfo($flow_no){
         $PosSaleFlow=new PosSaleFlow();
         $goods=$PosSaleFlow->alias("a")
             ->join("bd_item_info b","b.item_no=a.item_no","LEFT")
-            ->field("a.flow_id,a.flow_no,a.sale_price,a.sale_qnty,a.sell_way,b.item_no,b.item_name,b.img_src")
+            ->field("a.flow_id,a.flow_no,a.unit_price,a.sale_price,a.sale_qnty,a.sale_money,a.in_price,a.sell_way,a.discount_rate,a.plan_no,b.item_no,b.item_name,b.img_src")
             ->where("a.flow_no='$flow_no'")
             ->select();
         if($goods&&count($goods)>0){
@@ -942,7 +940,7 @@ group by p.branch_no,p.pos_id,p.oper_id
 
     //返回订单状态
     //$order 是支付流水记录
-    private function OrderStatus($order){
+    public function OrderStatus($order){
         $totalRefund=0;
         $totalUnpay=0;
         foreach($order as $v){

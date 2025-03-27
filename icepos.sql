@@ -5625,6 +5625,9 @@ CREATE TABLE IF NOT EXISTS `ice_integral_member` (
   `credit` decimal(9,2) UNSIGNED DEFAULT '0.00' COMMENT '获得的积分',
   `add_date` int(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT '获得积分日期',
   `refund_flag` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '0未退款，1已退款',
+  `is_expire` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '0有效，1已过期',
+  `types` smallint(3) UNSIGNED DEFAULT '0' COMMENT '获取积分的方式，默认0是订单，1是注册',
+  `memo` text COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='消费者积分表';
 
@@ -6019,6 +6022,7 @@ CREATE TABLE IF NOT EXISTS `ice_member` (
   `email` varchar(50) DEFAULT NULL COMMENT '邮件',
   `address` varchar(100) DEFAULT NULL COMMENT '地址',
   `birthday` varchar(20) DEFAULT NULL COMMENT '生日',
+  `sex` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '0男1女',
   `status` tinyint(1) UNSIGNED DEFAULT '1' COMMENT '会员状态，1是正常，2是冻结',
   `regtime` int(11) UNSIGNED DEFAULT '0' COMMENT '注册日期时间戳',
   `logintime` int(11) UNSIGNED DEFAULT '0' COMMENT '最后登录使用时间戳',
@@ -6030,6 +6034,30 @@ CREATE TABLE IF NOT EXISTS `ice_member` (
   UNIQUE KEY `mobile` (`mobile`),
   KEY `ucode` (`ucode`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='会员主表';
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ice_member_credit`
+--
+
+DROP TABLE IF EXISTS `ice_member_credit`;
+CREATE TABLE IF NOT EXISTS `ice_member_credit` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `ucode` varchar(30) NOT NULL COMMENT '会员编号',
+  `uid` int(11) UNSIGNED NOT NULL COMMENT '会员id',
+  `flow_no` varchar(32) NOT NULL COMMENT '支付流水号',
+  `branch_no` varchar(30) DEFAULT NULL COMMENT '门店编号',
+  `pos_id` varchar(30) DEFAULT NULL COMMENT 'pos机编号',
+  `credit` int(11) UNSIGNED DEFAULT '0' COMMENT '积分变动值',
+  `action` varchar(2) DEFAULT '-' COMMENT '"-"消费,"+"增加',
+  `memo` varchar(200) DEFAULT NULL COMMENT '备注',
+  `add_date` int(11) UNSIGNED DEFAULT '0' COMMENT '记录日期',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `ucode` (`ucode`),
+  KEY `flow_no` (`flow_no`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='会员积分变动记录表';
 
 -- --------------------------------------------------------
 
@@ -7122,6 +7150,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_payflow` (
   `com_flag` char(1) DEFAULT NULL,
   `pos_flag` char(1) DEFAULT '0',
   `refund_flag` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '1表示已退款，0正常',
+  `refund_log` text COMMENT '退款原因',
+  `order_refund` tinyint(1) UNSIGNED DEFAULT '0' COMMENT '整单支付流水是否已有其中一个已退款，1是已退款',
   PRIMARY KEY (`id`,`flow_id`,`flow_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='收银流水表';
 
@@ -7196,6 +7226,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_saleflow` (
   `sale_price` decimal(10,4) DEFAULT NULL COMMENT '实际销售单价',
   `sale_qnty` decimal(10,4) DEFAULT NULL COMMENT '销售数量',
   `sale_money` decimal(10,4) DEFAULT NULL COMMENT '商品总价',
+  `goods_money` decimal(10,2) DEFAULT NULL COMMENT '未优惠商品总价',
   `in_price` decimal(10,4) DEFAULT NULL,
   `sell_way` varchar(1) DEFAULT NULL,
   `discount_rate` decimal(10,2) DEFAULT NULL,
@@ -7213,7 +7244,8 @@ CREATE TABLE IF NOT EXISTS `ice_pos_saleflow` (
   `com_flag` char(1) DEFAULT NULL,
   `plan_no` varchar(30) DEFAULT NULL,
   `over_flag` char(1) DEFAULT '0',
-  PRIMARY KEY (`id`,`flow_id`,`flow_no`)
+  PRIMARY KEY (`id`,`flow_id`,`flow_no`),
+  KEY `item_no` (`item_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='销售流水表';
 
 -- --------------------------------------------------------

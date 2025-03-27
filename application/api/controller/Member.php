@@ -9,6 +9,7 @@ use model\IntegralMember;
 use model\MemberMoney;
 use model\MemberLevel;
 use model\BaseModel;
+use model\PosPayFlow;
 /**
  * 会员接口
  * @author xmos
@@ -103,9 +104,23 @@ class Member extends Super {
                 $score=floatval($_POST['score']);//实际销售金额（折后金额）
                 $flowno=trim($_POST['ordername']);//订单流水号
                 $branch_no=trim($_POST['branch_no']);//门店编号
+                $memo=trim($_POST['else']);//备注
+                $flows=json_decode($_POST['payflow'],true);
                 $db = new MemberDb ();
                 $member=$db->getWhere(['ucode'=>$mem_no]);
                 if($member){
+                    //查询订单的支付方式，现金/微信/等支付方式可获得积分
+                    $realPayment=consume_payment();
+
+                    $money=0;
+                    if($flows&&count($flows)>0){
+                        foreach($flows as $v){
+                            if(in_array($v['coin_type'],$realPayment)){
+                                $money+=$v['pay_amount'];
+                            }
+                        }
+                    }
+
                     //查询当前门店是否有积分方案
                     $Integral=new Integral();
                     $now=time();
@@ -116,7 +131,7 @@ class Member extends Super {
                         $times=floatval($plan['rate']);
                     }
 
-                    $total_credit=$times*$score;
+                    $total_credit=$times*$money;
                     //更新用户的积分
                     $db->updateCredit("inc",['uid'=>$member['uid']],$total_credit);
                     //添加积分记录
@@ -125,6 +140,7 @@ class Member extends Super {
                     $IntegralMember->flowno=$flowno;
                     $IntegralMember->credit=$total_credit;
                     $IntegralMember->add_date=$now;
+                    $IntegralMember->memo=$memo;
                     $IntegralMember->add($IntegralMember);
 
                     $res=[];

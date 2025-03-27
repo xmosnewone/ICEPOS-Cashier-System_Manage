@@ -149,3 +149,43 @@ ALTER TABLE `ice_portal_ad` ADD `link` VARCHAR(250) NULL COMMENT '超链接' AFT
 ALTER TABLE `ice_pos_payflow` CHANGE `memo` `memo` VARCHAR(250) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE `ice_pos_status` ADD `postype` TINYINT(2) UNSIGNED NULL DEFAULT '0' COMMENT '收银机终端类型，0人工收银，1自助机' AFTER `hostmac`;
+
+ALTER TABLE `ice_integral_member` ADD `is_expire` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '0有效，1已过期' AFTER `refund_flag`;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ice_member_credit`
+--
+
+DROP TABLE IF EXISTS `ice_member_credit`;
+CREATE TABLE IF NOT EXISTS `ice_member_credit` (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `ucode` varchar(30) NOT NULL COMMENT '会员编号',
+  `uid` int(11) UNSIGNED NOT NULL COMMENT '会员id',
+  `flow_no` varchar(32) NOT NULL COMMENT '支付流水号',
+  `branch_no` varchar(30) DEFAULT NULL COMMENT '门店编号',
+  `pos_id` varchar(30) DEFAULT NULL COMMENT 'pos机编号',
+  `credit` int(11) UNSIGNED DEFAULT '0' COMMENT '积分变动值',
+  `action` varchar(2) DEFAULT '-' COMMENT '"-"消费,"+"增加',
+  `memo` varchar(200) DEFAULT NULL COMMENT '备注',
+  `add_date` int(11) UNSIGNED DEFAULT '0' COMMENT '记录日期',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `ucode` (`ucode`),
+  KEY `flow_no` (`flow_no`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='会员积分变动记录表';
+
+ALTER TABLE `ice_pos_payflow` ADD `refund_log` TEXT NULL COMMENT '退款原因' AFTER `refund_flag`;
+
+ALTER TABLE `ice_pos_payflow` ADD `order_refund` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '整单支付流水是否已有其中一个已退款，1是已退款' AFTER `refund_log`;
+
+ALTER TABLE `ice_pos_saleflow` ADD `goods_money` DECIMAL(10,2) UNSIGNED NULL DEFAULT '0.00' COMMENT '未优惠商品总价' AFTER `sale_money`;
+
+ALTER TABLE `ice_integral_member` ADD `types` SMALLINT(3) UNSIGNED NULL DEFAULT '0' COMMENT '获取积分的方式，默认0是订单，1是注册' AFTER `is_expire`;
+
+ALTER TABLE `ice_pos_saleflow` ADD INDEX(`item_no`);
+
+ALTER TABLE `ice_member` ADD `sex` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '0男1女' AFTER `birthday`;
+
+ALTER TABLE `ice_integral_member` ADD `memo` TEXT NULL COMMENT '备注' AFTER `types`;

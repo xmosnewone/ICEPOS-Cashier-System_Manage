@@ -1095,10 +1095,11 @@ class Api extends Super {
 									$res = 0;
 									break;
 								}
-								$saleflow->unit_price = $v ["sale_price"];
-								$saleflow->sale_price = $v ["unit_price"];
-								$saleflow->sale_qnty = $v ["sale_qnty"];
-								$saleflow->sale_money = $v ["sale_money"];
+                                $saleflow->unit_price = $v ["sale_price"];//原价
+                                $saleflow->sale_price = $v ["unit_price"];//折后价
+                                $saleflow->sale_qnty = $v ["sale_qnty"];//数量
+                                $saleflow->sale_money = $v ["sale_money"];//优惠后商品总价
+                                $saleflow->goods_money = $v ["sale_price"]*$v ["sale_qnty"];//优惠前商品总价
 								$saleflow->in_price = $v ["price"];//进货价
 								$saleflow->sell_way = $v ["sale_way"];
 								$saleflow->discount_rate = $v ["discount_rate"];

@@ -17,5 +17,8 @@ return array(
     'coupon_end'=>'已过期',
     'coupon_used'=>'已使用',
     'coupon_unstart'=>'未开始',
+    //年度称呼
+    'spirit_boy'=>'精神小伙',
+    'god_lady'=>'御姐女神',
 );
 ?>

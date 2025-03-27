@@ -28,10 +28,3 @@ function pos_log($posid,$content=''){
 	}
 	return true;
 }
-/**
- * 返回可以记录个人消费金额的支付方式
- */
-function consume_payment(){
-    //参考ice_bd_payment_info表
-    return ['RMB','BCD','CHA','CHQ','CRD','HF','PTZ','WXQR','ZFBQR','WECHAT','ZFB'];
-}
