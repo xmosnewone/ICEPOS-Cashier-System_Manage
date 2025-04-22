@@ -189,3 +189,31 @@ ALTER TABLE `ice_pos_saleflow` ADD INDEX(`item_no`);
 ALTER TABLE `ice_member` ADD `sex` TINYINT(1) UNSIGNED NULL DEFAULT '0' COMMENT '0男1女' AFTER `birthday`;
 
 ALTER TABLE `ice_integral_member` ADD `memo` TEXT NULL COMMENT '备注' AFTER `types`;
+
+ALTER TABLE `ice_portal_content_ext` CHANGE `origin` `origin_author` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '来源';
+
+ALTER TABLE `ice_member_level` ADD `expire_date` INT(11) UNSIGNED NULL DEFAULT NULL COMMENT '等级有效期' AFTER `sale`;
+
+
+--
+--  2025-04-01
+--
+
+INSERT INTO `ice_function` (`name`, `code`, `icon`, `action`, `add_time`, `parent`, `url`, `is_display`, `level`, `orderby`) VALUES
+('新闻分类', 'newstype', 'layui-icon-component', NULL, '1739677905', '34', '/admin/news/typeindex', 1, 3, 148);
+
+INSERT INTO `ice_function` ( `name`, `code`, `icon`, `action`, `add_time`, `parent`, `url`, `is_display`, `level`, `orderby`) VALUES ('系统设置', 'system_config', '', NULL, '1728892789', '12', '/admin/config/index', 1, 2, 111);
+
+TRUNCATE `ice_portal_channel`;
+TRUNCATE `ice_portal_channel_ext`;
+
+--
+--  2025-04-04
+--
+ALTER TABLE `ice_member` DROP INDEX `mobile`;
+ALTER TABLE `ice_member` ADD INDEX(`mobile`);
+
+--
+--  2025-04-12
+--
+ALTER TABLE `ice_portal_ad` ADD `news_id` INT(11) UNSIGNED NULL DEFAULT '0' COMMENT '关联新闻的id' AFTER `link`;

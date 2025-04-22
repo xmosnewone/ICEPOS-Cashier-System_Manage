@@ -174,52 +174,53 @@ class Main extends Super {
     	
     	return ['member'=>$member?$member:'null','pos'=>$pos?$pos:'null'];
     }
-    
+
     //获取当天内注册会员信息
     public function members(){
-    	$today=timezone_get(2);
-    	$start=$today['begin'];
-    	$end=$today['end'];
-    	$members=M("member")
-	    		->alias("a")
-	    		->where("a.addtime>=$start and a.addtime<$end")
-	    		->join("pos_branch_info b","b.branch_no=a.branch_no","LEFT")
-	    		->field("a.uname,a.nickname,a.phone,a.addtime,b.branch_name")
-	    		->limit(20)
-	    		->order("addtime desc")
-	    		->select();
-    	
-    	if($members){
-    		foreach($members as $key=>$value){
-    			$members[$key]['addtime']=date('Y-m-d H:i:s',$value['addtime']);
-    		}
-    	}
-    	return $members;
+        $today=timezone_get(2);
+        $start=$today['begin'];
+        $end=$today['end'];
+        $members=M("member")
+            ->alias("a")
+            ->where("a.addtime>=$start and a.addtime<$end")
+            ->join("pos_branch_info b","b.branch_no=a.branch_no","LEFT")
+            ->field("a.uname,a.nickname,a.phone,a.addtime,a.utype,b.branch_name")
+            ->limit(20)
+            ->order("addtime desc")
+            ->select();
+
+        if($members){
+            foreach($members as $key=>$value){
+                $members[$key]['branch_name']=!empty($value['branch_name'])?$value['branch_name']:$value['utype'];
+                $members[$key]['addtime']=date('Y-m-d H:i:s',$value['addtime']);
+            }
+        }
+        return $members;
     }
     
     
     //POS终端同步记录
     public function posSync(){
-    	
-    	$today=timezone_get(2);
-    	$start=$today['begin'];
-    	$end=$today['end'];
-    	//读取前10记录
-    	$pos=M("pos_sync")
-	    	->alias("a")
-	    	->where("a.synctime>=$start and a.synctime<$end and a.branch_no!=''")
-	    	->join("pos_branch_info b","b.branch_no=a.branch_no","LEFT")
-	    	->field("a.*,b.branch_name")
-	    	->limit(10)
-	    	->select();
-    	
-    	if($pos){
-    		foreach($pos as $key=>$value){
-    			$pos[$key]['synctime']=date('Y-m-d H:i:s',$value['synctime']);
-    		}
-    	}
-    	
-    	return $pos;
+
+        $today=timezone_get(2);
+        $start=$today['begin'];
+        $end=$today['end'];
+        //读取前10记录
+        $pos=M("pos_sync")
+            ->alias("a")
+            ->where("a.synctime>=$start and a.synctime<$end and a.branch_no!=''")
+            ->join("pos_branch_info b","b.branch_no=a.branch_no","LEFT")
+            ->field("a.*,b.branch_name")
+            ->limit(10)
+            ->select();
+
+        if($pos){
+            foreach($pos as $key=>$value){
+                $pos[$key]['synctime']=date('Y-m-d H:i:s',$value['synctime']);
+            }
+        }
+
+        return $pos;
     }
     
     

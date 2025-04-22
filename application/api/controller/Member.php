@@ -200,42 +200,7 @@ class Member extends Super {
     //返还用户全场折扣优惠
     public function memb_recharge_order_add() {
 
-        $res = $this->ApiConnect ( $_POST );
-        if ($res != 1) {
-            return $this->ajaxReturn($res);
-        }
-
-        try {
-            $mem_no=trim($_POST['mem_no']);//会员编号
-            $money=floatval($_POST['money']);//使用金额
-            $flowno=trim($_POST['ordername']);//订单流水号
-            $paytype=trim($_POST['paytype']);//支付方式
-
-            $db = new MemberDb();
-            $member=$db->getWhere(['ucode'=>$mem_no]);
-            if($member){
-                //更新用户的余额
-                $db->updateMoney("inc",['uid'=>$member['uid']],$money);
-
-                //添加余额变动记录-退还金额
-                $MemberMoney=new MemberMoney();
-                $MemberMoney->uid=$member['uid'];
-                $MemberMoney->flowno=$flowno;
-                $MemberMoney->type=2;//退还余额
-                $MemberMoney->money=$money;
-                $MemberMoney->add_date=time();
-                $MemberMoney->add($MemberMoney);
-
-                $res=[];
-                $res['code']=1;
-            }
-
-        } catch ( \Exception $ex ) {
-            $message=$this->getVars("方法:返还用户全场折扣优惠(memb_recharge_order_add)");
-            write_log ( "访问方法:返还用户全场折扣优惠(memb_recharge_order_add),错误信息:" . $ex.$message, "api/member/memb_recharge_order_add" );
-            $res = "";
-        }
-
+        $res['code']=1;
         return $this->ajaxReturn($res);
     }
 

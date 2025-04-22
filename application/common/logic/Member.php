@@ -31,7 +31,7 @@ class Member{
         switch ($regtype) {
             case 1:
                 //手机号码的md5值
-                return md5($data['mobile']);
+                return md5($data);
                 break;
             case 2:
                 //注册日期 例如: 20250101的md5值
@@ -43,7 +43,7 @@ class Member{
     //获取最初级会员等级
     private function getLowestLevel(){
         $MemberLevel=new MemberLevel();
-        $lowest=$MemberLevel->order("discount asc")->find();
+        $lowest=$MemberLevel->order("discount desc")->find();
         return $lowest;
     }
 
@@ -53,8 +53,8 @@ class Member{
         $mobile=ctrim($memberData['mobile']);
         $branch_no=$memberData['branch_no']?$memberData['branch_no']:'';
         $ucode=$this->generateUcode();
-        $nickname=$this->generateNickname();
-        $password=$this->generatePassword($memberData['mobile'],1);
+        $nickname=$memberData['nickname']?$memberData['nickname']:$this->generateNickname();
+        $password=$this->generatePassword($memberData['passwd']?$memberData['passwd']:$memberData['mobile'],1);
         $level=$this->getLowestLevel();
         $levelid=0;
         if($level!=null&&!empty($level['lid'])){
@@ -74,7 +74,12 @@ class Member{
         $member->addtime=$now;
         $member->regtime=$now;
         $member->branch_no=$branch_no;
-        $ok=$member->save();
+        try{
+            $ok=$member->save();
+        }catch (\Exception $e){
+
+        }
+
         if($ok!=false){
             return $member->uid;
         }
@@ -87,9 +92,9 @@ class Member{
         $MemberModel=new MemberModel();
         $member=$MemberModel->where(['openid'=>$openid,'unionid'=>$unionid])->find();
         if(!empty($member)&&!empty($member['uid'])){
-                return $member;
+            return $member;
         }else{
-                return false;
+            return false;
         }
     }
     //小程序注册会员
@@ -139,11 +144,11 @@ class Member{
             $where=['mobile'=>$key];
         }
         $model=new MemberModel();
-        $member=$model->where($where)->find();
+        $data=[];
         foreach($updateData as $k=>$v){
-            $member->$k=$v;
+            $data[$k]=$v;
         }
-        $member->logintime=$now;
-        return $member->save();
+        $data['logintime']=$now;
+        return $model->updateMember($where,$data);
     }
 }

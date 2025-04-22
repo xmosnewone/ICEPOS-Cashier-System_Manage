@@ -107,7 +107,7 @@ class Jsondata extends Super {
         $countSql="SELECT count(*) as totalnum";
         $listSql="SELECT ctt.content_id,chle.channel_id,chle.channel_name, CASE ctt.status WHEN 0 THEN '草稿' WHEN 1 THEN '正在审核' WHEN 2 THEN '审核通过' WHEN 3 THEN '删除' END status ,"
                 . " ctt.user_id,ctt.type_id,cty.type_name,ctt.top_level,"
-                . " ctt.is_recommend, ctte.title,ctte.short_title,ctte.author,ctte.origin,ctte.origin_url,ctte.description,"
+                . " ctt.is_recommend, ctte.title,ctte.short_title,ctte.author,ctte.origin_author,ctte.origin_url,ctte.description,"
                 . " ctte.release_date,ctte.title_img,ctte.content_img,ctte.link,ctte.txt";
         
         $sql =  " FROM " . $PortalContent->tableName() . " AS ctt "

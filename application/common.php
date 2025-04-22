@@ -55,7 +55,7 @@ function isEmail($email) {
  * @param $mobile
  */
 function isMobile($mobile) {
-	return strlen ( $mobile ) == 11 && preg_match ( "/^1[3|4|5|7|8|9](\d){9}$/", $mobile );
+	return strlen ( $mobile ) == 11 && preg_match ( "/^1[3|4|5|6|7|8|9](\d){9}$/", $mobile );
 }
 /*
  * 连接字符

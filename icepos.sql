@@ -5415,7 +5415,8 @@ INSERT INTO `ice_function` (`id`, `name`, `code`, `icon`, `action`, `add_time`, 
 (132, '分店要货', 'Purchase_Order_PmSheetyPo', 'layui-icon-component', NULL, '1640773325', '18', '/admin/pmsheet/Yhsheet/index', 1, 3, 132),
 (138, '积分方案', 'JF', '', NULL, '1698739569', '19', '/admin/integral/index', 1, 3, 107),
 (139, 'POS端留言', 'POS_Feedback', '', NULL, '1730384721', '98', '/admin/portal/Guestbook/posFeed', 1, 3, 109),
-(148, '新闻分类', 'newstype', '', NULL, '1739674554', '34', '/admin/news/typeindex', 1, 3, 114);
+(148, '新闻分类', 'newstype', '', NULL, '1739674554', '34', '/admin/news/typeindex', 1, 3, 114),
+(149, '系统设置', 'system_config', '', NULL, '1743464089', '12', '/admin/config/index', 1, 2, 111);
 
 -- --------------------------------------------------------
 
@@ -6031,7 +6032,7 @@ CREATE TABLE IF NOT EXISTS `ice_member` (
   `addtime` int(11) DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`uid`),
   UNIQUE KEY `uname` (`uname`),
-  UNIQUE KEY `mobile` (`mobile`),
+  KEY `mobile` (`mobile`),
   KEY `ucode` (`ucode`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='会员主表';
 
@@ -6072,6 +6073,7 @@ CREATE TABLE IF NOT EXISTS `ice_member_level` (
   `levelname` text NOT NULL COMMENT '等级名称',
   `discount` text COMMENT '折扣',
   `sale` text COMMENT '优惠',
+  `expire_date` int(11) UNSIGNED DEFAULT NULL COMMENT '等级有效期',
   PRIMARY KEY (`lid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -6366,6 +6368,7 @@ CREATE TABLE IF NOT EXISTS `ice_portal_ad` (
   `category` varchar(20) NOT NULL COMMENT '广告类型',
   `ad_code` longtext,
   `link` varchar(250) DEFAULT NULL COMMENT '超链接',
+  `news_id` int(11) UNSIGNED DEFAULT '0' COMMENT '关联新闻的id',
   `ad_weight` int(11) DEFAULT '1',
   `display_count` int(11) DEFAULT '0' COMMENT '显示次数',
   `click_count` int(11) DEFAULT '0' COMMENT '点击数量',
@@ -6430,7 +6433,7 @@ CREATE TABLE IF NOT EXISTS `ice_portal_ad_space` (
   `description` varchar(255) DEFAULT NULL,
   `is_enabled` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`ad_space_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='广告位置';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='广告位置';
 
 --
 -- 转存表中的数据 `ice_portal_ad_space`
@@ -6438,7 +6441,11 @@ CREATE TABLE IF NOT EXISTS `ice_portal_ad_space` (
 
 INSERT INTO `ice_portal_ad_space` (`ad_space_id`, `ad_space_name`, `description`, `is_enabled`) VALUES
 (1, 'POS广告位', 'pos机统一广告', 1),
-(2, '门店POS专机', '', 1);
+(2, 'APP收银端广告位', 'UNIAPP移动端收银机首页主广告', 1),
+(3, '会员APP首页主广告', '会员APP首页主广告', 1),
+(4, '会员中心UNIAPP 首页其他广告', '会员中心UNIAPP 首页其他广告位置 多图片广告列表', 1),
+(5, '会员中心UNIAPP 会员主页广告位', '会员中心UNIAPP 会员主页广告位', 1),
+(6, '会员中心首页弹窗广告', '', 1);
 
 -- --------------------------------------------------------
 
@@ -6456,25 +6463,8 @@ CREATE TABLE IF NOT EXISTS `ice_portal_channel` (
   `has_content` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否有栏目内容',
   `is_display` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否显示',
   PRIMARY KEY (`channel_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='栏目主表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='栏目主表';
 
---
--- 转存表中的数据 `ice_portal_channel`
---
-
-INSERT INTO `ice_portal_channel` (`channel_id`, `parent_id`, `model_id`, `channel_path`, `priority`, `has_content`, `is_display`) VALUES
-(4, 0, 1, NULL, 2, 1, 0),
-(5, 4, 1, NULL, 0, 1, 1),
-(14, 0, 1, NULL, 1, 1, 1),
-(15, 0, 1, NULL, 3, 1, 1),
-(16, 15, 4, NULL, 10, 1, 1),
-(17, 14, 1, NULL, 5, 1, 1),
-(18, 14, 1, NULL, 45, 1, 1),
-(19, 14, 1, NULL, 0, 1, 1),
-(20, 15, 4, NULL, 8, 1, 1),
-(21, 15, 4, NULL, 7, 1, 1),
-(22, 15, 4, NULL, 9, 1, 1),
-(23, 15, 4, NULL, 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -6495,24 +6485,6 @@ CREATE TABLE IF NOT EXISTS `ice_portal_channel_ext` (
   `description` text COMMENT '描述',
   PRIMARY KEY (`channel_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='栏目附表';
-
---
--- 转存表中的数据 `ice_portal_channel_ext`
---
-
-INSERT INTO `ice_portal_channel_ext` (`channel_id`, `channel_name`, `is_static_channel`, `is_static_content`, `link`, `title_img`, `title`, `keywords`, `description`) VALUES
-(4, '商品栏目', '0', '0', '', NULL, '', '', ''),
-(5, '食品常识', '0', '0', '', NULL, '食品常识', '', '食品常识'),
-(14, '常用栏目', '0', '0', '', NULL, '', '', ''),
-(15, '关于ICE', '0', '0', '', NULL, '', '', ''),
-(16, '关于我们', '0', '0', '', NULL, '关于我们', '关于我们', '关于我们'),
-(17, '常见问题', '0', '0', '', NULL, '常见问题', '', ''),
-(18, '网站公告', '0', '0', '', NULL, '网站公告', '', '网站公告'),
-(19, '最新信息', '0', '0', '', NULL, '', '', ''),
-(20, '供应申请', '0', '0', '', NULL, '供应申请', '供应申请', '供应申请'),
-(21, '广告服务', '0', '0', '', NULL, '广告服务', '广告服务', '广告服务'),
-(22, '联系我们', '0', '0', '', NULL, '联系我们', '联系我们', '联系我们'),
-(23, '招商加盟', '0', '0', '/active/merchants', NULL, '招商加盟', '招商加盟', '招商加盟');
 
 -- --------------------------------------------------------
 
@@ -6545,7 +6517,7 @@ CREATE TABLE IF NOT EXISTS `ice_portal_content_ext` (
   `title` varchar(150) NOT NULL COMMENT '标题',
   `short_title` varchar(150) DEFAULT NULL COMMENT '短标题',
   `author` varchar(100) DEFAULT NULL COMMENT '作者',
-  `origin` varchar(100) DEFAULT NULL COMMENT '来源',
+  `origin_author` varchar(100) DEFAULT NULL COMMENT '来源',
   `origin_url` varchar(100) DEFAULT NULL COMMENT '来源url',
   `description` varchar(255) DEFAULT NULL COMMENT '简述',
   `release_date` datetime NOT NULL COMMENT '发布日期',

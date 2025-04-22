@@ -1,94 +1,110 @@
 <!DOCTYPE html>
 <html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>编辑会员等级</title>
-    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+	<meta charset="UTF-8">
+	<title>编辑会员等级</title>
+	<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
 </head>
 <body>
 <form class="layui-form" action="">
-    <div class="mainBox">
-        <div class="main-container">
-            <div class="main-container">
-           
-                  <div class="layui-form-item">
-				    <label class="layui-form-label">等级名称</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="levelname" value="{$one['levelname']}" {present name="one"}readonly="readonly"{/present} required  lay-verify="required" placeholder="请输入会员等级" autocomplete="off" class="layui-input">
-				    </div>
-				  </div>
-				  <div class="layui-form-item">
-				    <label class="layui-form-label">级别代码</label>
-				    <div class="layui-input-inline">
-				    	<select name="code">
-				    		{volist name="levelCode" id="vo"}
-				    		<option value="{$vo['code_id']}" {if condition="$vo['code_id'] eq $one['code']"}selected="selected"{/if}>{$vo['code_name']}</option>
-				    		{/volist}
-				    	</select>  
-				    	<label style="color:#ff6a08!important">*关联基础代码的会员级别</label>
-				    </div>
-				  </div>
-                  <div class="layui-form-item">
-				    <label class="layui-form-label">会员折扣(%)</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="discount" value="{$one['discount']}" required  lay-verify="required" placeholder="请输入折扣数值,无需带%" autocomplete="off" class="layui-input">
-				    </div>
-				  </div>
+	<div class="mainBox">
+		<div class="main-container">
+			<div class="main-container">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">等级名称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="levelname" value="{$one['levelname']}" {present name="one"}readonly="readonly"{/present} required  lay-verify="required" placeholder="请输入会员等级" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">级别代码</label>
+					<div class="layui-input-inline">
+						<select name="code">
+							{volist name="levelCode" id="vo"}
+							<option value="{$vo['code_id']}" {if condition="$vo['code_id'] eq $one['code']"}selected="selected"{/if}>{$vo['code_name']}</option>
+							{/volist}
+						</select>
+						<label style="color:#ff6a08!important">*关联基础代码的会员级别</label>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">会员折扣(%)</label>
+					<div class="layui-input-inline">
+						<input type="text" name="discount" value="{$one['discount']}" required  lay-verify="required" placeholder="请输入折扣数值,无需带%" autocomplete="off" class="layui-input">
+						<label style="color:#ff6a08!important">50代表5折，80代表8折</label>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">等级有效期</label>
+					<div class="layui-input-inline">
+						<input type="text" name="expire_date" id="expire_date" value="{$one['expire_date']}" required  lay-verify="required" placeholder="请选择等级有效期" autocomplete="off" class="layui-input">
+						<label style="color:#ff6a08!important">逾期不享受会员折扣</label>
+					</div>
+				</div>
+				<!--
 				  <div class="layui-form-item">
 				    <label class="layui-form-label">会员优惠</label>
 				    <div class="layui-input-inline">
 				      <input type="text" name="sale" value="{$one['sale']}" placeholder="请输入优惠数值" autocomplete="off" class="layui-input">
 				    </div>
 				  </div>
-				  
-        		<input name="lid" type="hidden" value="{$one['lid']}"/>
-            </div>
-        </div>
-    </div>
-    <div class="bottom">
-        <div class="button-container">
-            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="user-save">
-                <i class="layui-icon layui-icon-ok"></i>
-                提交
-            </button>
-            <button type="reset" class="pear-btn pear-btn-sm">
-                <i class="layui-icon layui-icon-refresh"></i>
-                重置
-            </button>
-        </div>
-    </div>
+				  -->
+
+				<input name="lid" type="hidden" value="{$one['lid']}"/>
+			</div>
+		</div>
+	</div>
+	<div class="bottom">
+		<div class="button-container">
+			<button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="user-save">
+				<i class="layui-icon layui-icon-ok"></i>
+				提交
+			</button>
+			<button type="reset" class="pear-btn pear-btn-sm">
+				<i class="layui-icon layui-icon-refresh"></i>
+				重置
+			</button>
+		</div>
+	</div>
 </form>
 <script src="__STATIC__/lib/layui/layui.js"></script>
 <script src="__PEAR__/component/pear/pear.js"></script>
 <script>
-layui.use(['form','jquery'],function(){
-    let form = layui.form;
-    let $ = layui.jquery;
-    var path="/{$MODULE_NAME}/Member";
-	var _url="/saveLevel";
+	layui.use(['form','jquery','laydate'],function(){
+		let form = layui.form;
+		let $ = layui.jquery;
+		let laydate=layui.laydate;
+		var path="/{$MODULE_NAME}/Member";
+		var _url="/saveLevel";
 
-    form.on('submit(user-save)', function(data){
-    	
-        $.ajax({
-            url:path+_url,
-            data:JSON.stringify(data.field),
-            dataType:'json',
-            contentType:'application/json',
-            type:'post',
-            success:function(result){
-                if(result.code){
-                    layer.msg(result.msg,{icon:1,time:1000},function(){
-                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
-                        parent.layui.table.reload("memberlevel-table");
-                    });
-                }else{
-                    layer.msg(result.msg,{icon:2,time:1000});
-                }
-            }
-        })
-        return false;
-    });
-})
+		laydate.render({
+			elem: '#expire_date'
+			,type: 'datetime'
+		});
+
+		form.on('submit(user-save)', function(data){
+
+			$.ajax({
+				url:path+_url,
+				data:JSON.stringify(data.field),
+				dataType:'json',
+				contentType:'application/json',
+				type:'post',
+				success:function(result){
+					if(result.code){
+						layer.msg(result.msg,{icon:1,time:1000},function(){
+							parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+							parent.layui.table.reload("memberlevel-table");
+						});
+					}else{
+						layer.msg(result.msg,{icon:2,time:1000});
+					}
+				}
+			})
+			return false;
+		});
+	})
 </script>
 <script>
 </script>

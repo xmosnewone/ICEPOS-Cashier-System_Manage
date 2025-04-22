@@ -5,7 +5,7 @@ return array(
 		//上传文件根目录
 		'uploads_path'			=>'./uploads',
 		//开启图片上传水印
-		'is_water'				=>1,
+		'is_water'				=>0,
 		//水印文件路径
 		'water_image'			=>'./static/images/admin/water.png',
 		//图片限制大小,单位是KB

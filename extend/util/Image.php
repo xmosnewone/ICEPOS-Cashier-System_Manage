@@ -317,7 +317,7 @@ class Image {
      * @param bool $border  是否加边框 array(color)
      * @return string
      */
-    static function buildString($string, $rgb=array(), $filename='', $type='png', $disturb=1, $border=true) {
+    static function buildString($string,$size, $font='', $rgb=array(), $filename='', $type='png', $disturb=1, $border=true) {
         if (is_string($size))
             $size = explode(',', $size);
         $width = $size[0];

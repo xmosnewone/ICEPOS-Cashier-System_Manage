@@ -1,197 +1,204 @@
 <!DOCTYPE html>
 <html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>编辑新闻</title>
-    <link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
-    <script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.config.js"></script>
-<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.all.js"></script>
-<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
-<style>
-.longtxt{width:500px;}
-</style>
+	<meta charset="UTF-8">
+	<title>编辑新闻</title>
+	<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+	<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.config.js"></script>
+	<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.all.js"></script>
+	<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/lang/zh-cn/zh-cn.js"></script>
+	<style>
+		.longtxt{width:500px;}
+	</style>
 </head>
 <body>
 <form class="layui-form" action="">
-    <div class="mainBox">
-        <div class="main-container">
-            <div class="main-container">
+	<div class="mainBox">
+		<div class="main-container">
+			<div class="main-container">
 
-                  <div class="layui-form-item ">
-                  	<div class="layui-col-md12">
-					    <label class="layui-form-label">新闻分类</label>
-					    <div class="layui-input-inline">
-					      <select name="type">
-									{volist name="types" id="vo"}
-									<option {if condition="$vo['id'] eq $one['type']"} selected="selected"{/if} value="{$vo['id']}">{$vo['name']}</option>
-									{/volist}
+				<div class="layui-form-item ">
+					<div class="layui-col-md12">
+						<label class="layui-form-label">新闻分类</label>
+						<div class="layui-input-inline">
+							<select name="type">
+								{volist name="types" id="vo"}
+								<option {if condition="$vo['id'] eq $one['type']"} selected="selected"{/if} value="{$vo['id']}">{$vo['name']}</option>
+								{/volist}
 							</select>
-					    </div>
-				    </div>
-				  </div>
-				  
-				  <div class="layui-form-item">
-				  <div class="layui-col-md12">
-				    <label class="layui-form-label">新闻标题</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="title" value="{$one['title']}" required  lay-verify="required" placeholder="请输入新闻标题" autocomplete="off" class="layui-input longtxt">
-				    </div>
-				    </div>
-				  </div>
-				  
-				  <div class="layui-form-item">
-				  <div class="layui-col-md12">
-				    <label class="layui-form-label">发布人</label>
-				    <div class="layui-input-inline">
-				      <input type="text" name="username" value="{$one['username']}" placeholder="请输入发布人" autocomplete="off" class="layui-input longtxt">
-				    </div>
-				    </div>
-				  </div>
-				  
-				  <style>
-				.layui-upload-list{width:500px;margin: 0 auto;}
-				</style>
-				<div class="layui-row">
-					 <div class="layui-form-item">
-					 	<div class="layui-col-md6">
-					   <label class="layui-form-label">新闻小图</label>
-					   <div class="layui-input-inline">
-					     <input type="text" id="headimg_small" name="headimg_small" value="{$one['headimg_small']|default=''}" autocomplete="off" class="layui-input">
-					   </div>
-					   </div>
-					   
-					   <div class="layui-col-md6">
-					   	<button type="button" class="layui-btn layui-btn-danger" id="uploadImage"><i class="layui-icon"></i>上传图片</button>
-					   	<div class="layui-upload-list">
-					    	<img class="layui-upload-img" id="showimg" {if condition="$one['headimg_small'] neq '' "} src="{$one['headimg_small']} {/if}" width="150">
-					  	</div>
-					   </div>
-					   
-					 </div>
-				 </div>
-				 
-				 <div class="layui-row">
-					 <div class="layui-form-item">
-					 	<div class="layui-col-md6">
-					   <label class="layui-form-label">新闻大图</label>
-					   <div class="layui-input-inline">
-					     <input type="text" id="headimg" name="headimg" value="{$one['headimg']|default=''}" autocomplete="off" class="layui-input">
-					   </div>
-					   </div>
-					   
-					   <div class="layui-col-md6">
-					   	<button type="button" class="layui-btn layui-btn-danger" id="uploadImage2"><i class="layui-icon"></i>上传图片</button>
-					   	<div class="layui-upload-list">
-					    	<img class="layui-upload-img" id="showimg2" {if condition="$one['headimg'] neq '' "} src="{$one['headimg']} {/if}" width="150">
-					  	</div>
-					   </div>
-					   
-					 </div>
-				 </div>
-				  
-				  <div class="layui-row">
-						<div class="layui-form-item">
-							  	<div class="layui-col-md12">
-							    <p style="color:#ff6a08;text-align:center;"> * 建议点击编辑器右上角 "全屏" 图标，使用全屏模式编辑</p>
-							    </div>
-							  	<div class="layui-col-md12">
-							    <label class="layui-form-label">新闻内容</label>
-							    <div class="layui-input-inline" style="width: 660px; height: 400px;">
-							    	<script id="editor" name="content"  type="text/plain" style="width: 660px; height: 400px;"></script>
-							    </div>
-							    </div>
-						
 						</div>
 					</div>
-				  
-				  <input name="id" type="hidden" value="{$one['id']}"/>
-            </div>
-        </div>
-    </div>
-    <div class="bottom">
-        <div class="button-container">
-            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="type-save">
-                <i class="layui-icon layui-icon-ok"></i>
-                提交
-            </button>
-            <button type="reset" class="pear-btn pear-btn-sm">
-                <i class="layui-icon layui-icon-refresh"></i>
-                重置
-            </button>
-        </div>
-    </div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-col-md12">
+						<label class="layui-form-label">新闻标题</label>
+						<div class="layui-input-inline">
+							<input type="text" name="title" value="{$one['title']}" required  lay-verify="required" placeholder="请输入新闻标题" autocomplete="off" class="layui-input longtxt">
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-col-md12">
+						<label class="layui-form-label">发布人</label>
+						<div class="layui-input-inline">
+							<input type="text" name="username" value="{$one['username']}" placeholder="请输入发布人" autocomplete="off" class="layui-input longtxt">
+						</div>
+					</div>
+				</div>
+
+				<style>
+					.layui-upload-list{width:500px;margin: 0 auto;}
+				</style>
+				<div class="layui-row">
+					<div class="layui-form-item">
+						<div class="layui-col-md6">
+							<label class="layui-form-label">新闻小图</label>
+							<div class="layui-input-inline">
+								<input type="text" id="headimg_small" name="headimg_small" value="{$one['headimg_small']|default=''}" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-col-md6">
+							<button type="button" class="layui-btn layui-btn-danger" id="uploadImage"><i class="layui-icon"></i>上传图片</button>
+							<div class="layui-upload-list">
+								<img class="layui-upload-img" id="showimg" {if condition="$one['headimg_small'] neq '' "} src="{$one['headimg_small']} {/if}" width="150">
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="layui-row">
+					<div class="layui-form-item">
+						<div class="layui-col-md6">
+							<label class="layui-form-label">新闻大图</label>
+							<div class="layui-input-inline">
+								<input type="text" id="headimg" name="headimg" value="{$one['headimg']|default=''}" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-col-md6">
+							<button type="button" class="layui-btn layui-btn-danger" id="uploadImage2"><i class="layui-icon"></i>上传图片</button>
+							<div class="layui-upload-list">
+								<img class="layui-upload-img" id="showimg2" {if condition="$one['headimg'] neq '' "} src="{$one['headimg']} {/if}" width="150">
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">是否开启</label>
+					<div class="layui-input-inline">
+						<input type="checkbox" name="isEnabled" {if condition="$one['is_enabled'] eq 1"} checked="checked"{/if} value="1" title="是" >
+					</div>
+				</div>
+
+				<div class="layui-row">
+					<div class="layui-form-item">
+						<div class="layui-col-md12">
+							<p style="color:#ff6a08;text-align:center;"> * 建议点击编辑器右上角 "全屏" 图标，使用全屏模式编辑</p>
+						</div>
+						<div class="layui-col-md12">
+							<label class="layui-form-label">新闻内容</label>
+							<div class="layui-input-inline" style="width: 660px; height: 400px;">
+								<script id="editor" name="content"  type="text/plain" style="width: 660px; height: 400px;"></script>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<input name="id" type="hidden" value="{$one['id']}"/>
+			</div>
+		</div>
+	</div>
+	<div class="bottom">
+		<div class="button-container">
+			<button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="type-save">
+				<i class="layui-icon layui-icon-ok"></i>
+				提交
+			</button>
+			<button type="reset" class="pear-btn pear-btn-sm">
+				<i class="layui-icon layui-icon-refresh"></i>
+				重置
+			</button>
+		</div>
+	</div>
 </form>
 <script src="__STATIC__/lib/layui/layui.js"></script>
 <script src="__PEAR__/component/pear/pear.js"></script>
 <script>
 
-var ue = UE.getEditor('editor');
-//编辑器加载完毕后执行操作
-ue.ready(function() {
-	ue.setContent('{$one["content"]|raw}',false);
-});
+	var ue = UE.getEditor('editor');
+	//编辑器加载完毕后执行操作
+	ue.ready(function() {
+		ue.setContent('{$one["content"]|raw}',false);
+	});
 
-layui.use(['form','jquery','laydate','upload','colorpicker'],function(){
-	
-	var laydate = layui.laydate;
-	var upload = layui.upload;
-    let form = layui.form;
-    let $ = layui.jquery;
-    let colorpicker = layui.colorpicker;
-    
-	//小图片上传
-	upload.render({
-	    elem: '#uploadImage'
-	    ,url: "/{$MODULE_NAME}/News/upload" //此处配置你自己的上传接口即可
-	    ,method: 'post'
-	    ,size: 2048 //限制文件大小，单位 KB
-	    ,done: function(res){
-	     	$("#headimg_small").val(res.data.path);
-	     	$("#showimg").attr("src",res.data.path);
-	    },error: function(index, upload){ //上传失败
-	    	layer.msg('上传失败，请重试');
-	    }
-	  });
-	
-	//大图片上传
-	upload.render({
-	    elem: '#uploadImage2'
-	    ,url: "/{$MODULE_NAME}/News/upload" //此处配置你自己的上传接口即可
-	    ,method: 'post'
-	    ,size: 2048 //限制文件大小，单位 KB
-	    ,done: function(res){
-	     	$("#headimg").val(res.data.path);
-	     	$("#showimg2").attr("src",res.data.path);
-	    },error: function(index, upload){ //上传失败
-	    	layer.msg('上传失败，请重试');
-	    }
-	  });
-	
-    var path="/{$MODULE_NAME}/news";
-	var _url="/save";
-    form.on('submit(type-save)', function(data){
-        $.ajax({
-            url:path+_url,
-            data:JSON.stringify(data.field),
-            dataType:'json',
-            contentType:'application/json',
-            type:'post',
-            success:function(result){
-                if(result.code){
-                    layer.msg(result.msg,{icon:1,time:1000},function(){
-                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
-                        parent.layui.table.reload("news-table",{
-							where:{}
+	layui.use(['form','jquery','laydate','upload','colorpicker'],function(){
+
+		var laydate = layui.laydate;
+		var upload = layui.upload;
+		let form = layui.form;
+		let $ = layui.jquery;
+		let colorpicker = layui.colorpicker;
+
+		//小图片上传
+		upload.render({
+			elem: '#uploadImage'
+			,url: "/{$MODULE_NAME}/News/upload" //此处配置你自己的上传接口即可
+			,method: 'post'
+			,size: 2048 //限制文件大小，单位 KB
+			,done: function(res){
+				$("#headimg_small").val(res.data.path);
+				$("#showimg").attr("src",res.data.path);
+			},error: function(index, upload){ //上传失败
+				layer.msg('上传失败，请重试');
+			}
+		});
+
+		//大图片上传
+		upload.render({
+			elem: '#uploadImage2'
+			,url: "/{$MODULE_NAME}/News/upload" //此处配置你自己的上传接口即可
+			,method: 'post'
+			,size: 2048 //限制文件大小，单位 KB
+			,done: function(res){
+				$("#headimg").val(res.data.path);
+				$("#showimg2").attr("src",res.data.path);
+			},error: function(index, upload){ //上传失败
+				layer.msg('上传失败，请重试');
+			}
+		});
+
+		var path="/{$MODULE_NAME}/news";
+		var _url="/save";
+		form.on('submit(type-save)', function(data){
+			$.ajax({
+				url:path+_url,
+				data:JSON.stringify(data.field),
+				dataType:'json',
+				contentType:'application/json',
+				type:'post',
+				success:function(result){
+					if(result.code){
+						layer.msg(result.msg,{icon:1,time:1000},function(){
+							parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+							parent.layui.table.reload("news-table",{
+								where:{}
+							});
 						});
-                    });
-                }else{
-                    layer.msg(result.msg,{icon:2,time:1000});
-                }
-            }
-        })
-        return false;
-    });
-})
+					}else{
+						layer.msg(result.msg,{icon:2,time:1000});
+					}
+				}
+			})
+			return false;
+		});
+	})
 </script>
 <script>
 </script>

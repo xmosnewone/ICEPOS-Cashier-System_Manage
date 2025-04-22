@@ -140,3 +140,27 @@ function cache_functions(){
 	cache_write ( 'function', 'function', $cache );
 	cache_write ( 'function_url', 'function_url', $cache_url );
 }
+/**
+ * 系统配置写入缓存
+ */
+function config_cache(){
+    $configs = M( 'system_config' )->select ();
+    $cache=[];
+    foreach ( $configs as  $value ) {
+        $cache [$value['key']] = stripslashes($value['value']);
+    }
+    unset($configs);
+    cache_write ( 'web_config', 'web_config', $cache );
+}
+/**
+ * 替换部分字符串为星号
+ * $start = 2; // 开始替换的位置
+ * $length = 5; // 需要替换的长度
+ */
+function cover_string($string,$start=2,$length=3){
+    if(trim($string)==''){
+        return '';
+    }
+    $stars = str_repeat("*", $length);
+    return substr_replace($string, $stars, $start, $length);
+}

@@ -1,8 +1,4 @@
 <?php
-
-namespace Qcloud\Sms;
-
-
 /**
  * 发送Util类
  *

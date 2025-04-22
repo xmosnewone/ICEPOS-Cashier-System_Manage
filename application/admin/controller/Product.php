@@ -263,7 +263,7 @@ class Product extends Super {
 		$content ['base_price2'] = input ( 'base_price2' );
 		$content ['base_price3'] = input ( 'base_price3' );
 		$content ['base_price4'] = input ( 'base_price4' );
-		$content ['content'] = input ( 'content','',"");
+		$content ['content'] = input ( 'content','',"trim");
 		
 		$content ['modify_date'] = date ( "Y-m-d H:i:s", time () );
 		

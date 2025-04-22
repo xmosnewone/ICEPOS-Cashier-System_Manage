@@ -1,8 +1,5 @@
 <?php
-
-namespace Qcloud\Sms;
-
-use Qcloud\Sms\SmsSenderUtil;
+require_once dirname ( __FILE__ ).DIRECTORY_SEPARATOR.'./SmsSenderUtil.php';
 
 /**
  * 发送语音验证码类

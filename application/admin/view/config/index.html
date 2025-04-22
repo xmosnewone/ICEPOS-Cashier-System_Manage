@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>系统设置</title>
+	<link rel="stylesheet" href="__PEAR__/component/pear/css/pear.css" />
+</head>
+<style>
+	.layui-form-item{width: 750px;}
+	.layui-form-item .layui-input-inline{width: 500px;}
+	.top {width: 100%;position: relative;height: 50px;line-height: 50px;border-top: 1px solid #eee;text-align: left}
+	.bu-container{margin-left: 10px;}
+</style>
+<body >
+<form class="layui-form" action="">
+	<div class="top">
+		<div class="bu-container">
+			<button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit="" lay-filter="config-save">
+				<i class="layui-icon layui-icon-ok"></i>
+				保存
+			</button>
+			<button type="reset" class="pear-btn pear-btn-sm">
+				<i class="layui-icon layui-icon-refresh"></i>
+				重置
+			</button>
+		</div>
+	</div>
+	<div class="layui-tab">
+		<ul class="layui-tab-title">
+			<li class="layui-this">系统设置</li>
+			<li>会员中心UNIAPP</li>
+		</ul>
+
+		<div class="layui-tab-content">
+
+			<div class="layui-tab-item layui-show">
+				<div class="layui-form-item">
+					<label class="layui-form-label">系统名称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="web_name" value="{$web_config['web_name']}" required  lay-verify="required" placeholder="请输入系统名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">会员折扣</label>
+					<div class="layui-input-inline">
+						<input type="radio" name="open_member_discount" value="1" {if condition="$web_config['open_member_discount'] eq 1"} checked="checked"{/if} title="已开启收银系统会员折扣促销">
+						<input type="radio" name="open_member_discount"  value="0" {if condition="$web_config['open_member_discount'] neq 1"} checked="checked"{/if} title="已关闭收银系统会员折扣促销" >
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">积分有效期</label>
+					<div class="layui-input-inline" style="width:200px">
+						<input type="text"  name="credit_expire" value="{$web_config['credit_expire']}" required  lay-verify="required" placeholder="请输入数字" autocomplete="off" class="layui-input">
+
+					</div>
+					<div class="layui-form-mid layui-word-aux">年</div>
+				</div>
+
+			</div>
+			<div class="layui-tab-item">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">小程序APPID</label>
+					<div class="layui-input-inline">
+						<input type="text" name="mp_appid" value="{$web_config['mp_appid']}"   placeholder="请输入小程序APPID" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">小程序AppSecret</label>
+					<div class="layui-input-inline">
+						<input type="text" name="mp_appsecret" value="{$web_config['mp_appsecret']}"   placeholder="请输入小程序AppSecret" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">小程序手机号验证</label>
+					<div class="layui-input-inline">
+						<input type="radio" name="mp_mobile_verify" value="1" {if condition="$web_config['mp_mobile_verify'] eq 1"} checked="checked"{/if} title="已开启小程序手机号快速验证组件">
+						<input type="radio" name="mp_mobile_verify"  value="0" {if condition="$web_config['mp_mobile_verify'] neq 1"} checked="checked"{/if} title="已关闭小程序手机号快速验证组件" >
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">短信验证注册</label>
+					<div class="layui-input-inline">
+						<input type="radio" name="sms_verify" value="1" {if condition="$web_config['sms_verify'] eq 1"} checked="checked"{/if} title="已开启会员注册短信验证手机">
+						<input type="radio" name="sms_verify"  value="0" {if condition="$web_config['sms_verify'] neq 1"} checked="checked"{/if} title="已关闭会员注册短信验证手机" >
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">腾讯secretId</label>
+					<div class="layui-input-inline">
+						<input type="text" name="sms_secretid" value="{$web_config['sms_secretid']}"   placeholder="请输入secretId" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">腾讯secretKey</label>
+					<div class="layui-input-inline">
+						<input type="text" name="sms_secretkey" value="{$web_config['sms_secretkey']}"   placeholder="请输入secretKey" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">短信应用ID</label>
+					<div class="layui-input-inline">
+						<input type="text" name="sms_appid" value="{$web_config['sms_appid']}"   placeholder="请输入短信应用APPID" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">短信签名</label>
+					<div class="layui-input-inline">
+						<input type="text" name="sms_sign" value="{$web_config['sms_sign']}"   placeholder="请输入短信签名" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">短信模板ID</label>
+					<div class="layui-input-inline">
+						<input type="text" name="sms_tempid" value="{$web_config['sms_tempid']}"   placeholder="请输入短信模板ID" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</form>
+<script src="__STATIC__/lib/jquery.min.js"></script>
+<script src="__STATIC__/lib/layui/layui.js"></script>
+<script src="__PEAR__/component/pear/pear.js"></script>
+<script>
+
+	layui.use(['element', 'code',"layer",'form','jquery'], function() {
+		let form = layui.form;
+		let $ = layui.jquery;
+		var path="/{$MODULE_NAME}/Config/";
+		var _url="/set_config";
+
+		form.on('submit(config-save)', function(data){
+			$.ajax({
+				url:path+_url,
+				data:JSON.stringify(data.field),
+				dataType:'json',
+				contentType:'application/json',
+				type:'post',
+				success:function(result){
+					if(result.code){
+						layer.msg(result.msg,{icon:1,time:3000},function(){
+
+						});
+					}else{
+						layer.msg(result.msg,{icon:2,time:3000});
+					}
+				}
+			})
+			return false;
+		});
+
+	})
+
+
+</script>
+</body>
+</html>

@@ -267,34 +267,6 @@ class Api extends Super {
         return $this->ajaxReturn(['status'=>200,'url'=>$pics]);//返回图片路径
     }
 
-    /**
-     * 文件上传
-     * @access string $input 文件名称
-     */
-    public function uploadFile($input)
-    {
-        if (!empty($_FILES[$input])) {
-            $uploads=config("uploads_path");
-            $file = request()->file($input);
-            $info = $file->move($uploads);
-            $result=[];
-            if($info){
-                // 成功上传后 获取上传信息
-                $result['status']=1;
-                $result['extension']=$info->getExtension();
-                //完整上传路径
-                $result['path']=$uploads."/".str_replace("\\", "/", $info->getSaveName());
-                //上传后的名称
-                $result['filename']=$info->getFilename();
-            }else{
-                // 上传失败获取错误信息
-                $result['status']=0;
-                $result['msg']=$file->getError();
-            }
-            return $result;
-        }
-    }
-
     // 保存门店的信息
     public function saveBrninfo() {
         $res = $this->ApiConnect ( $_POST );

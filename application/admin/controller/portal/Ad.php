@@ -5,46 +5,69 @@ use app\admin\controller\portal\Jsondata;
 use model\PortalAd;
 use model\PortalAdSpace;
 use model\PortalAdAttr;
+use model\News;
 use think\Db;
 
 class Ad extends Super{
 
-	//广告列表
+    //广告列表
     public function index() {
-    	$PortalAdSpace=new PortalAdSpace();
+        $PortalAdSpace=new PortalAdSpace();
         $this->assign("space", $PortalAdSpace->GetEnabledAdSpace());
         return $this->fetch("portal/ad/index");
     }
 
-	//编辑广告
+    //编辑广告
     public function view() {
 
-       	 	$adId = input("id");
-       	 	
-       	 	$PortalAdSpace=new PortalAdSpace();
-       	 	$this->assign("space", $PortalAdSpace->GetEnabledAdSpace());
-       	 	$this->assign("category", $this->GetCategory());
-       	 	
-           	if (!empty($adId)) {
-	                $PortalAd=new PortalAd();
-	                $ad = $PortalAd->GetOneById($adId);
-	                $this->assign("one", $ad);
-	                $PortalAdAttr=new PortalAdAttr();
-	                $attr = $PortalAdAttr->GetAdAttrByAdid($adId);
-	                $attrAry = array();
-	                if($ad['category']=='image'){
-                        foreach ($attr as $k => $v) {
-                            $attrAry[$v['pid']][$v['attr_key']] = $v['attr_value'];//二维数组
-                        }
-                    }else{
-                        foreach ($attr as $k => $v) {
-                            $attrAry[$v['attr_key']] = $v['attr_value'];//二维数组
-                        }
-                    }
-	                $this->assign("attr", $attrAry);
-             }
-            
-            return $this->fetch("portal/ad/view");
+        $adId = input("id");
+
+        $PortalAdSpace=new PortalAdSpace();
+        $this->assign("space", $PortalAdSpace->GetEnabledAdSpace());
+        $this->assign("category", $this->GetCategory());
+
+        //查询新闻
+        $newsModel=new News();
+        $newsList=$newsModel->field("id,type,title")->order("time desc")->where("is_enabled='1'")->select();
+        $this->assign("newslist", $newsList);
+
+        if (!empty($adId)) {
+            $PortalAd=new PortalAd();
+            $ad = $PortalAd->GetOneById($adId);
+            $this->assign("one", $ad);
+            $PortalAdAttr=new PortalAdAttr();
+            $attr = $PortalAdAttr->GetAdAttrByAdid($adId);
+            $attrAry = array();
+            if($ad['category']=='image'){
+                foreach ($attr as $k => $v) {
+                    $attrAry[$v['pid']][$v['attr_key']] = $v['attr_value'];//二维数组
+                }
+            }else{
+                foreach ($attr as $k => $v) {
+                    $attrAry[$v['attr_key']] = $v['attr_value'];//二维数组
+                }
+            }
+            $this->assign("attr", $attrAry);
+        }
+
+        return $this->fetch("portal/ad/view");
+    }
+
+    //搜索新闻
+    public function search_news() {
+        $keyword=input("keyword");
+        //查询新闻
+        $newsModel=new News();
+        $newsList=$newsModel->field("id,type,title")
+            ->order("time desc")
+            ->where("is_enabled='1' and title like '%$keyword%'")
+            ->limit("10")
+            ->select();
+        $data=[];
+        if($newsList!==false&&count($newsList)>0){
+            $data=$newsList->toArray();
+        }
+        ajaxReturn(['data'=>$data]);
     }
 
     //保存广告
@@ -60,6 +83,7 @@ class Ad extends Super{
         $option = input("option");
         $branch_no=input("branch_no");
         $link=input("link");
+        $news_id=input("news_id");
         if(strtoupper($branch_no)=='ALL'){
             $branch_no='ALL';
         }
@@ -126,6 +150,7 @@ class Ad extends Super{
             $ad->end_time = $endTime;
             $ad->is_enabled = $isenabled;
             $ad->link=$link;
+            $ad->news_id=$news_id;
 
             if ($ad_id=$ad->Add($ad, $attrAry)) {
                 if(count($attrval)>0&&$category=='image'){
@@ -158,6 +183,8 @@ class Ad extends Super{
             $ad->end_time = $endTime;
             $ad->is_enabled = $isenabled;
             $ad->link=$link;
+            $ad->news_id=$news_id;
+
             if ($ad->Add($ad, $attrAry)) {
                 if(count($attrval)>0&&$category=='image'){
                     foreach($attrval as $v){
@@ -173,36 +200,36 @@ class Ad extends Super{
             }
         }
     }
-    
+
     //是否显示广告
     public function updateEnable() {
-    
-    	$id = input("id");
-    	$is_enabled=is_numeric(input("is_enabled")) ? input("is_enabled") : 0;
-    	if (empty($id)) {
-    		return array("code" => false, "msg" =>lang("ad_id_empty"));
-    	}
-    
-    	$PortalAd=new PortalAd();
-    	$ad=$PortalAd->GetOneById($id);
-    	$ad->is_enabled=$is_enabled;
-    	$flag=$PortalAd->updateAd($ad);
-    	if ($flag) {
-    		return array("code" => true, "msg" => lang("save_data_success"));
-    	} else {
-    		return array("code" => false, "msg" => lang("save_data_error"));
-    	}
+
+        $id = input("id");
+        $is_enabled=is_numeric(input("is_enabled")) ? input("is_enabled") : 0;
+        if (empty($id)) {
+            return array("code" => false, "msg" =>lang("ad_id_empty"));
+        }
+
+        $PortalAd=new PortalAd();
+        $ad=$PortalAd->GetOneById($id);
+        $ad->is_enabled=$is_enabled;
+        $flag=$PortalAd->updateAd($ad);
+        if ($flag) {
+            return array("code" => true, "msg" => lang("save_data_success"));
+        } else {
+            return array("code" => false, "msg" => lang("save_data_error"));
+        }
     }
 
     //删除广告
     public function delete() {
-    	
+
         $adId = input("id");
 
         if (empty($adId)) {
-           return array("code" => "-1", "msg" => lang("ad_id_empty"));
+            return array("code" => "-1", "msg" => lang("ad_id_empty"));
         }
-        
+
         $PortalAd=new PortalAd();
         $ad = $PortalAd->GetOneById($adId);
 
@@ -215,33 +242,33 @@ class Ad extends Super{
             return array("code" => "-1", "msg" => lang("ad_delete_error"));
         }
     }
-    
+
     //批量删除广告
     public function batchDelete() {
-    	 
-    	$adId = input("id");
-    
-    	if (empty($adId)) {
-    		return array("code" => false, "msg" => lang("ad_id_empty"));
-    	}
-    
-    	$adIds=explode(",",$adId);
-    	
-    	$PortalAd=new PortalAd();
-    	foreach($adIds as $id){
-    		
-    		$ad = $PortalAd->GetOneById($id);
-    		if (empty($ad)) {
-    			continue;
-    		}
-    		$ad->Del($id);
-    	}
-    
-    	return array("code" => true, "msg" => lang("ad_delete_success"));
-    	
+
+        $adId = input("id");
+
+        if (empty($adId)) {
+            return array("code" => false, "msg" => lang("ad_id_empty"));
+        }
+
+        $adIds=explode(",",$adId);
+
+        $PortalAd=new PortalAd();
+        foreach($adIds as $id){
+
+            $ad = $PortalAd->GetOneById($id);
+            if (empty($ad)) {
+                continue;
+            }
+            $ad->Del($id);
+        }
+
+        return array("code" => true, "msg" => lang("ad_delete_success"));
+
     }
 
-	//上传图片
+    //上传图片
     public function uploadImages() {
         //上传图片
         $result=$this->uploadImage("file",[]);
@@ -277,7 +304,7 @@ class Ad extends Super{
         }
         $result['pid']=$pid;
         return array("code" => '0', "msg" =>'success','data'=>$result);
-        
+
     }
 
     //删除上传图片
@@ -308,7 +335,7 @@ class Ad extends Super{
         );
     }
 
-	//广告列表
+    //广告列表
     public function getAdList() {
         $approve = input("approve");
         $category = input("category");
@@ -319,14 +346,14 @@ class Ad extends Super{
         $page = input('page') ? intval(input('page')) : 1;
         $rows = input('limit') ? intval(input('limit')) : 10;
         $cateAry = $this->GetCategory();
-        
+
         $PortalAd=new PortalAd();
         $PortalAdSpace=new PortalAdSpace();
         $countSql='SELECT count(*) as total';
         $fieldSql="SELECT  a.ad_id, s.ad_space_name, a.ad_name, a.category, a.start_time, a.end_time, a.is_enabled";
         $sql =  " FROM " . $PortalAd->tableName() . " AS a "
-                . " LEFT JOIN " . $PortalAdSpace->tableName() . " AS s ON s.ad_space_id=a.ad_space_id"
-                . " WHERE 1=1 ";
+            . " LEFT JOIN " . $PortalAdSpace->tableName() . " AS s ON s.ad_space_id=a.ad_space_id"
+            . " WHERE 1=1 ";
 
         if ($category != "-1" && $category != "") {
             $sql .= " AND a.category='" . $category . "'";
@@ -353,11 +380,13 @@ class Ad extends Super{
 
         $result=Db::query($countSql.$sql);
         $total=$result[0]['total'];
-        
+
         $offset = ($page - 1) * $rows;
         $rowIndex = ($page - 1) * $rows + 1;
         $model = Db::query($fieldSql.$sql." limit $offset,$rows");
-        
+
+        $PortalAdAttr=new PortalAdAttr();
+
         $ary = array();
         foreach ($model as $k => $v) {
             $tt = array();
@@ -370,6 +399,13 @@ class Ad extends Super{
             $tt["endTime"] = $v["end_time"];
             $tt["isEnabled"] = $v["is_enabled"];
 
+            $image="";
+            $ad_id=$v["ad_id"];
+            if($v["category"]=="image"){
+                $attr=$PortalAdAttr->field("attr_value")->where("ad_id='$ad_id' and attr_key='attr_image_url'")->find();
+                $image=$attr['attr_value'];
+            }
+            $tt["image"] = $image;
             array_push($ary, $tt);
             $rowIndex++;
         }

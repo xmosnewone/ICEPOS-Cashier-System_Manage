@@ -62,7 +62,7 @@ class Content extends Super {
                 }
                 $sql = "SELECT ctt.content_id,chle.channel_id,chle.channel_name, ctt.status,"
                         . " ctt.user_id,ctt.type_id,cty.type_name,ctt.top_level,ctt.sort_date,ctte.link,"
-                        . " ctt.is_recommend, ctte.title,ctte.short_title,ctte.author,ctte.origin,ctte.origin_url,ctte.description,"
+                        . " ctt.is_recommend, ctte.title,ctte.short_title,ctte.author,ctte.origin_author,ctte.origin_url,ctte.description,"
                         . " ctte.release_date,ctte.title_img,ctte.title_img_width,ctte.title_img_height,ctte.content_img,"
                         . " ctte.content_img_width,ctte.content_img_height,ctte.txt"
                         . " FROM " . $PortalContent->tableName() . " AS ctt "
@@ -101,7 +101,7 @@ class Content extends Super {
         $txtReleaseDate = trim(input("txtReleaseDate"));
         $txtTitleImg = trim(input("txtTitleImgP"));
         $txtContentImg = trim(input("txtContentImgP"));
-        $txtContent = input("txtContent",'',"");
+        $txtContent = input("txtContent",'',"trim");
         $option = trim(input("option"));
         
         //获取图片文件信息
@@ -182,7 +182,7 @@ class Content extends Super {
             }
             $addCon = new PortalContent();
             $addCon->channel_id = $txtChannelid;
-            $addCon->user_id = session("loginname");
+            $addCon->user_id = session("uid");
             $addCon->type_id = $sltType;
             $addCon->top_level = $txtTopLevel;
             $addCon->is_recommend = $chkIsRecommend;
@@ -192,7 +192,7 @@ class Content extends Super {
             $addConExt->title = $txtTitle;
             $addConExt->short_title = $txtShortTitle;
             $addConExt->author = $txtAuthor;
-            $addConExt->origin = $txtOrgin;
+            $addConExt->origin_author = $txtOrgin;
             $addConExt->origin_url = $txtOrginUrl;
             $addConExt->description = $txtDescription;
             $addConExt->release_date = $txtReleaseDate;
@@ -218,7 +218,7 @@ class Content extends Super {
                 return array("code" => false, "msg" =>lang("empty_record"));
             }
             $updCon->channel_id = $txtChannelid;
-            $updCon->user_id = session("loginname");
+            $updCon->user_id = session("uid");
             $updCon->type_id = $sltType;
             $updCon->top_level = $txtTopLevel;
             $updCon->is_recommend = $chkIsRecommend;
@@ -231,7 +231,7 @@ class Content extends Super {
             $updConExt->title = $txtTitle;
             $updConExt->short_title = $txtShortTitle;
             $updConExt->author = $txtAuthor;
-            $updConExt->origin = $txtOrgin;
+            $updConExt->origin_author = $txtOrgin;
             $updConExt->origin_url = $txtOrginUrl;
             $updConExt->description = $txtDescription;
             $updConExt->release_date = $txtReleaseDate;

@@ -66,6 +66,10 @@ class Member extends BaseModel{
        return Db::name($this->name)->where($where)->update($data);
     }
 
+    public function updateMember($where,$data){
+        return Db::name($this->name)->where($where)->update($data);
+    }
+
     //条件返回会员信息
     public function getWhere($where){
         $one=Db::name($this->name)->where($where)->find();
