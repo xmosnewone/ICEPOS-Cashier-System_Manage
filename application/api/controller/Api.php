@@ -1654,8 +1654,14 @@ class Api extends Super {
         $barPayRequestBuilder->setAppAuthToken ( $appAuthToken );
 
         // 调用barPay方法获取当面付应答
-        $barPay = new \AlipayTradeService ( $ali_config );
-        $barPayResult = $barPay->barPay ( $barPayRequestBuilder );
+        try{
+            $barPay = new \AlipayTradeService ( $ali_config );
+            $barPayResult = $barPay->barPay ( $barPayRequestBuilder );
+        }catch(\Exception $e ){
+            $message = "访问方法:支付宝扫码支付(aliPayFtf)失败 :" .$e ;
+            write_log ( $message, "API/api/aliPayFtf" );
+            return "-5";
+        }
 
         $code="-1";
         switch ($barPayResult->getTradeStatus ()) {
