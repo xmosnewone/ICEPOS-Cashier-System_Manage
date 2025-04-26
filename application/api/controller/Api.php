@@ -1688,7 +1688,8 @@ class Api extends Super {
                 $code="-4";
         }
 
-        $message = "访问方法:支付宝扫码支付(aliPayFtf)失败 :" .$code ;
+        $response=$barPayResult->getResponse();
+        $message = "访问方法:支付宝扫码支付(aliPayFtf)失败 :" .$code."失败原因:".$response->sub_msg;
         write_log ( $message, "API/api/aliPayFtf" );
         return $code;
     }

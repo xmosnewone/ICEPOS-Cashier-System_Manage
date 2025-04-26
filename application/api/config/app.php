@@ -7,7 +7,7 @@ return array(
 		// 默认输出类型
 		'default_return_type'    => 'html',
 		// 默认AJAX 数据返回格式,可选json xml ...
-		'default_ajax_return'    => 'xml',
+		'default_ajax_return'    => 'json',
 		//是否开启POS端访问接口日志记录,1是记录,0是不记录
 		'pos_log'=>1,
         //上传文件根目录
