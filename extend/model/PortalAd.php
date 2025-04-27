@@ -140,18 +140,22 @@ class PortalAd extends BaseModel {
     public function GetOneById($adId) {
     	return $this->where("ad_id='$adId'")->find();
     }
-    
-    public function GetAdForPos($branch_no, $pos_id='') {
+
+    public function GetAdForPos($branch_no, $space_id='') {
         $now=date('Y-m-d H:i:s',time());
-    	$model = $this->where("branch_no = '$branch_no' or branch_no='ALL' and start_time < '$now' and end_time > '$now' and is_enabled='1'")->find();
-    	$return=array();
-    	if (!empty($model)) {
-    		$return['category']=$model->category;
-    		$return['ad_id'] = $model->ad_id;
-    		$return['ad_code'] = $model->ad_code;
-    	}
-    	 
-    	return $return;
+        $where="(branch_no = '$branch_no' or branch_no='ALL')";
+        if(!empty($space_id)){
+            $where.=" and ad_space_id='$space_id'";
+        }
+        $model = $this->where("$where and start_time < '$now' and end_time > '$now' and is_enabled='1'")->find();
+        $return=array();
+        if (!empty($model)) {
+            $return['category']=$model->category;
+            $return['ad_id'] = $model->ad_id;
+            $return['ad_code'] = $model->ad_code;
+        }
+
+        return $return;
     }
 
 }

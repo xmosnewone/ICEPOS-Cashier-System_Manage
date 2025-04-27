@@ -178,8 +178,9 @@ class Api extends Super {
     // 显示广告图片
     public function adImage() {
         $branch_no = $_GET ['branch_no'];
+        $space_id=intval($_GET ['space_id']);
         $PortalAd = new PortalAd ();
-        $ad = $PortalAd->GetAdForPos ( $branch_no );
+        $ad = $PortalAd->GetAdForPos ( $branch_no,$space_id);
         $code = '';
         if ($ad ['category'] == 'image') {
             $PortalAdAttr = new PortalAdAttr ();
