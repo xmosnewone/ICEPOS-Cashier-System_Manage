@@ -217,3 +217,10 @@ ALTER TABLE `ice_member` ADD INDEX(`mobile`);
 --  2025-04-12
 --
 ALTER TABLE `ice_portal_ad` ADD `news_id` INT(11) UNSIGNED NULL DEFAULT '0' COMMENT '关联新闻的id' AFTER `link`;
+
+--
+--  2025-05-01
+--
+ALTER TABLE `ice_pos_status` CHANGE `hostip` `hostip` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE `ice_pos_status` CHANGE `hostname` `hostname` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE `ice_pos_status` CHANGE `hostmac` `hostmac` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;

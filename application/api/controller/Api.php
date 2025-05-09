@@ -12,6 +12,7 @@ use model\PortalAdAttr;
 use model\Item_cls;
 use model\Item_info;
 use model\ItemBarCode;
+use model\IntegralMember;
 use model\BaseCodeType;
 use model\BdItemCombsplit;
 use model\BaseCode;
@@ -1456,10 +1457,17 @@ class Api extends Super {
                         $result = "-10";
                     } else {
                         $model=$models[0];
+                        $IntegralMember=new IntegralMember();
+                        $im=$IntegralMember->where("flowno='{$model ["flow_no"]}'")->find();
+                        $score=0;
+                        //读取订单会员获取积分数，防止客户端没有计算积分方案
+                        if(!empty($im)&&!empty($im->id)&&!empty($im->credit)){
+                            $score=$im->credit;
+                        }
                         $posvip = new PosViplist ();
                         $posvip->flow_no = $model ["flow_no"];
                         $posvip->card_no = $model ["card_no"];
-                        $posvip->score = $model ["score"];
+                        $posvip->score = $score;
                         $posvip->sale_amt = $model ["sale_amt"];
                         $posvip->card_score = $model ["card_score"];
                         $posvip->card_amount = $model ["card_amount"];

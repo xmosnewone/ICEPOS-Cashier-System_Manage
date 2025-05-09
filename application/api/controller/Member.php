@@ -145,6 +145,7 @@ class Member extends Super {
 
                     $res=[];
                     $res['code']=1;
+                    $res['credit']=$total_credit;
                 }
 
             } catch ( \Exception $ex ) {
