@@ -4,6 +4,7 @@ use app\admin\controller\Super;
 use app\admin\components\BuildTreeArray;
 use model\Item_cls;
 use model\Item_info;
+use model\IntegralMember;
 use model\TreeNode;
 use model\PosBranch;
 use model\PosBranchStock;
@@ -577,7 +578,15 @@ class Index extends Super {
 		$result = array ();
 		$result ["saleflow"] = $saleflow;
 		$result ["payflow"] = $payflow;
-		$result ["baseflow"] = $baseflow;
+        if(!empty($baseflow['vip_no'])){
+            //查询会员积分
+            $im=new IntegralMember();
+            $imcredit=$im->field("credit")->where("flowno='$flowno'")->find();
+            if($imcredit){
+                $baseflow['credit']=$imcredit->credit;
+            }
+        }
+        $result ["baseflow"] = $baseflow;
 		return $result; 
     }
 
