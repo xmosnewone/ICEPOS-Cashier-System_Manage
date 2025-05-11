@@ -115,7 +115,7 @@ class Member extends Super {
                     $money=0;
                     if($flows&&count($flows)>0){
                         foreach($flows as $v){
-                            if(in_array($v['coin_type'],$realPayment)){
+                            if(in_array(strtoupper($v['coin_type']),$realPayment)){
                                 $money+=$v['pay_amount'];
                             }
                         }
