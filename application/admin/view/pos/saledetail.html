@@ -72,19 +72,19 @@
 				    <hr>
 				    <table border="0" cellpadding="0" cellspacing="0" width="100%">
 				        <tbody><tr>
-				            <td style="width: 65px;">
-				                数量:
-				            </td>
-				            <td align="left" style="width: 100px;">
-				                <label>{$data['saleflow']['length']}</label>
-				            </td>
-				            <td>
-				                合计：
-				            </td>
-				            <td align="right">
-				                <label id="lbSumAmt">{$totalAmt}</label>
-				            </td>
-				        </tr>
+							<td style="width: 65px;">
+								数量:
+							</td>
+							<td align="left" style="width: 100px;">
+								<label>{$data['totalnum']}</label>
+							</td>
+							<td>
+							</td>
+							<td align="right">
+								合计：
+								<label id="lbSumAmt">{$totalAmt}</label>
+							</td>
+						</tr>
 				
 				    </tbody></table>
 				    <table id="tbPay" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -102,9 +102,9 @@
 				    {/php}
 				    {php} if(!empty($data['baseflow']['vip_no'])){ {/php}
 				    <table id="tbVip" border="0" cellpadding="0" cellspacing="0" width="100%">
-		    				<tr><td style='width: 65px;'>会员卡号：</td>
+		    				<tr><td style='width: 80px;'>会员卡号：</td>
                                 <td align='left'>{$data['baseflow']['vip_no']}</td>
-                                <td style='width: 65px;'>本次积分：</td>
+                                <td style='width: 80px;'>本次积分：</td>
 								<td align='left'>{$data['baseflow']['credit']}</td>
 		                     </tr>
 				    </table>

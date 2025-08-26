@@ -224,3 +224,18 @@ ALTER TABLE `ice_portal_ad` ADD `news_id` INT(11) UNSIGNED NULL DEFAULT '0' COMM
 ALTER TABLE `ice_pos_status` CHANGE `hostip` `hostip` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ALTER TABLE `ice_pos_status` CHANGE `hostname` `hostname` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ALTER TABLE `ice_pos_status` CHANGE `hostmac` `hostmac` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+--
+--  2025-05-16
+--
+ALTER TABLE `ice_pos_branch_info` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增ID';
+
+--
+--  2025-05-21
+--
+ALTER TABLE `ice_pos_saleflow` ADD `vip_discount` DECIMAL(10,2) UNSIGNED NULL DEFAULT '100' COMMENT '会员折扣' AFTER `plan_no`;
+
+--
+--  2025-08-26
+--
+ALTER TABLE `ice_pos_operator` CHANGE `branch_no` `branch_no` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;

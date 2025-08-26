@@ -7005,7 +7005,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_operator` (
   `oper_type` char(4) DEFAULT NULL COMMENT '用户角色，1用户',
   `last_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `output_rate` double DEFAULT NULL,
-  `branch_no` char(6) DEFAULT NULL,
+  `branch_no` varchar(32) DEFAULT NULL,
   `data_grant` char(1) DEFAULT NULL,
   `confirm_pw` varchar(30) DEFAULT NULL,
   `save_discount` double DEFAULT NULL,
@@ -7215,6 +7215,7 @@ CREATE TABLE IF NOT EXISTS `ice_pos_saleflow` (
   `pos_id` varchar(32) DEFAULT NULL,
   `com_flag` char(1) DEFAULT NULL,
   `plan_no` varchar(30) DEFAULT NULL,
+  `vip_discount` decimal(10,2) UNSIGNED DEFAULT '100.00' COMMENT '会员折扣',
   `over_flag` char(1) DEFAULT '0',
   PRIMARY KEY (`id`,`flow_id`,`flow_no`),
   KEY `item_no` (`item_no`)

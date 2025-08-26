@@ -578,6 +578,10 @@ class Index extends Super {
 		$result = array ();
 		$result ["saleflow"] = $saleflow;
 		$result ["payflow"] = $payflow;
+        $totalNum=0;
+        foreach($saleflow as $value){
+            $totalNum+=floatval($value['sale_qnty']);
+        }
         if(!empty($baseflow['vip_no'])){
             //查询会员积分
             $im=new IntegralMember();
@@ -587,6 +591,7 @@ class Index extends Super {
             }
         }
         $result ["baseflow"] = $baseflow;
+        $result ["totalnum"] = $totalNum;
 		return $result; 
     }
 
