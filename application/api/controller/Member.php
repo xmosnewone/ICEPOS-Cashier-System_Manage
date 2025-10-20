@@ -15,7 +15,10 @@ use model\PosPayFlow;
  * @author xmos
  */
 class Member extends Super {
-
+    
+    public function index(){
+        return 'success';
+    }
     //门店退货，返还积分和余额
     public function usescore(){
         $res = $this->ApiConnect ( $_POST );
