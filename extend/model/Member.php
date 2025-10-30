@@ -110,7 +110,7 @@ class Member extends BaseModel{
     private function formatMember($meminfo){
         $data=[];
         foreach($this->formater as $key=>$field){
-            if(isset($meminfo[$field])&&!empty($meminfo[$field])){
+            if(isset($meminfo[$field])){
                 $data[$key]=trim($meminfo[$field]);
             }
         }
