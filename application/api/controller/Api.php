@@ -1563,7 +1563,7 @@ class Api extends Super {
 
         $flowno = input ( "flow_no" ); // 订单号
         $payAmount = input ( "pay_amount" ); // 订单金额
-        $authCode = input ( "auth_code" ); // 18位数字授权码
+        $authCodeIn = input ( "auth_code" ); // 18位数字授权码
         $branchno = input ( "branch_no" ); // 商店号
         $payAmount = floatval ( $payAmount ); // 订单总金额。单位为元
 
@@ -1604,7 +1604,7 @@ class Api extends Super {
         $totalAmount = $payAmount;//单位是(元)
 
         // (必填) 付款条码
-        $authCode = $authCode; // 28开头18位数字
+        $authCode = $authCodeIn; // 28开头18位数字
 
         // (可选,根据需要使用) 订单可打折金额
         // 如果该值未传入,但传入了【订单总金额】,【不可打折金额】 则该值默认为【订单总金额】- 【不可打折金额】
@@ -1683,7 +1683,7 @@ class Api extends Super {
                 // 添加收银支付流水信息
                 //支付宝交易号 trade_no
                 $trade_no=isset($response->trade_no)?$response->trade_no:'';
-                $PosPay->UpdatewxPosPay ( $outTradeNo, $trade_no); // 更新支付信息
+                $PosPay->UpdateZfbPosPay ( $outTradeNo, $trade_no); // 更新支付信息
                 return "1";
 
             case "FAILED" :
